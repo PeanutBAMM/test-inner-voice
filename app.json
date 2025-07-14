@@ -1,29 +1,71 @@
 {
   "expo": {
     "name": "TestInnerVoiceTemplateFixed",
-    "slug": "TestInnerVoiceTemplateFixed",
+    "slug": "testinnervoicetemplatefixed",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "newArchEnabled": true,
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.apex.testinnervoicetemplatefixed",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Deze app heeft toegang tot de microfoon nodig voor spraakherkenning en voice chat functionaliteiten.",
+        "NSSpeechRecognitionUsageDescription": "Deze app gebruikt spraakherkenning om je gesproken tekst te transcriberen.",
+        "NSFaceIDUsageDescription": "Deze app gebruikt Face ID/Touch ID voor veilige authenticatie.",
+        "NSCameraUsageDescription": "Deze app heeft toegang tot de camera nodig voor foto's en video's in je gesprekken."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "package": "com.apex.testinnervoicetemplatefixed",
+      "versionCode": 1,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Deze app heeft toegang tot de microfoon nodig voor spraakherkenning en voice chat functionaliteiten."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Deze app gebruikt Face ID/Touch ID voor veilige authenticatie."
+        }
+      ]
+    ],
+    "scheme": "testinnervoicetemplatefixed",
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-here"
+      }
     }
   }
 }

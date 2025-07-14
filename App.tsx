@@ -1,20 +1,35 @@
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import RootNavigator from '@/navigation/RootNavigator';
+import useCachedResources from '@/hooks/useCachedResources';
+import useAuthStore from '@/store/useAuthStore';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
-export default function App() {
+function App() {
+  const isLoadingComplete = useCachedResources();
+  const { isAuthenticated, isLoading } = useAuthStore();
+
+  if (!isLoadingComplete || isLoading) {
+    return null; // Or a splash screen component
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <RootNavigator />
+        <StatusBar style="auto" />
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+// Wrap the entire app in an error boundary
+export default function AppWithErrorBoundary() {
+  return (
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  );
+}

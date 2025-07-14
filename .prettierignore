@@ -1,0 +1,12 @@
+node_modules/
+.expo/
+dist/
+build/
+coverage/
+android/
+ios/
+*.lock
+*.log
+.git/
+.idea/
+.vscode/
