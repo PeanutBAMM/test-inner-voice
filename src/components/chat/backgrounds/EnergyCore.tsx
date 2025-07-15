@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -29,6 +29,23 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedG = Animated.createAnimatedComponent(G);
+
+// Animated Star component om hooks probleem op te lossen
+const AnimatedStar = ({ star, opacityValue }: { star: any; opacityValue: Animated.SharedValue<number> }) => {
+  const animatedProps = useAnimatedProps(() => ({
+    opacity: star.opacity * opacityValue.value,
+  }));
+  
+  return (
+    <AnimatedCircle
+      cx={star.x}
+      cy={star.y}
+      r={star.r}
+      fill="#FFFFFF"
+      animatedProps={animatedProps}
+    />
+  );
+};
 
 interface EnergyCoreProps {
   intensity?: number;
@@ -70,7 +87,7 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
       ],
       glow: '#FF69B4',
       ring: '#00FFFF',
-      lightning: '#FFFFFF',
+      lightning: '#87CEEB',
     },
     contemplative: {
       stops: [
@@ -85,7 +102,7 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
       ],
       glow: '#DDA0DD',
       ring: '#9400D3',
-      lightning: '#E6E6FA',
+      lightning: '#B0C4DE',
     },
     joyful: {
       stops: [
@@ -100,7 +117,7 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
       ],
       glow: '#FFB6C1',
       ring: '#FF6347',
-      lightning: '#FFD700',
+      lightning: '#87CEEB',
     },
     grounded: {
       stops: [
@@ -113,7 +130,7 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
       ],
       glow: '#BC8F8F',
       ring: '#8B7355',
-      lightning: '#DEB887',
+      lightning: '#B0C4DE',
     },
     neutral: {
       stops: [
@@ -125,7 +142,7 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
       ],
       glow: '#C0C0C0',
       ring: '#A9A9A9',
-      lightning: '#F5F5F5',
+      lightning: '#87CEEB',
     },
   };
 
@@ -239,24 +256,27 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
 
   // Generate realistic lightning paths from core
   const generateLightningPath = (angle: number, startRadius: number, endRadius: number): string => {
-    const startX = 112.5 + Math.cos(angle) * startRadius;
-    const startY = 112.5 + Math.sin(angle) * startRadius;
-    const endX = 112.5 + Math.cos(angle) * endRadius;
-    const endY = 112.5 + Math.sin(angle) * endRadius;
+    const centerX = 150; // New center for 300x300 viewBox
+    const centerY = 150;
+    const startX = centerX + Math.cos(angle) * startRadius;
+    const startY = centerY + Math.sin(angle) * startRadius;
+    const endX = centerX + Math.cos(angle) * endRadius;
+    const endY = centerY + Math.sin(angle) * endRadius;
     
     let path = `M${startX},${startY}`;
     let currentX = startX;
     let currentY = startY;
-    const steps = 5 + Math.floor(Math.random() * 5);
+    const steps = 10 + Math.floor(Math.random() * 10); // 10-20 steps voor natuurlijkere bliksem
     
     for (let i = 0; i < steps; i++) {
       const progress = (i + 1) / steps;
       const targetX = startX + (endX - startX) * progress;
       const targetY = startY + (endY - startY) * progress;
       
-      // Add randomness for zigzag effect
-      currentX = targetX + (Math.random() - 0.5) * 15;
-      currentY = targetY + (Math.random() - 0.5) * 15;
+      // Add randomness for zigzag effect - meer variatie
+      const offset = 25 - (progress * 15); // Groter aan begin, kleiner aan eind
+      currentX = targetX + (Math.random() - 0.5) * offset;
+      currentY = targetY + (Math.random() - 0.5) * offset;
       
       path += ` L${currentX},${currentY}`;
     }
@@ -266,29 +286,148 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
 
   // Generate main lightning paths (slower rotation)
   const mainLightningPaths = [];
-  const numMainPaths = 8;
+  const numMainPaths = 25;
   
   for (let i = 0; i < numMainPaths; i++) {
     const angle = (i / numMainPaths) * Math.PI * 2;
     mainLightningPaths.push({
-      path: generateLightningPath(angle, 15, 105), // From core to edge
+      path: generateLightningPath(angle, 4 + Math.random() * 3, 100), // From TRUE core to edge
       opacity: 0.8 + Math.random() * 0.2,
-      width: 2 + Math.random() * 1,
+      width: 0.5 + Math.random() * 0.3,
     });
   }
 
   // Generate secondary lightning paths (faster rotation)
   const secondaryLightningPaths = [];
-  const numSecondaryPaths = 15;
+  const numSecondaryPaths = 40;
   
   for (let i = 0; i < numSecondaryPaths; i++) {
     const angle = (i / numSecondaryPaths) * Math.PI * 2;
     secondaryLightningPaths.push({
-      path: generateLightningPath(angle, 20, 100), // Slightly different range
+      path: generateLightningPath(angle, 6 + Math.random() * 5, 96), // From core area
       opacity: 0.3 + Math.random() * 0.3,
-      width: 0.5 + Math.random() * 1,
+      width: 0.2 + Math.random() * 0.2,
     });
   }
+  
+  // Generate micro lightning paths (zeer dunne details)
+  const microLightningPaths = [];
+  const numMicroPaths = 100;
+  
+  for (let i = 0; i < numMicroPaths; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const startR = 10 + Math.random() * 30;
+    const endR = startR + 20 + Math.random() * 40;
+    microLightningPaths.push({
+      path: generateLightningPath(angle, startR, Math.min(endR, 95)),
+      opacity: 0.1 + Math.random() * 0.2,
+      width: 0.1 + Math.random() * 0.1,
+    });
+  }
+
+  // Generate plasma web connections
+  const generatePlasmaWeb = () => {
+    const web = [];
+    const numPoints = 50; // Increased for more connections
+    const points = [];
+    
+    // Generate random points within sphere
+    for (let i = 0; i < numPoints; i++) {
+      const r = Math.random() * 90 + 11; // Random radius (75% of previous values)
+      const theta = Math.random() * Math.PI * 2;
+      points.push({
+        x: 150 + r * Math.cos(theta),
+        y: 150 + r * Math.sin(theta),
+      });
+    }
+    
+    // Connect nearby points
+    for (let i = 0; i < points.length; i++) {
+      for (let j = i + 1; j < points.length; j++) {
+        const dx = points[i].x - points[j].x;
+        const dy = points[i].y - points[j].y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Only connect points that are relatively close
+        if (distance < 60 && distance > 10) { // Increased range for more connections
+          // Create curved connection path
+          const midX = (points[i].x + points[j].x) / 2 + (Math.random() - 0.5) * 10;
+          const midY = (points[i].y + points[j].y) / 2 + (Math.random() - 0.5) * 10;
+          
+          web.push({
+            path: `M${points[i].x},${points[i].y} Q${midX},${midY} ${points[j].x},${points[j].y}`,
+            opacity: 0.1 + Math.random() * 0.2,
+            width: 0.3 + Math.random() * 0.5,
+          });
+        }
+      }
+    }
+    
+    return web;
+  };
+  
+  const plasmaWeb = generatePlasmaWeb();
+
+  // Generate starfield particles
+  const generateStarfield = () => {
+    const stars = [];
+    const numStars = 500; // Verhoogd naar 500+
+    
+    for (let i = 0; i < numStars; i++) {
+      const r = Math.random() * 100 + 5; // Random radius within sphere
+      const theta = Math.random() * Math.PI * 2;
+      const opacity = 0.1 + Math.random() * 0.5;
+      const size = 0.3 + Math.random() * 1.5;
+      
+      // Twinkle animation parameters
+      const twinkleDelay = Math.random() * 3000;
+      const twinkleDuration = 1000 + Math.random() * 2000;
+      
+      stars.push({
+        x: 150 + r * Math.cos(theta),
+        y: 150 + r * Math.sin(theta),
+        r: size,
+        opacity: opacity,
+        twinkleDelay: twinkleDelay,
+        twinkleDuration: twinkleDuration,
+      });
+    }
+    
+    return stars;
+  };
+  
+  const starfield = generateStarfield();
+  
+  // Star twinkle animations - maak 500 shared values
+  const starOpacity1 = useSharedValue(1);
+  const starOpacity2 = useSharedValue(1);
+  const starOpacity3 = useSharedValue(1);
+  const starOpacity4 = useSharedValue(1);
+  const starOpacity5 = useSharedValue(1);
+  
+  // Voor simplicity gebruik ik maar 5 animated stars, de rest static
+  const animatedStarIndices = [0, 100, 200, 300, 400];
+  const starOpacities = [starOpacity1, starOpacity2, starOpacity3, starOpacity4, starOpacity5];
+  
+  // Setup twinkle animations voor de 5 animated stars
+  useEffect(() => {
+    animatedStarIndices.forEach((starIndex, i) => {
+      const star = starfield[starIndex];
+      if (star) {
+        starOpacities[i].value = withDelay(
+          star.twinkleDelay,
+          withRepeat(
+            withSequence(
+              withTiming(0.3, { duration: star.twinkleDuration / 2 }),
+              withTiming(1, { duration: star.twinkleDuration / 2 })
+            ),
+            -1,
+            false
+          )
+        );
+      }
+    });
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -306,25 +445,63 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
         ]} 
       />
       
+      {/* Echte blur/glow effects met React Native shadow */}
+      <View 
+        style={{
+          position: 'absolute',
+          width: 200,
+          height: 200,
+          borderRadius: 100,
+          backgroundColor: 'transparent',
+          shadowColor: colors.glow,
+          shadowOffset: { width: 0, height: 0 },
+          shadowRadius: 50,
+          shadowOpacity: 0.6,
+          elevation: 30,
+        }}
+      />
+      <View 
+        style={{
+          position: 'absolute',
+          width: 150,
+          height: 150,
+          borderRadius: 75,
+          left: 25,
+          top: 25,
+          backgroundColor: 'transparent',
+          shadowColor: '#FFFFFF',
+          shadowOffset: { width: 0, height: 0 },
+          shadowRadius: 40,
+          shadowOpacity: 0.4,
+          elevation: 25,
+        }}
+      />
+      <View 
+        style={{
+          position: 'absolute',
+          width: 100,
+          height: 100,
+          borderRadius: 50,
+          left: 50,
+          top: 50,
+          backgroundColor: 'transparent',
+          shadowColor: colors.ring,
+          shadowOffset: { width: 0, height: 0 },
+          shadowRadius: 30,
+          shadowOpacity: 0.8,
+          elevation: 20,
+        }}
+      />
+      
       {/* Main plasma sphere */}
       <AnimatedSvg
-        width={225}
-        height={225}
+        width={300}
+        height={300}
+        viewBox="0 0 300 300"
         style={[styles.sphere, sphereStyle]}
       >
         <Defs>
           {/* Complex gradient for plasma effect with animated stops */}
-          <RadialGradient id="plasmaGradient" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%" stopColor={colors.stops[0].color} stopOpacity={colors.stops[0].opacity} />
-            <Stop offset="10%" stopColor={colors.stops[1].color} stopOpacity={colors.stops[1].opacity} />
-            <Stop offset="20%" stopColor={colors.stops[2].color} stopOpacity={colors.stops[2].opacity} />
-            <Stop offset="35%" stopColor={colors.stops[3].color} stopOpacity={colors.stops[3].opacity} />
-            <Stop offset="50%" stopColor={colors.stops[4].color} stopOpacity={colors.stops[4].opacity} />
-            <Stop offset="65%" stopColor={colors.stops[5].color} stopOpacity={colors.stops[5].opacity} />
-            <Stop offset="80%" stopColor={colors.stops[6].color} stopOpacity={colors.stops[6].opacity} />
-            <Stop offset="95%" stopColor={colors.stops[7].color} stopOpacity={colors.stops[7].opacity} />
-            <Stop offset="100%" stopColor={colors.stops[8].color} stopOpacity={colors.stops[8].opacity} />
-          </RadialGradient>
 
           {/* Inner glow gradient */}
           <RadialGradient id="innerGlow" cx="50%" cy="50%" r="30%">
@@ -341,24 +518,89 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
           </RadialGradient>
         </Defs>
 
-        {/* Main sphere with gradient */}
+        {/* Dark base sphere with extra depth layers */}
         <Circle
-          cx={112.5}
-          cy={112.5}
+          cx={150}
+          cy={150}
           r={105}
-          fill="url(#plasmaGradient)"
+          fill="#0A0020"
+          opacity={1}
         />
+        
+        {/* Background glow layers for more body */}
+        <Circle
+          cx={150}
+          cy={150}
+          r={101}
+          fill="#1A0030"
+          opacity={0.5}
+        />
+        <Circle
+          cx={150}
+          cy={150}
+          r={98}
+          fill="#2A0040"
+          opacity={0.4}
+        />
+        <Circle
+          cx={150}
+          cy={150}
+          r={94}
+          fill="#3A0050"
+          opacity={0.3}
+        />
+
+        {/* Starfield particles - sterrenstelsel effect */}
+        <G opacity={0.8}>
+          {starfield.map((star, index) => {
+            const animatedIndex = animatedStarIndices.indexOf(index);
+            if (animatedIndex !== -1) {
+              // Animated star
+              return (
+                <AnimatedStar
+                  key={`star-${index}`}
+                  star={star}
+                  opacityValue={starOpacities[animatedIndex]}
+                />
+              );
+            } else {
+              // Static star
+              return (
+                <Circle
+                  key={`star-${index}`}
+                  cx={star.x}
+                  cy={star.y}
+                  r={star.r}
+                  fill="#FFFFFF"
+                  opacity={star.opacity}
+                />
+              );
+            }
+          })}
+        </G>
+
+        {/* Plasma web structure */}
+        <G opacity={0.4}>
+          {plasmaWeb.map((connection, index) => (
+            <Path
+              key={`web-${index}`}
+              d={connection.path}
+              stroke="#E0D0FF"
+              strokeWidth={connection.width}
+              fill="none"
+              opacity={connection.opacity}
+            />
+          ))}
+        </G>
 
         {/* Main lightning energy paths - slow rotation */}
         <AnimatedG 
           animatedProps={useAnimatedProps(() => ({
             opacity: 1,
-            transform: [{
-              rotate: `${mainRotation.value}deg`
-            }]
+            transform: [{ rotate: `${mainRotation.value}deg` }]
           }))}
-          originX={112.5}
-          originY={112.5}
+          originX={150}
+          originY={150}
         >
           {mainLightningPaths.map((lightning, index) => (
             <Path
@@ -377,12 +619,10 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
         <AnimatedG 
           animatedProps={useAnimatedProps(() => ({
             opacity: 1,
-            transform: [{
-              rotate: `${secondaryRotation.value}deg`
-            }]
+            transform: [{ rotate: `${secondaryRotation.value}deg` }]
           }))}
-          originX={112.5}
-          originY={112.5}
+          originX={150}
+          originY={150}
         >
           {secondaryLightningPaths.map((lightning, index) => (
             <Path
@@ -396,60 +636,64 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
             />
           ))}
         </AnimatedG>
-
-        {/* Wolkachtige plasma kern structuur */}
-        <G opacity={0.4}>
-          {/* Organische plasma wolken */}
-          <Circle cx={100} cy={100} r={35} fill="#FFB6E1" opacity={0.5} />
-          <Circle cx={125} cy={105} r={30} fill="#E088E0" opacity={0.4} />
-          <Circle cx={110} cy={125} r={28} fill="#C77DD8" opacity={0.5} />
-          <Circle cx={115} cy={95} r={32} fill="#FF69B4" opacity={0.3} />
-          <Circle cx={105} cy={115} r={25} fill="#FFB6E1" opacity={0.6} />
+        
+        {/* Micro lightning layer - zeer fijne details */}
+        <G opacity={0.6}>
+          {microLightningPaths.map((lightning, index) => (
+            <Path
+              key={`micro-lightning-${index}`}
+              d={lightning.path}
+              stroke={colors.lightning}
+              strokeWidth={lightning.width}
+              fill="none"
+              opacity={lightning.opacity}
+              strokeLinecap="round"
+            />
+          ))}
         </G>
 
-        {/* Inner bright core with multiple layers for blur effect */}
-        <Circle
-          cx={112.5}
-          cy={112.5}
-          r={35}
-          fill="url(#innerGlow)"
-          opacity={0.4}
-        />
-        <Circle
-          cx={112.5}
-          cy={112.5}
-          r={25}
-          fill="url(#innerGlow)"
-          opacity={0.6}
-        />
-        <Circle
-          cx={112.5}
-          cy={112.5}
-          r={15}
-          fill="#FFFFFF"
-          opacity={0.8}
-        />
-        
-        {/* Intense bright center with glow */}
-        <Circle
-          cx={112.5}
-          cy={112.5}
-          r={10}
-          fill="#FFFFFF"
-          opacity={1}
-        />
-        <Circle
-          cx={112.5}
-          cy={112.5}
-          r={8}
-          fill="#FFFFFF"
-          opacity={1}
-        />
+        {/* Mistige wolkachtige kern structuur - organisch verspreid */}
+        <G opacity={0.6}>
+          {/* Organisch verspreide plasma wolken */}
+          <Circle cx={130} cy={135} r={34} fill="#FFB6E1" opacity={0.15} />
+          <Circle cx={170} cy={140} r={30} fill="#E088E0" opacity={0.12} />
+          <Circle cx={145} cy={170} r={29} fill="#C77DD8" opacity={0.18} />
+          <Circle cx={160} cy={130} r={32} fill="#FF69B4" opacity={0.1} />
+          <Circle cx={140} cy={160} r={26} fill="#FFB6E1" opacity={0.2} />
+          <Circle cx={165} cy={155} r={24} fill="#DDA0DD" opacity={0.15} />
+          <Circle cx={125} cy={150} r={27} fill="#FF69B4" opacity={0.12} />
+          <Circle cx={150} cy={125} r={23} fill="#FFB6E1" opacity={0.18} />
+          <Circle cx={145} cy={175} r={26} fill="#E088E0" opacity={0.13} />
+          <Circle cx={155} cy={145} r={21} fill="#C77DD8" opacity={0.2} />
+          {/* Extra wolken voor meer body */}
+          <Circle cx={120} cy={170} r={30} fill="#DDA0DD" opacity={0.1} />
+          <Circle cx={180} cy={160} r={26} fill="#FFB6E1" opacity={0.12} />
+          <Circle cx={135} cy={120} r={29} fill="#E088E0" opacity={0.15} />
+          {/* Nog meer plasma wolken voor volume */}
+          <Circle cx={110} cy={145} r={32} fill="#FF69B4" opacity={0.08} />
+          <Circle cx={190} cy={135} r={27} fill="#C77DD8" opacity={0.11} />
+          <Circle cx={150} cy={190} r={25} fill="#FFB6E1" opacity={0.14} />
+          <Circle cx={175} cy={115} r={29} fill="#DDA0DD" opacity={0.09} />
+          <Circle cx={125} cy={185} r={28} fill="#E088E0" opacity={0.13} />
+          <Circle cx={165} cy={175} r={26} fill="#FF69B4" opacity={0.1} />
+        </G>
+
+        {/* Kern glow effect - meerdere layers voor intense glow */}
+        <Circle cx={150} cy={150} r={38} fill="#FFFFFF" opacity={0.1} />
+        <Circle cx={150} cy={150} r={30} fill="#FFFFFF" opacity={0.15} />
+        <Circle cx={150} cy={150} r={26} fill="#FFFFFF" opacity={0.2} />
+        <Circle cx={150} cy={150} r={23} fill="#FFE0F5" opacity={0.3} />
+        <Circle cx={150} cy={150} r={19} fill="#FFB6E1" opacity={0.4} />
+        <Circle cx={150} cy={150} r={15} fill="#FF69B4" opacity={0.5} />
+        <Circle cx={150} cy={150} r={11} fill="#FFFFFF" opacity={0.5} />
+        <Circle cx={150} cy={150} r={8} fill="#FFFFFF" opacity={0.7} />
+        <Circle cx={150} cy={150} r={4} fill="#FFFFFF" opacity={0.9} />
+        <Circle cx={150} cy={150} r={2} fill="#FFFFFF" opacity={1} />
 
         {/* Energy discharge ring */}
         <AnimatedCircle
-          cx={112.5}
-          cy={112.5}
+          cx={150}
+          cy={150}
           r={108}
           stroke={colors.ring}
           fill="none"
@@ -463,55 +707,62 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
           }))}
         />
 
-        {/* Corona glow effect - intense blue ring */}
+        {/* Intense diffuse corona - multiple layers */}
         <Circle
-          cx={112.5}
-          cy={112.5}
+          cx={150}
+          cy={150}
           r={105}
-          fill="url(#coronaGlow)"
+          stroke="#00FFFF"
+          strokeWidth={8}
+          fill="none"
           opacity={0.8}
         />
-        
-        {/* Sharp ring glow at edge */}
         <Circle
-          cx={112.5}
-          cy={112.5}
-          r={105}
-          stroke={colors.ring}
-          strokeWidth={3}
+          cx={150}
+          cy={150}
+          r={108}
+          stroke="#00DDFF"
+          strokeWidth={12}
           fill="none"
-          opacity={1}
+          opacity={0.7}
         />
-
-        {/* Secondary glow ring */}
         <Circle
-          cx={112.5}
-          cy={112.5}
-          r={110}
-          stroke="#00FFFF"
-          strokeWidth={2}
+          cx={150}
+          cy={150}
+          r={112}
+          stroke="#0099FF"
+          strokeWidth={16}
           fill="none"
           opacity={0.6}
         />
-        
-        {/* Extra glow layers for blur effect */}
         <Circle
-          cx={112.5}
-          cy={112.5}
-          r={107}
-          stroke={colors.ring}
-          strokeWidth={1}
+          cx={150}
+          cy={150}
+          r={118}
+          stroke="#0066FF"
+          strokeWidth={20}
           fill="none"
-          opacity={0.3}
+          opacity={0.5}
         />
         <Circle
-          cx={112.5}
-          cy={112.5}
-          r={109}
-          stroke={colors.ring}
+          cx={150}
+          cy={150}
+          r={125}
+          stroke="#0044DD"
+          strokeWidth={24}
+          fill="none"
+          opacity={0.4}
+        />
+        
+        {/* Bright edge highlight */}
+        <Circle
+          cx={150}
+          cy={150}
+          r={105}
+          stroke="#FFFFFF"
           strokeWidth={1}
           fill="none"
-          opacity={0.2}
+          opacity={1}
         />
       </AnimatedSvg>
 
@@ -539,8 +790,8 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
           shadowRadius: 30,
           shadowOpacity: 0.9,
           elevation: 25,
-          left: 87.5,
-          top: 87.5,
+          left: 125,
+          top: 125,
         }}
       />
     </View>
@@ -550,10 +801,10 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    left: SCREEN_WIDTH / 2 - 112.5,
-    bottom: SCREEN_HEIGHT * 0.4 - 112.5,
-    width: 225,
-    height: 225,
+    left: SCREEN_WIDTH / 2 - 150,
+    bottom: SCREEN_HEIGHT * 0.4 - 150,
+    width: 300,
+    height: 300,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -562,38 +813,38 @@ const styles = StyleSheet.create({
   },
   vibrationField: {
     position: 'absolute',
-    width: 250,
-    height: 250,
-    borderRadius: 125,
+    width: 350,
+    height: 350,
+    borderRadius: 175,
     backgroundColor: 'transparent',
     shadowColor: '#00DDFF',
     shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 60,
+    shadowRadius: 80,
     shadowOpacity: 0.8,
     elevation: 10,
-    left: -12.5,
-    top: -12.5,
+    left: -25,
+    top: -25,
   },
   glowLayer: {
     position: 'absolute',
-    width: 225,
-    height: 225,
-    borderRadius: 112.5,
+    width: 300,
+    height: 300,
+    borderRadius: 150,
     backgroundColor: 'transparent',
     shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 80,
+    shadowRadius: 100,
     elevation: 20,
   },
   glowLayer2: {
     position: 'absolute',
-    width: 250,
-    height: 250,
-    borderRadius: 125,
+    width: 330,
+    height: 330,
+    borderRadius: 165,
     backgroundColor: 'transparent',
     shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 60,
+    shadowRadius: 70,
     elevation: 15,
-    left: -12.5,
-    top: -12.5,
+    left: -15,
+    top: -15,
   },
 });

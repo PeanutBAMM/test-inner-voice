@@ -131,7 +131,7 @@ const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
 ];
 
 export default function OnboardingChatScreen() {
-  const _navigation = useNavigation();
+  const _navigation = useNavigation<any>();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [messages, setMessages] = useState<any[]>([]);
   const [userProfile, setUserProfile] = useState<any>({});
@@ -293,20 +293,28 @@ export default function OnboardingChatScreen() {
   };
 
   const skipOnboarding = async () => {
-    // Set default values for skipped onboarding
-    const defaultProfile = {
-      userName: 'Gebruiker',
-      preferences: {
-        language: 'nl',
-        notifications: true,
-        voiceEnabled: false,
-      },
-    };
-    
-    // Save profile and mark onboarding as completed
-    await AsyncStorage.setItem('userProfile', JSON.stringify(defaultProfile));
-    await AsyncStorage.setItem('onboardingCompleted', 'true');
-    await AsyncStorage.setItem('triggerReload', Date.now().toString());
+    console.log('Skip button pressed');
+    try {
+      // Set default values for skipped onboarding
+      const defaultProfile = {
+        userName: 'Gebruiker',
+        preferences: {
+          language: 'nl',
+          notifications: true,
+          voiceEnabled: false,
+        },
+      };
+      
+      // Save profile and mark onboarding as completed
+      await AsyncStorage.setItem('userProfile', JSON.stringify(defaultProfile));
+      await AsyncStorage.setItem('onboardingCompleted', 'true');
+      await AsyncStorage.setItem('triggerReload', Date.now().toString());
+      
+      // Navigate to main app
+      _navigation.replace('MainTabs');
+    } catch (error) {
+      console.error('Error skipping onboarding:', error);
+    }
   };
 
   const currentQ = ONBOARDING_QUESTIONS[currentQuestion];
