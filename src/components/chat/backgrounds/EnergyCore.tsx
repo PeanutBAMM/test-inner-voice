@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -28,7 +28,6 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-const AnimatedG = Animated.createAnimatedComponent(G);
 
 // Animated Star component om hooks probleem op te lossen
 const AnimatedStar = ({ star, opacityValue }: { star: any; opacityValue: Animated.SharedValue<number> }) => {
@@ -64,10 +63,6 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
   const glowIntensity = useSharedValue(intensity);
   const energyDischarge = useSharedValue(0);
   
-  
-  // Lightning animation
-  const mainRotation = useSharedValue(0);
-  const secondaryRotation = useSharedValue(0);
 
   // Color palettes - Tesla-style met vrouwelijke touch (lichter)
   const moodColors = {
@@ -171,20 +166,7 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
       false
     );
 
-    // Main lightning rotation - slow
-    mainRotation.value = withRepeat(
-      withTiming(360, { duration: 75000, easing: Easing.linear }),
-      -1,
-      false
-    );
-
-    // Secondary lightning rotation - faster, opposite direction
-    secondaryRotation.value = withRepeat(
-      withTiming(-360, { duration: 50000, easing: Easing.linear }),
-      -1,
-      false
-    );
-  }, [breathingAnim, energyDischarge, mainRotation, secondaryRotation]);
+  }, [breathingAnim, energyDischarge]);
 
   // Handle pulse animation
   useEffect(() => {
@@ -217,25 +199,6 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
     };
   });
 
-  // Animated style for outer glow
-  const glowStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      glowIntensity.value,
-      [0, 1],
-      [0.3, 0.8]
-    );
-
-    const dischargeOpacity = interpolate(
-      energyDischarge.value,
-      [0, 1],
-      [opacity, 1]
-    );
-
-    return {
-      shadowOpacity: dischargeOpacity,
-      shadowRadius: interpolate(energyDischarge.value, [0, 1], [80, 120]),
-    };
-  });
 
 
   // Plasma texture pulse animation - global for all circles
@@ -284,32 +247,6 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
     return path;
   };
 
-  // Generate main lightning paths (slower rotation)
-  const mainLightningPaths = [];
-  const numMainPaths = 25;
-  
-  for (let i = 0; i < numMainPaths; i++) {
-    const angle = (i / numMainPaths) * Math.PI * 2;
-    mainLightningPaths.push({
-      path: generateLightningPath(angle, 4 + Math.random() * 3, 100), // From TRUE core to edge
-      opacity: 0.8 + Math.random() * 0.2,
-      width: 0.5 + Math.random() * 0.3,
-    });
-  }
-
-  // Generate secondary lightning paths (faster rotation)
-  const secondaryLightningPaths = [];
-  const numSecondaryPaths = 40;
-  
-  for (let i = 0; i < numSecondaryPaths; i++) {
-    const angle = (i / numSecondaryPaths) * Math.PI * 2;
-    secondaryLightningPaths.push({
-      path: generateLightningPath(angle, 6 + Math.random() * 5, 96), // From core area
-      opacity: 0.3 + Math.random() * 0.3,
-      width: 0.2 + Math.random() * 0.2,
-    });
-  }
-  
   // Generate micro lightning paths (zeer dunne details)
   const microLightningPaths = [];
   const numMicroPaths = 100;
@@ -431,68 +368,6 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* Outer vibration field */}
-      <Animated.View style={[styles.vibrationField, glowStyle]} />
-      
-      {/* Additional glow layers for depth */}
-      <Animated.View 
-        style={[
-          styles.glowLayer2,
-          {
-            shadowColor: colors.glow,
-            shadowOpacity: 0.4,
-          }
-        ]} 
-      />
-      
-      {/* Echte blur/glow effects met React Native shadow */}
-      <View 
-        style={{
-          position: 'absolute',
-          width: 200,
-          height: 200,
-          borderRadius: 100,
-          backgroundColor: 'transparent',
-          shadowColor: colors.glow,
-          shadowOffset: { width: 0, height: 0 },
-          shadowRadius: 50,
-          shadowOpacity: 0.6,
-          elevation: 30,
-        }}
-      />
-      <View 
-        style={{
-          position: 'absolute',
-          width: 150,
-          height: 150,
-          borderRadius: 75,
-          left: 25,
-          top: 25,
-          backgroundColor: 'transparent',
-          shadowColor: '#FFFFFF',
-          shadowOffset: { width: 0, height: 0 },
-          shadowRadius: 40,
-          shadowOpacity: 0.4,
-          elevation: 25,
-        }}
-      />
-      <View 
-        style={{
-          position: 'absolute',
-          width: 100,
-          height: 100,
-          borderRadius: 50,
-          left: 50,
-          top: 50,
-          backgroundColor: 'transparent',
-          shadowColor: colors.ring,
-          shadowOffset: { width: 0, height: 0 },
-          shadowRadius: 30,
-          shadowOpacity: 0.8,
-          elevation: 20,
-        }}
-      />
-      
       {/* Main plasma sphere */}
       <AnimatedSvg
         width={300}
@@ -501,20 +376,52 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
         style={[styles.sphere, sphereStyle]}
       >
         <Defs>
-          {/* Complex gradient for plasma effect with animated stops */}
-
-          {/* Inner glow gradient */}
-          <RadialGradient id="innerGlow" cx="50%" cy="50%" r="30%">
+          {/* Kern blur gradient - simuleert echte blur */}
+          <RadialGradient id="kernBlur" cx="50%" cy="50%" r="50%">
             <Stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
-            <Stop offset="50%" stopColor={colors.glow} stopOpacity="0.8" />
-            <Stop offset="100%" stopColor={colors.glow} stopOpacity="0" />
+            <Stop offset="10%" stopColor="#FFFFFF" stopOpacity="0.9" />
+            <Stop offset="20%" stopColor="#FFFFFF" stopOpacity="0.7" />
+            <Stop offset="30%" stopColor="#FFE0F5" stopOpacity="0.5" />
+            <Stop offset="40%" stopColor="#FFB6E1" stopOpacity="0.4" />
+            <Stop offset="50%" stopColor="#FF69B4" stopOpacity="0.3" />
+            <Stop offset="70%" stopColor="#FF69B4" stopOpacity="0.1" />
+            <Stop offset="100%" stopColor="#FF69B4" stopOpacity="0" />
           </RadialGradient>
           
-          {/* Corona glow gradient */}
-          <RadialGradient id="coronaGlow" cx="50%" cy="50%" r="50%">
+          {/* Corona blur gradient - zachte blauwe rand */}
+          <RadialGradient id="coronaBlur" cx="50%" cy="50%" r="50%">
+            <Stop offset="0%" stopColor="transparent" stopOpacity="0" />
             <Stop offset="70%" stopColor="transparent" stopOpacity="0" />
-            <Stop offset="90%" stopColor="#00DDFF" stopOpacity="0.5" />
-            <Stop offset="100%" stopColor="#00FFFF" stopOpacity="1" />
+            <Stop offset="80%" stopColor="#00FFFF" stopOpacity="0.2" />
+            <Stop offset="85%" stopColor="#00FFFF" stopOpacity="0.5" />
+            <Stop offset="90%" stopColor="#00FFFF" stopOpacity="0.8" />
+            <Stop offset="95%" stopColor="#00DDFF" stopOpacity="0.9" />
+            <Stop offset="100%" stopColor="#0099FF" stopOpacity="0.3" />
+          </RadialGradient>
+          
+          {/* Extra glow gradients voor intense outer ring */}
+          <RadialGradient id="outerGlow1" cx="50%" cy="50%" r="50%">
+            <Stop offset="0%" stopColor="transparent" stopOpacity="0" />
+            <Stop offset="85%" stopColor="transparent" stopOpacity="0" />
+            <Stop offset="92%" stopColor="#00FFFF" stopOpacity="0.6" />
+            <Stop offset="96%" stopColor="#00DDFF" stopOpacity="0.8" />
+            <Stop offset="100%" stopColor="#0099FF" stopOpacity="0.4" />
+          </RadialGradient>
+          
+          <RadialGradient id="outerGlow2" cx="50%" cy="50%" r="50%">
+            <Stop offset="0%" stopColor="transparent" stopOpacity="0" />
+            <Stop offset="88%" stopColor="transparent" stopOpacity="0" />
+            <Stop offset="94%" stopColor="#00CCFF" stopOpacity="0.7" />
+            <Stop offset="97%" stopColor="#00AAFF" stopOpacity="0.5" />
+            <Stop offset="100%" stopColor="#0088FF" stopOpacity="0.2" />
+          </RadialGradient>
+          
+          <RadialGradient id="outerGlow3" cx="50%" cy="50%" r="50%">
+            <Stop offset="0%" stopColor="transparent" stopOpacity="0" />
+            <Stop offset="82%" stopColor="transparent" stopOpacity="0" />
+            <Stop offset="90%" stopColor="#00EEFF" stopOpacity="0.5" />
+            <Stop offset="95%" stopColor="#00BBFF" stopOpacity="0.6" />
+            <Stop offset="100%" stopColor="#0077FF" stopOpacity="0.3" />
           </RadialGradient>
         </Defs>
 
@@ -593,50 +500,6 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
           ))}
         </G>
 
-        {/* Main lightning energy paths - slow rotation */}
-        <AnimatedG 
-          animatedProps={useAnimatedProps(() => ({
-            opacity: 1,
-            transform: [{ rotate: `${mainRotation.value}deg` }]
-          }))}
-          originX={150}
-          originY={150}
-        >
-          {mainLightningPaths.map((lightning, index) => (
-            <Path
-              key={`main-lightning-${index}`}
-              d={lightning.path}
-              stroke={colors.lightning}
-              strokeWidth={lightning.width}
-              fill="none"
-              opacity={lightning.opacity}
-              strokeLinecap="round"
-            />
-          ))}
-        </AnimatedG>
-
-        {/* Secondary lightning energy paths - faster counter-rotation */}
-        <AnimatedG 
-          animatedProps={useAnimatedProps(() => ({
-            opacity: 1,
-            transform: [{ rotate: `${secondaryRotation.value}deg` }]
-          }))}
-          originX={150}
-          originY={150}
-        >
-          {secondaryLightningPaths.map((lightning, index) => (
-            <Path
-              key={`secondary-lightning-${index}`}
-              d={lightning.path}
-              stroke={colors.lightning}
-              strokeWidth={lightning.width}
-              fill="none"
-              opacity={lightning.opacity}
-              strokeLinecap="round"
-            />
-          ))}
-        </AnimatedG>
-        
         {/* Micro lightning layer - zeer fijne details */}
         <G opacity={0.6}>
           {microLightningPaths.map((lightning, index) => (
@@ -678,17 +541,9 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
           <Circle cx={165} cy={175} r={26} fill="#FF69B4" opacity={0.1} />
         </G>
 
-        {/* Kern glow effect - meerdere layers voor intense glow */}
-        <Circle cx={150} cy={150} r={38} fill="#FFFFFF" opacity={0.1} />
-        <Circle cx={150} cy={150} r={30} fill="#FFFFFF" opacity={0.15} />
-        <Circle cx={150} cy={150} r={26} fill="#FFFFFF" opacity={0.2} />
-        <Circle cx={150} cy={150} r={23} fill="#FFE0F5" opacity={0.3} />
-        <Circle cx={150} cy={150} r={19} fill="#FFB6E1" opacity={0.4} />
-        <Circle cx={150} cy={150} r={15} fill="#FF69B4" opacity={0.5} />
-        <Circle cx={150} cy={150} r={11} fill="#FFFFFF" opacity={0.5} />
-        <Circle cx={150} cy={150} r={8} fill="#FFFFFF" opacity={0.7} />
-        <Circle cx={150} cy={150} r={4} fill="#FFFFFF" opacity={0.9} />
-        <Circle cx={150} cy={150} r={2} fill="#FFFFFF" opacity={1} />
+        {/* Kern met blur effect - 1 circle met gradient */}
+        <Circle cx={150} cy={150} r={50} fill="url(#kernBlur)" />
+        <Circle cx={150} cy={150} r={3} fill="#FFFFFF" opacity={1} />
 
         {/* Energy discharge ring */}
         <AnimatedCircle
@@ -707,93 +562,28 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
           }))}
         />
 
-        {/* Intense diffuse corona - multiple layers */}
-        <Circle
-          cx={150}
-          cy={150}
-          r={105}
-          stroke="#00FFFF"
-          strokeWidth={8}
-          fill="none"
-          opacity={0.8}
-        />
-        <Circle
-          cx={150}
-          cy={150}
-          r={108}
-          stroke="#00DDFF"
-          strokeWidth={12}
-          fill="none"
-          opacity={0.7}
-        />
-        <Circle
-          cx={150}
-          cy={150}
-          r={112}
-          stroke="#0099FF"
-          strokeWidth={16}
-          fill="none"
-          opacity={0.6}
-        />
-        <Circle
-          cx={150}
-          cy={150}
-          r={118}
-          stroke="#0066FF"
-          strokeWidth={20}
-          fill="none"
-          opacity={0.5}
-        />
-        <Circle
-          cx={150}
-          cy={150}
-          r={125}
-          stroke="#0044DD"
-          strokeWidth={24}
-          fill="none"
-          opacity={0.4}
-        />
-        
-        {/* Bright edge highlight */}
-        <Circle
-          cx={150}
-          cy={150}
-          r={105}
-          stroke="#FFFFFF"
-          strokeWidth={1}
-          fill="none"
-          opacity={1}
-        />
+        {/* Corona met intense glow/blur - meerdere overlappende circles */}
+        <G>
+          {/* Basis corona ring */}
+          <Circle cx={150} cy={150} r={105} fill="url(#coronaBlur)" opacity={1} />
+          
+          {/* Extra glow layers - allemaal op r=105 */}
+          <Circle cx={150} cy={150} r={105} fill="url(#outerGlow1)" opacity={0.8} />
+          <Circle cx={150} cy={150} r={105} fill="url(#outerGlow2)" opacity={0.6} />
+          <Circle cx={150} cy={150} r={105} fill="url(#outerGlow3)" opacity={0.7} />
+          
+          {/* Extra blur circles voor meer intensiteit */}
+          <Circle cx={150} cy={150} r={105} fill="#00FFFF" opacity={0.15} />
+          <Circle cx={150} cy={150} r={105} fill="#00DDFF" opacity={0.12} />
+          <Circle cx={150} cy={150} r={105} fill="#00BBFF" opacity={0.10} />
+          <Circle cx={150} cy={150} r={105} fill="#0099FF" opacity={0.08} />
+          
+          {/* Bright edge highlight - nu met meer glow */}
+          <Circle cx={150} cy={150} r={105} stroke="#00FFFF" strokeWidth={3} fill="none" opacity={0.9} />
+          <Circle cx={150} cy={150} r={105} stroke="#00EEFF" strokeWidth={2} fill="none" opacity={0.6} />
+          <Circle cx={150} cy={150} r={105} stroke="#FFFFFF" strokeWidth={1} fill="none" opacity={0.4} />
+        </G>
       </AnimatedSvg>
-
-      {/* Additional glow layer */}
-      <Animated.View 
-        style={[
-          styles.glowLayer,
-          {
-            shadowColor: colors.glow,
-          },
-          glowStyle
-        ]} 
-      />
-      
-      {/* Extra glow for intense white core */}
-      <View 
-        style={{
-          position: 'absolute',
-          width: 50,
-          height: 50,
-          borderRadius: 25,
-          backgroundColor: 'transparent',
-          shadowColor: '#FFFFFF',
-          shadowOffset: { width: 0, height: 0 },
-          shadowRadius: 30,
-          shadowOpacity: 0.9,
-          elevation: 25,
-          left: 125,
-          top: 125,
-        }}
-      />
     </View>
   );
 };
@@ -810,41 +600,5 @@ const styles = StyleSheet.create({
   },
   sphere: {
     zIndex: 2,
-  },
-  vibrationField: {
-    position: 'absolute',
-    width: 350,
-    height: 350,
-    borderRadius: 175,
-    backgroundColor: 'transparent',
-    shadowColor: '#00DDFF',
-    shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 80,
-    shadowOpacity: 0.8,
-    elevation: 10,
-    left: -25,
-    top: -25,
-  },
-  glowLayer: {
-    position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: 'transparent',
-    shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 100,
-    elevation: 20,
-  },
-  glowLayer2: {
-    position: 'absolute',
-    width: 330,
-    height: 330,
-    borderRadius: 165,
-    backgroundColor: 'transparent',
-    shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 70,
-    elevation: 15,
-    left: -15,
-    top: -15,
   },
 });
