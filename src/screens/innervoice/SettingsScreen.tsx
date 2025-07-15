@@ -16,6 +16,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
 import useUserStore from '../../store/innervoice/useUserStore';
 import useSubscriptionStore from '../../store/innervoice/useSubscriptionStore';
+import useAppStore from '../../store/useAppStore';
+import { theme, getThemeColors } from '../../constants/theme';
 
 interface SettingItem {
   id: string;
@@ -31,6 +33,7 @@ export default function SettingsScreen() {
   const navigation = useNavigation();
   const { userProfile, updateUserProfile } = useUserStore();
   const { tier, restorePurchases } = useSubscriptionStore();
+  const { theme: currentTheme, toggleTheme } = useAppStore();
   
   const [biometricEnabled, setBiometricEnabled] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(
@@ -38,6 +41,9 @@ export default function SettingsScreen() {
   );
   const [voiceOutputEnabled, setVoiceOutputEnabled] = useState(false);
   const [cloudBackupEnabled, setCloudBackupEnabled] = useState(false);
+  
+  const isDark = currentTheme === 'dark';
+  const themeColors = getThemeColors(isDark);
 
   const handleBiometricToggle = async (value: boolean) => {
     if (value) {
@@ -117,6 +123,15 @@ export default function SettingsScreen() {
 
   const appSettings: SettingItem[] = [
     {
+      id: 'darkMode',
+      title: 'Donkere modus',
+      subtitle: isDark ? 'Donker thema actief' : 'Licht thema actief',
+      type: 'toggle',
+      icon: isDark ? 'moon' : 'sunny',
+      value: isDark,
+      onPress: () => toggleTheme(),
+    },
+    {
       id: 'notifications',
       title: 'Notificaties',
       subtitle: 'Dagelijkse herinneringen',
@@ -194,18 +209,18 @@ export default function SettingsScreen() {
   const renderSettingItem = (item: SettingItem) => (
     <TouchableOpacity
       key={item.id}
-      style={styles.settingItem}
+      style={[styles.settingItem, { backgroundColor: themeColors.card }]}
       onPress={item.onPress}
       activeOpacity={0.7}
     >
       <View style={styles.settingLeft}>
-        <View style={styles.iconContainer}>
-          <Ionicons name={item.icon} size={24} color="#8B7BA7" />
+        <View style={[styles.iconContainer, { backgroundColor: themeColors.peaceful.primary[1] }]}>
+          <Ionicons name={item.icon} size={24} color={themeColors.textSecondary} />
         </View>
         <View style={styles.textContainer}>
-          <Text style={styles.settingTitle}>{item.title}</Text>
+          <Text style={[styles.settingTitle, { color: themeColors.text }]}>{item.title}</Text>
           {item.subtitle && (
-            <Text style={styles.settingSubtitle}>{item.subtitle}</Text>
+            <Text style={[styles.settingSubtitle, { color: themeColors.textSecondary }]}>{item.subtitle}</Text>
           )}
         </View>
       </View>
@@ -214,13 +229,13 @@ export default function SettingsScreen() {
         <Switch
           value={item.value}
           onValueChange={item.onPress}
-          trackColor={{ false: '#E8DFFD', true: '#C3B5E3' }}
-          thumbColor={item.value ? '#8B7BA7' : '#f4f3f4'}
+          trackColor={{ false: themeColors.peaceful.primary[2], true: themeColors.peaceful.accent[0] }}
+          thumbColor={item.value ? themeColors.textSecondary : '#f4f3f4'}
         />
       )}
       
       {item.type === 'navigation' && (
-        <Ionicons name="chevron-forward" size={20} color="#C3B5E3" />
+        <Ionicons name="chevron-forward" size={20} color={themeColors.textLight} />
       )}
     </TouchableOpacity>
   );
@@ -228,38 +243,38 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        colors={['#FAFAF8', '#F5F0FF']}
+        colors={themeColors.peaceful.primary as [string, string, ...string[]]}
         style={StyleSheet.absoluteFillObject}
       />
       
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Instellingen</Text>
+          <Text style={[styles.headerTitle, { color: themeColors.text }]}>Instellingen</Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Privacy & Beveiliging</Text>
+          <Text style={[styles.sectionTitle, { color: themeColors.textSecondary }]}>Privacy & Beveiliging</Text>
           {privacySettings.map(renderSettingItem)}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>App Instellingen</Text>
+          <Text style={[styles.sectionTitle, { color: themeColors.textSecondary }]}>App Instellingen</Text>
           {appSettings.map(renderSettingItem)}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Data Beheer</Text>
+          <Text style={[styles.sectionTitle, { color: themeColors.textSecondary }]}>Data Beheer</Text>
           {dataSettings.map(renderSettingItem)}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account</Text>
+          <Text style={[styles.sectionTitle, { color: themeColors.textSecondary }]}>Account</Text>
           {accountSettings.map(renderSettingItem)}
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.version}>InnerVoice v1.0.0</Text>
-          <Text style={styles.footerText}>Met liefde gemaakt voor jouw innerlijke reis</Text>
+          <Text style={[styles.version, { color: themeColors.textLight }]}>InnerVoice v1.0.0</Text>
+          <Text style={[styles.footerText, { color: themeColors.textSecondary }]}>Met liefde gemaakt voor jouw innerlijke reis</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -278,7 +293,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#4A4458',
   },
   section: {
     marginHorizontal: 20,
@@ -287,7 +301,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#6B6478',
     marginBottom: 12,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -296,7 +309,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'white',
     padding: 16,
     borderRadius: 12,
     marginBottom: 8,
@@ -315,7 +327,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F5F0FF',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -326,11 +337,9 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#4A4458',
   },
   settingSubtitle: {
     fontSize: 13,
-    color: '#6B6478',
     marginTop: 2,
   },
   footer: {
@@ -339,12 +348,10 @@ const styles = StyleSheet.create({
   },
   version: {
     fontSize: 12,
-    color: '#C3B5E3',
     marginBottom: 4,
   },
   footerText: {
     fontSize: 12,
-    color: '#6B6478',
     fontStyle: 'italic',
   },
 });

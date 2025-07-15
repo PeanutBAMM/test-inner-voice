@@ -6,6 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Screens
+import OnboardingScreen from '../screens/OnboardingScreen';
+import AuthScreen from '../screens/auth/AuthScreen';
 import OnboardingChatScreen from '../screens/innervoice/OnboardingChatScreen';
 import ChatScreen from '../screens/innervoice/ChatScreen';
 import LibraryScreen from '../screens/innervoice/LibraryScreen';
@@ -20,6 +22,9 @@ import UpgradeModal from '../screens/innervoice/UpgradeModal';
 // Stores
 import useCoachStore from '../store/innervoice/useCoachStore';
 import useUserStore from '../store/innervoice/useUserStore';
+
+// Services
+import mockAuthService from '../services/auth/mockAuthService';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -66,6 +71,8 @@ function MainTabs() {
 export default function RootNavigator() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  const [hasCompletedAppOnboarding, setHasCompletedAppOnboarding] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { initializeCoach } = useCoachStore();
   const { loadUserProfile } = useUserStore();
 
@@ -86,8 +93,15 @@ export default function RootNavigator() {
 
   const checkOnboardingStatus = async () => {
     try {
+      const appOnboardingCompleted = await AsyncStorage.getItem('appOnboardingCompleted');
       const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
       const userProfile = await AsyncStorage.getItem('userProfile');
+      
+      setHasCompletedAppOnboarding(appOnboardingCompleted === 'true');
+      
+      // Check authentication status
+      const authStatus = await mockAuthService.isAuthenticated();
+      setIsAuthenticated(authStatus);
       
       if (onboardingCompleted === 'true' && userProfile) {
         setHasCompletedOnboarding(true);
@@ -115,7 +129,17 @@ export default function RootNavigator() {
           animation: 'fade',
         }}
       >
-        {!hasCompletedOnboarding ? (
+        {!hasCompletedAppOnboarding ? (
+          <Stack.Screen 
+            name="Onboarding" 
+            component={OnboardingScreen as any} 
+          />
+        ) : !isAuthenticated ? (
+          <Stack.Screen 
+            name="Auth" 
+            component={AuthScreen as any} 
+          />
+        ) : !hasCompletedOnboarding ? (
           <Stack.Screen 
             name="OnboardingChat" 
             component={OnboardingChatScreen} 
@@ -124,6 +148,18 @@ export default function RootNavigator() {
           <>
             <Stack.Screen 
               name="MainTabs" 
+              component={MainTabs} 
+            />
+            <Stack.Screen 
+              name="ChatScreen" 
+              component={ChatScreen} 
+            />
+            <Stack.Screen 
+              name="LibraryScreen" 
+              component={LibraryScreen} 
+            />
+            <Stack.Screen 
+              name="Main" 
               component={MainTabs} 
             />
             <Stack.Screen 

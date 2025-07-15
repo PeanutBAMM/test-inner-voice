@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Svg, { Circle, Path, G, Defs, LinearGradient, Stop } from 'react-native-svg';
-import { theme } from '@/constants/theme';
+import { theme } from '../../constants/theme';
 
 interface AuthIllustrationProps {
   size?: number;

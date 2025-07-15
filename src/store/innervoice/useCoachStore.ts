@@ -1,45 +1,18 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getMockCoachResponse } from '../../services/innervoice/mockCoachService';
-
-export interface CoachPersonality {
-  type: 'gentle' | 'wise' | 'earthly';
-  name: string;
-  temperature: number;
-  traits: string;
-}
+import { getLLMResponse } from '../../services/innervoice/llmService';
 
 interface CoachStore {
-  coachPersonality: CoachPersonality;
   systemPrompt: string;
   isInitialized: boolean;
   
-  setCoachPersonality: (personality: Partial<CoachPersonality>) => void;
   initializeCoach: (userProfile: Record<string, string | string[]>) => void;
   getCoachResponse: (message: string, history: Array<{ role: string; content: string }>) => Promise<string>;
 }
 
-const COACH_PERSONALITIES = {
-  gentle: {
-    type: 'gentle' as const,
-    name: 'Zachte Begeleider',
-    temperature: 0.6,
-    traits: 'Extra zacht, veel ruimte gevend, poëtisch, met aandacht voor stiltes',
-  },
-  wise: {
-    type: 'wise' as const,
-    name: 'Wijze Mentor',
-    temperature: 0.7,
-    traits: 'Diepgaande vragen, filosofisch, bedachtzaam, nodigt uit tot reflectie',
-  },
-  earthly: {
-    type: 'earthly' as const,
-    name: 'Aardse Helper',
-    temperature: 0.8,
-    traits: 'Praktisch, lichaamsgericht, focus op het hier-en-nu, concrete suggesties',
-  },
-};
+const DEFAULT_TEMPERATURE = 0.6;
+const DEFAULT_TRAITS = 'Extra zacht, veel ruimte gevend, poëtisch, met aandacht voor stiltes';
 
 const BASE_SYSTEM_PROMPT = `Je bent een liefdevolle innerlijke gids die luistert zonder oordeel.
 
@@ -60,18 +33,10 @@ GESPREKSSTIJL:
 const useCoachStore = create<CoachStore>()(
   persist(
     (set, get) => ({
-      coachPersonality: COACH_PERSONALITIES.gentle,
       systemPrompt: BASE_SYSTEM_PROMPT,
       isInitialized: false,
 
-      setCoachPersonality: (personality) => set((state) => ({
-        coachPersonality: { ...state.coachPersonality, ...personality }
-      })),
-
       initializeCoach: (userProfile) => {
-        const { coachPersonality: personalityType } = userProfile;
-        const personality = COACH_PERSONALITIES[personalityType as keyof typeof COACH_PERSONALITIES] || COACH_PERSONALITIES.gentle;
-        
         const personalizedPrompt = `${BASE_SYSTEM_PROMPT}
 
 Context over ${userProfile.userName}:
@@ -81,30 +46,38 @@ Context over ${userProfile.userName}:
 ${userProfile.spiritualExperience ? `- Spirituele ervaring: ${userProfile.spiritualExperience}` : ''}
 ${userProfile.currentFocus ? `- Huidige focus: ${userProfile.currentFocus}` : ''}
 
-Specifieke stijl voor deze sessie: ${personality.traits}
+Specifieke stijl voor deze sessie: ${DEFAULT_TRAITS}
 
 Pas je begeleiding aan zonder deze informatie expliciet te noemen. Spreek in het ${userProfile.preferredLanguage === 'English' ? 'Engels' : 'Nederlands'}.`;
 
         set({
-          coachPersonality: personality,
           systemPrompt: personalizedPrompt,
           isInitialized: true
         });
       },
 
       getCoachResponse: async (message, history) => {
-        const { systemPrompt, coachPersonality } = get();
+        const { systemPrompt } = get();
         
         try {
-          // Simulate thinking delay
-          await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+          // Always try to use LLM first - convert history to ChatMessage format
+          const formattedHistory = history.map(msg => ({
+            role: msg.role as 'user' | 'assistant' | 'system',
+            content: msg.content
+          }));
           
-          // Get mock response based on coach type
-          const response = getMockCoachResponse(message, coachPersonality.type);
+          const response = await getLLMResponse(
+            message, 
+            formattedHistory,
+            systemPrompt,
+            'gentle',
+            DEFAULT_TEMPERATURE
+          );
           
           return response;
           
         } catch (error) {
+          console.error('Coach response error:', error);
           return 'Even een moment... Ik ben er voor je. Wat wilde je delen?';
         }
       }

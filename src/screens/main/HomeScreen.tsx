@@ -13,10 +13,11 @@ import { ChatContainer, GlassOverlay, SpiritualGradientBackground } from '../../
 import useCoachStore from '../../store/innervoice/useCoachStore';
 import useConversationStore from '../../store/innervoice/useConversationStore';
 import useSubscriptionStore from '../../store/innervoice/useSubscriptionStore';
+import { theme } from '../../constants/theme';
 
 export default function ChatScreen() {
   const navigation = useNavigation<RootStackScreenProps<'ChatScreen'>['navigation']>();
-  const { getCoachResponse, coachPersonality } = useCoachStore();
+  const { getCoachResponse } = useCoachStore();
   const { messages, addMessage, isTyping, setTyping } = useConversationStore();
   const { canAskQuestion, recordQuestion } = useSubscriptionStore();
 
@@ -75,19 +76,19 @@ export default function ChatScreen() {
         <GlassOverlay intensity={25}>
         <View style={styles.header}>
           <TouchableOpacity
-            onPress={() => navigation.navigate('LibraryScreen')}
+            onPress={() => navigation.navigate('MainTabs', { screen: 'Library' })}
             style={styles.headerButton}
           >
-            <Ionicons name="book-outline" size={24} color="#8B7BA7" />
+            <Ionicons name="book-outline" size={24} color={theme.colors.textSecondary} />
           </TouchableOpacity>
 
-          <Text style={styles.headerTitle}>{coachPersonality.name}</Text>
+          <Text style={styles.headerTitle}>InnerVoice</Text>
 
           <TouchableOpacity
             onPress={() => navigation.navigate('Main', { screen: 'Profile' })}
             style={styles.headerButton}
           >
-            <Ionicons name="person-circle-outline" size={28} color="#8B7BA7" />
+            <Ionicons name="person-circle-outline" size={28} color={theme.colors.textSecondary} />
           </TouchableOpacity>
         </View>
 
@@ -106,7 +107,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAF8',
+    backgroundColor: theme.colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(232, 223, 253, 0.2)',
+    borderBottomColor: theme.colors.border,
   },
   headerButton: {
     padding: 8,
@@ -123,6 +124,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#4A4458',
+    color: theme.colors.text,
   },
 });

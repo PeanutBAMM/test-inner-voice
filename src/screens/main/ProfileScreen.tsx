@@ -11,12 +11,10 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import useUserStore from '../../store/innervoice/useUserStore';
-import useCoachStore from '../../store/innervoice/useCoachStore';
 import useSubscriptionStore from '../../store/innervoice/useSubscriptionStore';
 
 export default function ProfileScreen() {
   const { userProfile } = useUserStore();
-  const { coachPersonality } = useCoachStore();
   const { tier, usage } = useSubscriptionStore();
 
   const stats = [
@@ -28,7 +26,6 @@ export default function ProfileScreen() {
   const profileItems = [
     { label: 'Naam', value: userProfile?.userName || 'Niet ingesteld' },
     { label: 'Taal', value: userProfile?.preferredLanguage || 'Nederlands' },
-    { label: 'Coach', value: coachPersonality.name },
     { label: 'Focus', value: userProfile?.currentFocus || 'Geen specifieke focus' },
   ];
 

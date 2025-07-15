@@ -1,20 +1,17 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import {
   View,
   StyleSheet,
   Dimensions,
-  Animated,
-  Easing,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop, Circle } from 'react-native-svg';
 import { EnergyCore } from './EnergyCore';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-// Create animated SVG components
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-const AnimatedPath = Animated.createAnimatedComponent(Path);
+// Animated components removed for performance optimization
 
 interface SpiritualGradientBackgroundProps {
   mood?: 'peaceful' | 'contemplative' | 'joyful' | 'grounded' | 'neutral';
@@ -25,47 +22,91 @@ interface SpiritualGradientBackgroundProps {
   onMessageSent?: boolean;
 }
 
-// Mood-based color palettes - Zachte, fletse pastel gradients voor magisch effect
-const MOOD_PALETTES = {
+// Mood-based color palettes - Dynamische paletten voor light/dark mode
+export const MOOD_PALETTES = {
   peaceful: {
-    primary: ['#FAF8F5', '#F8F6F3', '#F5F3F0', '#F3F1EE', '#F0EEEB', '#EDEAE8'], // Zacht beige/crème naar licht grijs
-    accent: ['#F5F0E8', '#F0EBE3', '#EBE6DE'], // Warme neutrale accenten
-    glow: '#F8E8D8', // Zachte warme gloed
-    sparkle: '#F0D4A8', // Gouden sparkle voor zichtbaarheid
-    orb1: '#E8D5C4', // Zacht terracotta voor orbs
-    orb2: '#D4E4E8', // Zacht mint voor contrast
+    primary: ['#FFF0F5', '#FFE4E1', '#FFD6E8', '#FFC8DD', '#FFB6C1', '#FFDAB9'], // Lavender blush naar perzik
+    accent: ['#FFB6C1', '#FFA07A', '#FF7F50'], // Roze naar koraal accenten
+    glow: '#FFB6C1', // Zachte roze gloed
+    sparkle: '#FFD700', // Gouden sparkle
+    orb1: '#FF69B4', // Hot pink voor diepte
+    orb2: '#FFDAB9', // Perzik voor contrast
   },
   contemplative: {
-    primary: ['#F3F0F5', '#F0EDF3', '#EDEAF0', '#EAE7ED', '#E7E4EA', '#E4E1E7'], // Zacht grijs-lavender
-    accent: ['#E8E5F0', '#E5E2ED', '#E2DFEA'], // Koele accenten
-    glow: '#E0DDE8', // Koele gloed
-    sparkle: '#D4C8E0', // Lavender sparkle
-    orb1: '#D8D0E8', // Zacht paars
-    orb2: '#D0E8E0', // Zacht mint-grijs
+    primary: ['#F8F0F8', '#F5E6F5', '#F2DCF2', '#EFD2EF', '#ECC8EC', '#E9BEE9'], // Koele roze-lila
+    accent: ['#DDA0DD', '#DA70D6', '#D8BFD8'], // Plum naar thistle
+    glow: '#DDA0DD', // Plum gloed
+    sparkle: '#E6E6FA', // Lavender sparkle
+    orb1: '#DA70D6', // Orchid
+    orb2: '#FFE4E1', // Misty rose
   },
   joyful: {
-    primary: ['#FBF8F3', '#F8F5F0', '#F5F2ED', '#F2EFEA', '#EFECE7', '#ECE9E4'], // Warm ivoor naar beige
-    accent: ['#F8F0E8', '#F5EDE5', '#F2EAE2'], // Warme accenten
-    glow: '#F5E8D8', // Warme gloed
-    sparkle: '#F0D8B8', // Peachy sparkle
-    orb1: '#F0DCC8', // Zacht peach
-    orb2: '#D8E8D0', // Zacht groen
+    primary: ['#FFF5EE', '#FFEFD5', '#FFE4B5', '#FFDAB9', '#FFD39B', '#FFCBA4'], // Seashell naar perzik
+    accent: ['#FFA07A', '#FF7F50', '#FF6347'], // Zalm naar tomaat
+    glow: '#FFA07A', // Zalm gloed
+    sparkle: '#FFD700', // Gouden sparkle
+    orb1: '#FF7F50', // Koraal
+    orb2: '#FFE4B5', // Moccasin
   },
   grounded: {
-    primary: ['#F8F5F2', '#F5F2EF', '#F2EFEC', '#EFECE9', '#ECE9E6', '#E9E6E3'], // Neutrale aardetinten
-    accent: ['#F0EDE8', '#EDE9E5', '#EAE6E2'], // Aardse accenten
-    glow: '#E8E0D8', // Aardse gloed
-    sparkle: '#E0D0C0', // Bruine sparkle
-    orb1: '#E0D4C8', // Zacht bruin
-    orb2: '#C8D8D0', // Zacht salie
+    primary: ['#F5E6E6', '#F0DADA', '#EBCECE', '#E6C2C2', '#E1B6B6', '#DCAAAA'], // Aardse roze
+    accent: ['#CD5C5C', '#BC8F8F', '#F4A460'], // Indian red naar sandy brown
+    glow: '#BC8F8F', // Rosy brown gloed
+    sparkle: '#D2691E', // Chocolate sparkle
+    orb1: '#CD5C5C', // Indian red
+    orb2: '#FFE4E1', // Misty rose
   },
   neutral: {
-    primary: ['#F5F5F5', '#F2F2F2', '#EFEFEF', '#ECECEC', '#E9E9E9', '#E6E6E6'], // Zachte grijzen
-    accent: ['#F0F0F0', '#EDEDED', '#EAEAEA'], // Neutrale accenten
-    glow: '#E8E8E8', // Neutrale gloed
-    sparkle: '#D8D8D8', // Zilveren sparkle
-    orb1: '#E0E0E0', // Licht grijs
-    orb2: '#D0D8E0', // Blauw-grijs
+    primary: ['#FFF0F5', '#F5E6EA', '#EBDCE0', '#E1D2D6', '#D7C8CC', '#CDBEC2'], // Lavender blush naar grijs-roze
+    accent: ['#E6E6FA', '#D8BFD8', '#DDA0DD'], // Lavender naar plum
+    glow: '#E6E6FA', // Lavender gloed
+    sparkle: '#C0C0C0', // Zilveren sparkle
+    orb1: '#D8BFD8', // Thistle
+    orb2: '#FFE4E1', // Misty rose
+  },
+};
+
+// Dark mode masculine energy palettes
+export const DARK_MOOD_PALETTES = {
+  peaceful: {
+    primary: ['#0F1419', '#1A2332', '#2E5984', '#4A7BA7', '#7FB3D3', '#B3D9FF'], // Deep ocean progression
+    accent: ['#2E5984', '#4A7BA7', '#7FB3D3'], // Steel blue spectrum
+    glow: '#00CED1', // Dark turquoise glow
+    sparkle: '#00BFFF', // Deep sky blue sparkle
+    orb1: '#1A3A5C', // Dark navy
+    orb2: '#00CED1', // Turquoise accent
+  },
+  contemplative: {
+    primary: ['#1A1625', '#2D2A3D', '#4A3D5C', '#6B5B73', '#8B7BA7', '#B8A9C9'], // Deep purple progression
+    accent: ['#663399', '#8A2BE2', '#9370DB'], // Purple spectrum
+    glow: '#8A2BE2', // Blue violet glow
+    sparkle: '#9370DB', // Medium slate blue sparkle
+    orb1: '#4A3D5C', // Dark purple
+    orb2: '#8A2BE2', // Blue violet accent
+  },
+  joyful: {
+    primary: ['#0F1F1C', '#1A332E', '#2E5984', '#20B2AA', '#40E0D0', '#7FFFD4'], // Teal progression
+    accent: ['#00CED1', '#20B2AA', '#40E0D0'], // Turquoise spectrum
+    glow: '#00FFFF', // Cyan glow
+    sparkle: '#7FFFD4', // Aquamarine sparkle
+    orb1: '#1A332E', // Dark sea green
+    orb2: '#00CED1', // Dark turquoise accent
+  },
+  grounded: {
+    primary: ['#191F25', '#2A3F5F', '#4682B4', '#5F9EA0', '#708090', '#B0C4DE'], // Steel blue progression
+    accent: ['#4682B4', '#5F9EA0', '#708090'], // Steel spectrum
+    glow: '#4682B4', // Steel blue glow
+    sparkle: '#B0C4DE', // Light steel blue sparkle
+    orb1: '#2A3F5F', // Dark steel
+    orb2: '#5F9EA0', // Cadet blue accent
+  },
+  neutral: {
+    primary: ['#0F1419', '#2A3F5F', '#5F9EA0', '#778899', '#A9A9A9', '#D3D3D3'], // Balanced navy progression
+    accent: ['#708090', '#778899', '#A9A9A9'], // Slate spectrum
+    glow: '#5F9EA0', // Cadet blue glow
+    sparkle: '#D3D3D3', // Light gray sparkle
+    orb1: '#2A3F5F', // Dark blue-gray
+    orb2: '#778899', // Light slate gray accent
   },
 };
 
@@ -85,109 +126,17 @@ export const SpiritualGradientBackground: React.FC<SpiritualGradientBackgroundPr
   children,
   onMessageSent = false,
 }) => {
-  const palette = MOOD_PALETTES[mood];
+  const { isDark } = useTheme();
+  const palette = isDark ? DARK_MOOD_PALETTES[mood] : MOOD_PALETTES[mood];
   const timeTint = TIME_TINTS[timeOfDay];
   
-  // Animation values for floating orbs
-  const floatAnim1 = useRef(new Animated.Value(0)).current;
-  const floatAnim2 = useRef(new Animated.Value(0.5)).current; // Start at different phase
-  const floatAnim3 = useRef(new Animated.Value(1)).current; // Start at different phase
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-  const sparkleAnim = useRef(new Animated.Value(0.6)).current;
+  // Animation values removed for performance optimization
   
-  // Continuous floating animations
-  useEffect(() => {
-    // Float animation for orbs
-    const createFloatAnimation = (animValue: Animated.Value, delay: number = 0) => {
-      return Animated.loop(
-        Animated.sequence([
-          Animated.delay(delay),
-          Animated.timing(animValue, {
-            toValue: 1,
-            duration: 4000,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: false,
-          }),
-          Animated.timing(animValue, {
-            toValue: 0,
-            duration: 4000,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: false,
-          }),
-        ])
-      );
-    };
-    
-    // Sparkle twinkling animation
-    const sparkleAnimation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(sparkleAnim, {
-          toValue: 1,
-          duration: 1500,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: false,
-        }),
-        Animated.timing(sparkleAnim, {
-          toValue: 0.3,
-          duration: 1500,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: false,
-        }),
-      ])
-    );
-    
-    // Start all animations
-    Animated.parallel([
-      createFloatAnimation(floatAnim1),
-      createFloatAnimation(floatAnim2, 1000),
-      createFloatAnimation(floatAnim3, 2000),
-      sparkleAnimation,
-    ]).start();
-  }, [floatAnim1, floatAnim2, floatAnim3, sparkleAnim]);
+  // Animations removed for performance optimization
   
-  // Pulse animation when message is sent
-  useEffect(() => {
-    if (onMessageSent) {
-      pulseAnim.setValue(1);
-      
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.2,
-          duration: 300,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: false,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 0.95,
-          duration: 200,
-          easing: Easing.in(Easing.ease),
-          useNativeDriver: false,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 300,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: false,
-        }),
-      ]).start();
-    }
-  }, [onMessageSent, pulseAnim]);
+  // Pulse animation removed for performance optimization
   
-  // Create interpolated values for floating
-  const float1Y = floatAnim1.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -30],
-  });
-  
-  const float2Y = floatAnim2.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -25],
-  });
-  
-  const float3Y = floatAnim3.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -35],
-  });
+  // Interpolated values removed for performance optimization
 
   // Apply time-based brightness adjustment to colors
   const adjustColor = (color: string): string => {
@@ -249,129 +198,28 @@ export const SpiritualGradientBackground: React.FC<SpiritualGradientBackgroundPr
               </SvgLinearGradient>
             </Defs>
 
-            {/* Background halos for depth */}
+            {/* Background halos for depth - alleen 2 voor sfeer */}
             <Circle
               cx={SCREEN_WIDTH * 0.7}
               cy={SCREEN_HEIGHT * 0.2}
-              r={150}
+              r={120}
               fill={palette.glow}
-              opacity={0.15}
+              opacity={0.1}
             />
             <Circle
               cx={SCREEN_WIDTH * 0.3}
-              cy={SCREEN_HEIGHT * 0.6}
-              r={120}
+              cy={SCREEN_HEIGHT * 0.7}
+              r={100}
               fill={palette.glow}
-              opacity={0.12}
+              opacity={0.08}
             />
 
-            {/* Floating glowing orbs - met zichtbare kleuren */}
-            <Circle
-              cx={SCREEN_WIDTH * 0.2}
-              cy={SCREEN_HEIGHT * 0.3}
-              r={40}
-              fill={palette.orb1}
-              opacity={0.25}
-            />
-            
-            <Circle
-              cx={SCREEN_WIDTH * 0.7}
-              cy={SCREEN_HEIGHT * 0.4}
-              r={55}
-              fill={palette.orb2}
-              opacity={0.2}
-            />
-            
-            <Circle
-              cx={SCREEN_WIDTH * 0.5}
-              cy={SCREEN_HEIGHT * 0.25}
-              r={35}
-              fill={palette.orb1}
-              opacity={0.3}
-            />
-            
-            <Circle
-              cx={SCREEN_WIDTH * 0.8}
-              cy={SCREEN_HEIGHT * 0.6}
-              r={30}
-              fill={palette.orb2}
-              opacity={0.25}
-            />
-
-            {/* Sparkles */}
-            {[
-              { x: SCREEN_WIDTH * 0.15, y: SCREEN_HEIGHT * 0.2 },
-              { x: SCREEN_WIDTH * 0.85, y: SCREEN_HEIGHT * 0.3 },
-              { x: SCREEN_WIDTH * 0.6, y: SCREEN_HEIGHT * 0.15 },
-              { x: SCREEN_WIDTH * 0.3, y: SCREEN_HEIGHT * 0.5 },
-              { x: SCREEN_WIDTH * 0.9, y: SCREEN_HEIGHT * 0.45 },
-              { x: SCREEN_WIDTH * 0.4, y: SCREEN_HEIGHT * 0.35 },
-            ].map((pos, index) => (
-              <Path
-                key={`sparkle-${index}`}
-                d="M0,-8 L2,-2 L8,0 L2,2 L0,8 L-2,2 L-8,0 L-2,-2 Z"
-                fill={palette.sparkle}
-                opacity={0.6}
-                transform={`translate(${pos.x}, ${pos.y}) scale(1)`}
-              />
-            ))}
+            {/* Sparkles removed for performance optimization */}
           </Svg>
         </View>
       )}
 
-      {/* View-based animated orbs for better animation support */}
-      {enableOrganicShapes && (
-        <>
-          <Animated.View
-            style={[
-              styles.floatingOrb,
-              {
-                left: SCREEN_WIDTH * 0.1,
-                top: SCREEN_HEIGHT * 0.2,
-                width: 60,
-                height: 60,
-                backgroundColor: palette.orb1,
-                transform: [
-                  { translateY: float1Y },
-                  { scale: pulseAnim }
-                ],
-              },
-            ]}
-          />
-          <Animated.View
-            style={[
-              styles.floatingOrb,
-              {
-                right: SCREEN_WIDTH * 0.15,
-                top: SCREEN_HEIGHT * 0.35,
-                width: 80,
-                height: 80,
-                backgroundColor: palette.orb2,
-                transform: [
-                  { translateY: float2Y },
-                  { scale: pulseAnim }
-                ],
-              },
-            ]}
-          />
-          <Animated.View
-            style={[
-              styles.floatingOrb,
-              {
-                left: SCREEN_WIDTH * 0.4,
-                bottom: SCREEN_HEIGHT * 0.3,
-                width: 50,
-                height: 50,
-                backgroundColor: palette.orb1,
-                transform: [
-                  { translateY: float3Y },
-                  { scale: pulseAnim }
-                ],
-              },
-            ]}
-          />
-        </>
-      )}
+      {/* Floating orbs removed for performance optimization */}
 
       {/* Energy Core - Het kloppende hart van de app */}
       {enableEnergyCore && (
@@ -385,6 +233,9 @@ export const SpiritualGradientBackground: React.FC<SpiritualGradientBackgroundPr
       {/* Time of day tint overlay */}
       <View style={[styles.tintOverlay, { backgroundColor: timeTint.tint }]} />
 
+      {/* Zand grain texture overlay */}
+      <View style={styles.grainOverlay} />
+
       {/* Subtle vignette for focus */}
       <View style={styles.vignette} />
 
@@ -397,6 +248,7 @@ export const SpiritualGradientBackground: React.FC<SpiritualGradientBackgroundPr
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    overflow: 'visible',
   },
   baseGradient: {
     position: 'absolute',
@@ -427,6 +279,22 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
   },
+  grainOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
+    // Subtiele grain texture effect
+    opacity: 0.08,
+    // CSS-like noise pattern simulatie
+    shadowColor: 'rgba(139, 123, 167, 0.5)',
+    shadowOffset: { width: 0.5, height: 0.5 },
+    shadowRadius: 0.5,
+    shadowOpacity: 0.3,
+    elevation: 1,
+  },
   vignette: {
     position: 'absolute',
     left: 0,
@@ -446,9 +314,9 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 15,
-    shadowOpacity: 0.08,
-    elevation: 5,
-    opacity: 0.15,
+    shadowRadius: 20,
+    shadowOpacity: 0.1,
+    elevation: 8,
+    opacity: 0.25, // Meer zichtbaar
   },
 });

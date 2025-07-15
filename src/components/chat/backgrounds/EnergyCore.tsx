@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -22,8 +22,6 @@ import Svg, {
   Stop, 
   G,
   Path,
-  LinearGradient,
-  Rect,
 } from 'react-native-svg';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -66,98 +64,85 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
   const glowIntensity = useSharedValue(intensity);
   const energyDischarge = useSharedValue(0);
   
+  
+  // Lightning animation
+  const mainRotation = useSharedValue(0);
+  const secondaryRotation = useSharedValue(0);
 
-  // Color palettes - Vrouwelijke energie kleuren (goud-roze-paars)
+  // Color palettes - Vrouwelijke energy kleuren (warm goud-perzik-koraal)
   const moodColors = {
     peaceful: {
       stops: [
         { offset: '0%', color: '#FFFFFF', opacity: 1 },
-        { offset: '10%', color: '#FFF8E7', opacity: 0.95 }, // Warm wit
-        { offset: '20%', color: '#FFE4B5', opacity: 0.9 },  // Zacht goud
-        { offset: '30%', color: '#FFD700', opacity: 0.85 }, // Goud
-        { offset: '40%', color: '#FFDAB9', opacity: 0.8 },  // Perzik
-        { offset: '50%', color: '#FFCCCB', opacity: 0.75 }, // Licht coral
-        { offset: '60%', color: '#FFB6C1', opacity: 0.7 },  // Licht roze
-        { offset: '70%', color: '#FFA07A', opacity: 0.65 }, // Licht zalm
-        { offset: '80%', color: '#FF8C69', opacity: 0.7 },  // Warm zalm
-        { offset: '90%', color: '#F08080', opacity: 0.75 }, // Licht coral
-        { offset: '100%', color: '#E6A8A8', opacity: 0.8 }, // Zacht roze
+        { offset: '15%', color: '#FFF8DC', opacity: 0.95 },
+        { offset: '25%', color: '#FFE4B5', opacity: 0.9 },
+        { offset: '35%', color: '#FFDAB9', opacity: 0.85 },
+        { offset: '45%', color: '#FFD700', opacity: 0.8 },
+        { offset: '55%', color: '#FFA07A', opacity: 0.75 },
+        { offset: '65%', color: '#FFB6C1', opacity: 0.7 },
+        { offset: '75%', color: '#FF7F50', opacity: 0.75 },
+        { offset: '85%', color: '#FF6347', opacity: 0.8 },
+        { offset: '95%', color: '#FA8072', opacity: 0.85 },
+        { offset: '100%', color: '#E9967A', opacity: 0.9 },
       ],
       glow: '#FFB6C1',
-      ring: '#FFA07A',
+      ring: '#FFDAB9',
       lightning: '#FFE4B5',
     },
     contemplative: {
       stops: [
         { offset: '0%', color: '#FFFFFF', opacity: 1 },
-        { offset: '15%', color: '#FAF0E6', opacity: 0.95 }, // Linnen wit
-        { offset: '25%', color: '#F5E6D3', opacity: 0.9 },  // Warm beige
-        { offset: '35%', color: '#F0E68C', opacity: 0.85 }, // Khaki
-        { offset: '45%', color: '#DDD6B4', opacity: 0.8 },  // Champagne
-        { offset: '55%', color: '#E6C2A6', opacity: 0.75 }, // Warm peach
-        { offset: '65%', color: '#DDBEA9', opacity: 0.7 },  // Zacht coral
-        { offset: '75%', color: '#D2B48C', opacity: 0.75 }, // Tan
-        { offset: '85%', color: '#C8A888', opacity: 0.8 },  // Zacht bruin
-        { offset: '95%', color: '#E6C2A6', opacity: 0.85 }, // Warm peach
-        { offset: '100%', color: '#DDD6B4', opacity: 0.9 }, // Champagne
+        { offset: '15%', color: '#FFFAF0', opacity: 0.95 },
+        { offset: '30%', color: '#FAF0E6', opacity: 0.9 },
+        { offset: '45%', color: '#FFDAB9', opacity: 0.85 },
+        { offset: '60%', color: '#FFB6C1', opacity: 0.8 },
+        { offset: '75%', color: '#FFA07A', opacity: 0.75 },
+        { offset: '90%', color: '#FF7F50', opacity: 0.85 },
+        { offset: '100%', color: '#FF6347', opacity: 1 },
       ],
-      glow: '#E6C2A6',
-      ring: '#D2B48C',
-      lightning: '#F5E6D3',
+      glow: '#FFB6C1',
+      ring: '#FFA07A',
+      lightning: '#FFDAB9',
     },
     joyful: {
       stops: [
         { offset: '0%', color: '#FFFFFF', opacity: 1 },
-        { offset: '10%', color: '#FFFACD', opacity: 0.95 }, // Citroen chiffon
-        { offset: '20%', color: '#FFE4B5', opacity: 0.9 },  // Moccasin
-        { offset: '30%', color: '#FFD700', opacity: 0.85 }, // Helder goud
-        { offset: '40%', color: '#FFDAB9', opacity: 0.8 },  // Perzik
-        { offset: '50%', color: '#FFA07A', opacity: 0.75 }, // Licht zalm
-        { offset: '60%', color: '#FF8C69', opacity: 0.7 },  // Zalm
-        { offset: '70%', color: '#FF7F50', opacity: 0.75 }, // Coral
-        { offset: '80%', color: '#FF6347', opacity: 0.8 },  // Tomato
-        { offset: '90%', color: '#FF4500', opacity: 0.85 }, // Orange red
-        { offset: '100%', color: '#E6A8A8', opacity: 0.9 }, // Zacht roze
+        { offset: '15%', color: '#FFF8DC', opacity: 0.95 },
+        { offset: '30%', color: '#FFD700', opacity: 0.9 },
+        { offset: '45%', color: '#FFB6C1', opacity: 0.85 },
+        { offset: '60%', color: '#FFA07A', opacity: 0.8 },
+        { offset: '75%', color: '#FF7F50', opacity: 0.8 },
+        { offset: '90%', color: '#FF6347', opacity: 0.85 },
+        { offset: '100%', color: '#FA8072', opacity: 1 },
       ],
-      glow: '#FFA07A',
+      glow: '#FFB6C1',
       ring: '#FF7F50',
-      lightning: '#FFE4B5',
+      lightning: '#FFD700',
     },
     grounded: {
       stops: [
         { offset: '0%', color: '#FFFFFF', opacity: 1 },
-        { offset: '15%', color: '#FFF5EE', opacity: 0.95 }, // Zeeschelp
-        { offset: '25%', color: '#FAEBD7', opacity: 0.9 },  // Antiek wit
-        { offset: '35%', color: '#F5DEB3', opacity: 0.85 }, // Tarwe
-        { offset: '45%', color: '#DEB887', opacity: 0.8 },  // Burly wood
-        { offset: '55%', color: '#D2B48C', opacity: 0.75 }, // Tan
-        { offset: '65%', color: '#C8A888', opacity: 0.7 },  // Zacht bruin
-        { offset: '75%', color: '#D4A76A', opacity: 0.75 }, // Fawn
-        { offset: '85%', color: '#E6C2A6', opacity: 0.8 },  // Warm peach
-        { offset: '95%', color: '#DDBEA9', opacity: 0.85 }, // Zacht coral
-        { offset: '100%', color: '#E6A8A8', opacity: 0.9 }, // Zacht roze-bruin
+        { offset: '20%', color: '#FAF0E6', opacity: 0.95 },
+        { offset: '40%', color: '#F0E68C', opacity: 0.9 },
+        { offset: '60%', color: '#DEB887', opacity: 0.85 },
+        { offset: '80%', color: '#D2B48C', opacity: 0.8 },
+        { offset: '100%', color: '#BC8F8F', opacity: 1 },
       ],
-      glow: '#E6C2A6',
+      glow: '#DEB887',
       ring: '#D2B48C',
-      lightning: '#F5DEB3',
+      lightning: '#F0E68C',
     },
     neutral: {
       stops: [
         { offset: '0%', color: '#FFFFFF', opacity: 1 },
-        { offset: '15%', color: '#FFF8F0', opacity: 0.95 }, // Floral white  
-        { offset: '25%', color: '#FAF0E6', opacity: 0.9 },  // Linnen
-        { offset: '35%', color: '#F5E6D3', opacity: 0.85 }, // Warm beige
-        { offset: '45%', color: '#E6D7C3', opacity: 0.8 },  // Bone
-        { offset: '55%', color: '#DDD6B4', opacity: 0.75 }, // Champagne
-        { offset: '65%', color: '#E6C2A6', opacity: 0.7 },  // Warm peach
-        { offset: '75%', color: '#DDBEA9', opacity: 0.75 }, // Zacht coral
-        { offset: '85%', color: '#E6A8A8', opacity: 0.8 },  // Zacht roze
-        { offset: '95%', color: '#D4A4A4', opacity: 0.85 }, // Neutraal roze
-        { offset: '100%', color: '#C8A888', opacity: 0.9 }, // Zacht taupe-roze
+        { offset: '25%', color: '#FFF5EE', opacity: 0.95 },
+        { offset: '50%', color: '#FFE4E1', opacity: 0.9 },
+        { offset: '75%', color: '#FFDAB9', opacity: 0.85 },
+        { offset: '100%', color: '#FFB6C1', opacity: 1 },
       ],
-      glow: '#E6C2A6',
-      ring: '#DDBEA9',
-      lightning: '#F5E6D3',
+      glow: '#FFDAB9',
+      ring: '#FFB6C1',
+      lightning: '#FFE4E1',
     },
   };
 
@@ -186,7 +171,20 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
       false
     );
 
-  }, [breathingAnim, energyDischarge]);
+    // Main lightning rotation - slow
+    mainRotation.value = withRepeat(
+      withTiming(360, { duration: 75000, easing: Easing.linear }),
+      -1,
+      false
+    );
+
+    // Secondary lightning rotation - faster, opposite direction
+    secondaryRotation.value = withRepeat(
+      withTiming(-360, { duration: 50000, easing: Easing.linear }),
+      -1,
+      false
+    );
+  }, [breathingAnim, energyDischarge, mainRotation, secondaryRotation]);
 
   // Handle pulse animation
   useEffect(() => {
@@ -219,13 +217,29 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
     };
   });
 
+  // Animated style for outer glow
+  const glowStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      glowIntensity.value,
+      [0, 1],
+      [0.3, 0.8]
+    );
+
+    const dischargeOpacity = interpolate(
+      energyDischarge.value,
+      [0, 1],
+      [opacity, 1]
+    );
+
+    return {
+      shadowOpacity: dischargeOpacity,
+      shadowRadius: interpolate(energyDischarge.value, [0, 1], [80, 120]),
+    };
+  });
 
 
   // Plasma texture pulse animation - global for all circles
   const plasmaTextureOpacity = useSharedValue(0.3);
-  
-  // Swirl rotation animation
-  const swirlRotation = useSharedValue(0);
 
   // Setup plasma texture animation
   useEffect(() => {
@@ -237,20 +251,13 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
       -1,
       true
     );
-    
-    // Slow swirl rotation
-    swirlRotation.value = withRepeat(
-      withTiming(360, { duration: 120000, easing: Easing.linear }),
-      -1,
-      false
-    );
-  }, [plasmaTextureOpacity, swirlRotation]);
+  }, [plasmaTextureOpacity]);
 
 
   // Generate realistic lightning paths from core
   const generateLightningPath = (angle: number, startRadius: number, endRadius: number): string => {
-    const centerX = 150; // New center for 300x300 viewBox
-    const centerY = 150;
+    const centerX = 93.75; // New center for 187.5x187.5 viewBox
+    const centerY = 93.75;
     const startX = centerX + Math.cos(angle) * startRadius;
     const startY = centerY + Math.sin(angle) * startRadius;
     const endX = centerX + Math.cos(angle) * endRadius;
@@ -277,49 +284,48 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
     return path;
   };
 
+  // Main and secondary lightning paths removed for performance
+  
   // Generate micro lightning paths (zeer dunne details)
   const microLightningPaths = [];
   const numMicroPaths = 100;
   
   for (let i = 0; i < numMicroPaths; i++) {
     const angle = Math.random() * Math.PI * 2;
-    const startR = 10 + Math.random() * 30;
-    const endR = startR + 20 + Math.random() * 40;
+    const startR = 6.25 + Math.random() * 18.75;
+    const endR = startR + 12.5 + Math.random() * 25;
     microLightningPaths.push({
-      path: generateLightningPath(angle, startR, Math.min(endR, 95)),
+      path: generateLightningPath(angle, startR, Math.min(endR, 59.375)),
       opacity: 0.1 + Math.random() * 0.2,
       width: 0.1 + Math.random() * 0.1,
     });
   }
 
-  // Generate plasma web connections - reduced for performance
+  // Generate plasma web connections
   const generatePlasmaWeb = () => {
     const web = [];
-    const numPoints = 20; // Reduced from 50 for better performance
+    const numPoints = 50; // Increased for more connections
     const points = [];
     
     // Generate random points within sphere
     for (let i = 0; i < numPoints; i++) {
-      const r = Math.random() * 90 + 11;
+      const r = Math.random() * 56.25 + 6.875; // Random radius (25% larger)
       const theta = Math.random() * Math.PI * 2;
       points.push({
-        x: 150 + r * Math.cos(theta),
-        y: 150 + r * Math.sin(theta),
+        x: 93.75 + r * Math.cos(theta),
+        y: 93.75 + r * Math.sin(theta),
       });
     }
     
-    // Connect nearby points - limit connections
-    let connectionCount = 0;
-    const maxConnections = 15; // Limit total connections
-    
-    for (let i = 0; i < points.length && connectionCount < maxConnections; i++) {
-      for (let j = i + 1; j < points.length && connectionCount < maxConnections; j++) {
+    // Connect nearby points
+    for (let i = 0; i < points.length; i++) {
+      for (let j = i + 1; j < points.length; j++) {
         const dx = points[i].x - points[j].x;
         const dy = points[i].y - points[j].y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
         // Only connect points that are relatively close
-        if (distance < 60 && distance > 10) {
+        if (distance < 37.5 && distance > 6.25) { // Adjusted for 25% larger sphere
           // Create curved connection path
           const midX = (points[i].x + points[j].x) / 2 + (Math.random() - 0.5) * 10;
           const midY = (points[i].y + points[j].y) / 2 + (Math.random() - 0.5) * 10;
@@ -329,7 +335,6 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
             opacity: 0.1 + Math.random() * 0.2,
             width: 0.3 + Math.random() * 0.5,
           });
-          connectionCount++;
         }
       }
     }
@@ -338,71 +343,25 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
   };
   
   const plasmaWeb = generatePlasmaWeb();
-  
-  // Generate swirl/smoke patterns
-  const generateSwirlPaths = () => {
-    const swirls = [];
-    const numSwirls = 3;
-    
-    for (let i = 0; i < numSwirls; i++) {
-      const startAngle = (i / numSwirls) * Math.PI * 2;
-      const spiralPath = [];
-      
-      // Create spiral from center outward
-      for (let j = 0; j <= 50; j++) {
-        const t = j / 50;
-        const angle = startAngle + t * Math.PI * 4; // 2 full rotations
-        const radius = 10 + t * 90; // From 10 to 100
-        const x = 150 + Math.cos(angle) * radius;
-        const y = 150 + Math.sin(angle) * radius;
-        
-        if (j === 0) {
-          spiralPath.push(`M${x},${y}`);
-        } else {
-          // Add curve for smoother path
-          const prevT = (j - 1) / 50;
-          const prevAngle = startAngle + prevT * Math.PI * 4;
-          const prevRadius = 10 + prevT * 90;
-          const prevX = 150 + Math.cos(prevAngle) * prevRadius;
-          const prevY = 150 + Math.sin(prevAngle) * prevRadius;
-          
-          const cpX = (prevX + x) / 2;
-          const cpY = (prevY + y) / 2;
-          
-          spiralPath.push(`Q${cpX},${cpY} ${x},${y}`);
-        }
-      }
-      
-      swirls.push({
-        path: spiralPath.join(' '),
-        opacity: 0.1 + i * 0.05,
-        strokeWidth: 2 - i * 0.3,
-      });
-    }
-    
-    return swirls;
-  };
-  
-  const swirlPaths = generateSwirlPaths();
 
   // Generate starfield particles
   const generateStarfield = () => {
     const stars = [];
-    const numStars = 150; // Gereduceerd voor betere performance
+    const numStars = 150; // Gereduceerd voor performance
     
     for (let i = 0; i < numStars; i++) {
-      const r = Math.random() * 100 + 5; // Random radius within sphere
+      const r = Math.random() * 62.5 + 3.125; // Random radius within sphere (25% larger)
       const theta = Math.random() * Math.PI * 2;
       const opacity = 0.1 + Math.random() * 0.5;
-      const size = 0.3 + Math.random() * 1.5;
+      const size = 0.1875 + Math.random() * 0.9375;
       
       // Twinkle animation parameters
       const twinkleDelay = Math.random() * 3000;
       const twinkleDuration = 1000 + Math.random() * 2000;
       
       stars.push({
-        x: 150 + r * Math.cos(theta),
-        y: 150 + r * Math.sin(theta),
+        x: 93.75 + r * Math.cos(theta),
+        y: 93.75 + r * Math.sin(theta),
         r: size,
         opacity: opacity,
         twinkleDelay: twinkleDelay,
@@ -415,16 +374,44 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
   
   const starfield = generateStarfield();
   
-  // Star twinkle animations - maak 500 shared values
+  // Star twinkle animations - 25 animated stars
+  // Create shared values outside of array mapping to follow React Hooks rules
+  const starOpacity0 = useSharedValue(1);
   const starOpacity1 = useSharedValue(1);
   const starOpacity2 = useSharedValue(1);
   const starOpacity3 = useSharedValue(1);
   const starOpacity4 = useSharedValue(1);
   const starOpacity5 = useSharedValue(1);
+  const starOpacity6 = useSharedValue(1);
+  const starOpacity7 = useSharedValue(1);
+  const starOpacity8 = useSharedValue(1);
+  const starOpacity9 = useSharedValue(1);
+  const starOpacity10 = useSharedValue(1);
+  const starOpacity11 = useSharedValue(1);
+  const starOpacity12 = useSharedValue(1);
+  const starOpacity13 = useSharedValue(1);
+  const starOpacity14 = useSharedValue(1);
+  const starOpacity15 = useSharedValue(1);
+  const starOpacity16 = useSharedValue(1);
+  const starOpacity17 = useSharedValue(1);
+  const starOpacity18 = useSharedValue(1);
+  const starOpacity19 = useSharedValue(1);
+  const starOpacity20 = useSharedValue(1);
+  const starOpacity21 = useSharedValue(1);
+  const starOpacity22 = useSharedValue(1);
+  const starOpacity23 = useSharedValue(1);
+  const starOpacity24 = useSharedValue(1);
   
-  // Voor simplicity gebruik ik maar 3 animated stars, de rest static
-  const animatedStarIndices = [0, 50, 100];
-  const starOpacities = [starOpacity1, starOpacity2, starOpacity3];
+  const starOpacities = [
+    starOpacity0, starOpacity1, starOpacity2, starOpacity3, starOpacity4,
+    starOpacity5, starOpacity6, starOpacity7, starOpacity8, starOpacity9,
+    starOpacity10, starOpacity11, starOpacity12, starOpacity13, starOpacity14,
+    starOpacity15, starOpacity16, starOpacity17, starOpacity18, starOpacity19,
+    starOpacity20, starOpacity21, starOpacity22, starOpacity23, starOpacity24
+  ];
+  
+  // Select 25 random star indices to animate
+  const animatedStarIndices = Array.from({ length: 25 }, (_, i) => Math.floor(i * 150 / 25));
   
   // Setup twinkle animations voor de 5 animated stars
   useEffect(() => {
@@ -447,122 +434,96 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} pointerEvents="none">
+      {/* Outer vibration field */}
+      <Animated.View style={[styles.vibrationField, glowStyle]} />
+      
+      {/* Additional glow layers for depth */}
+      <Animated.View 
+        style={[
+          styles.glowLayer2,
+          {
+            shadowColor: colors.glow,
+            shadowOpacity: 0.4,
+          }
+        ]} 
+      />
+      
+      {/* Echte blur/glow effects met React Native shadow */}
+      <View 
+        style={{
+          position: 'absolute',
+          width: 125,
+          height: 125,
+          borderRadius: 62.5,
+          backgroundColor: 'transparent',
+          shadowColor: colors.glow,
+          shadowOffset: { width: 0, height: 0 },
+          shadowRadius: 31.25,
+          shadowOpacity: 0.6,
+          elevation: 30,
+        }}
+      />
+      <View 
+        style={{
+          position: 'absolute',
+          width: 93.75,
+          height: 93.75,
+          borderRadius: 46.875,
+          left: 15.625,
+          top: 15.625,
+          backgroundColor: 'transparent',
+          shadowColor: '#FFFFFF',
+          shadowOffset: { width: 0, height: 0 },
+          shadowRadius: 25,
+          shadowOpacity: 0.4,
+          elevation: 25,
+        }}
+      />
+      <View 
+        style={{
+          position: 'absolute',
+          width: 62.5,
+          height: 62.5,
+          borderRadius: 31.25,
+          left: 31.25,
+          top: 31.25,
+          backgroundColor: 'transparent',
+          shadowColor: colors.ring,
+          shadowOffset: { width: 0, height: 0 },
+          shadowRadius: 18.75,
+          shadowOpacity: 0.8,
+          elevation: 20,
+        }}
+      />
+      
       {/* Main plasma sphere */}
       <AnimatedSvg
-        width={300}
-        height={300}
-        viewBox="0 0 300 300"
+        width={187.5}
+        height={187.5}
+        viewBox="0 0 187.5 187.5"
         style={[styles.sphere, sphereStyle]}
         pointerEvents="none"
       >
         <Defs>
-          {/* Kern blur gradient - vrouwelijke energie kleuren */}
-          <RadialGradient id="kernBlur" cx="50%" cy="50%" r="50%">
+          {/* Complex gradient for plasma effect with animated stops */}
+
+          {/* Inner glow gradient */}
+          <RadialGradient id="innerGlow" cx="50%" cy="50%" r="30%">
             <Stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
-            <Stop offset="5%" stopColor="#FFFFFF" stopOpacity="0.95" />
-            <Stop offset="10%" stopColor="#FFF8E7" stopOpacity="0.9" />
-            <Stop offset="20%" stopColor="#FFE4B5" stopOpacity="0.7" />
-            <Stop offset="30%" stopColor="#FFD700" stopOpacity="0.5" />
-            <Stop offset="40%" stopColor="#FFDAB9" stopOpacity="0.4" />
-            <Stop offset="50%" stopColor="#FFA07A" stopOpacity="0.3" />
-            <Stop offset="70%" stopColor="#FF8C69" stopOpacity="0.1" />
-            <Stop offset="100%" stopColor="#E6A8A8" stopOpacity="0" />
+            <Stop offset="50%" stopColor={colors.glow} stopOpacity="0.8" />
+            <Stop offset="100%" stopColor={colors.glow} stopOpacity="0" />
           </RadialGradient>
           
-          {/* 3D Inner glow gradient voor diepte */}
-          <RadialGradient id="innerGlow3D" cx="40%" cy="40%" r="60%">
-            <Stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.8" />
-            <Stop offset="30%" stopColor="#FFF8E7" stopOpacity="0.5" />
-            <Stop offset="60%" stopColor="#FFD700" stopOpacity="0.3" />
-            <Stop offset="100%" stopColor="transparent" stopOpacity="0" />
-          </RadialGradient>
-          
-          {/* Corona blur gradient - warme vrouwelijke energie kleuren */}
-          <RadialGradient id="coronaBlur" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%" stopColor="transparent" stopOpacity="0" />
+          {/* Corona glow gradient */}
+          <RadialGradient id="coronaGlow" cx="50%" cy="50%" r="50%">
             <Stop offset="70%" stopColor="transparent" stopOpacity="0" />
-            <Stop offset="80%" stopColor="#FFA07A" stopOpacity="0.4" />
-            <Stop offset="85%" stopColor="#FF8C69" stopOpacity="0.7" />
-            <Stop offset="90%" stopColor="#FF7F50" stopOpacity="0.9" />
-            <Stop offset="95%" stopColor="#F08080" stopOpacity="1" />
-            <Stop offset="100%" stopColor="#E6A8A8" stopOpacity="0.5" />
-          </RadialGradient>
-          
-          {/* Extra glow gradients voor intense outer ring */}
-          <RadialGradient id="outerGlow1" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%" stopColor="transparent" stopOpacity="0" />
-            <Stop offset="85%" stopColor="transparent" stopOpacity="0" />
-            <Stop offset="92%" stopColor="#FFB6C1" stopOpacity="0.6" />
-            <Stop offset="96%" stopColor="#FFA07A" stopOpacity="0.8" />
-            <Stop offset="100%" stopColor="#FF8C69" stopOpacity="0.4" />
-          </RadialGradient>
-          
-          <RadialGradient id="outerGlow2" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%" stopColor="transparent" stopOpacity="0" />
-            <Stop offset="88%" stopColor="transparent" stopOpacity="0" />
-            <Stop offset="94%" stopColor="#FFE4B5" stopOpacity="0.7" />
-            <Stop offset="97%" stopColor="#FFDAB9" stopOpacity="0.5" />
-            <Stop offset="100%" stopColor="#FFCCCB" stopOpacity="0.2" />
-          </RadialGradient>
-          
-          <RadialGradient id="outerGlow3" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%" stopColor="transparent" stopOpacity="0" />
-            <Stop offset="82%" stopColor="transparent" stopOpacity="0" />
-            <Stop offset="90%" stopColor="#FFB6C1" stopOpacity="0.5" />
-            <Stop offset="95%" stopColor="#FFA07A" stopOpacity="0.6" />
-            <Stop offset="100%" stopColor="#FF8C69" stopOpacity="0.3" />
+            <Stop offset="90%" stopColor={colors.ring} stopOpacity="0.3" />
+            <Stop offset="100%" stopColor={colors.ring} stopOpacity="0.4" />
           </RadialGradient>
         </Defs>
 
-        {/* Simplified volumetric glow - 1 subtle circle */}
-        <Circle cx={150} cy={150} r={145} fill={colors.glow} opacity={0.02} />
-
-        {/* 3D Depth Shells - vrouwelijke energy kleuren */}
-        {/* Outer shell - zeer transparant */}
-        <Circle
-          cx={150}
-          cy={150}
-          r={108}
-          fill="#E6C2A6"
-          opacity={0.05}
-        />
-        
-        {/* Second shell */}
-        <Circle
-          cx={150}
-          cy={150}
-          r={106}
-          fill="#DDBEA9"
-          opacity={0.08}
-        />
-        
-        {/* Third shell */}
-        <Circle
-          cx={150}
-          cy={150}
-          r={104}
-          fill="#D4A76A"
-          opacity={0.12}
-        />
-        
-        {/* Fourth shell */}
-        <Circle
-          cx={150}
-          cy={150}
-          r={102}
-          fill="#C8A888"
-          opacity={0.18}
-        />
-        
-        {/* Inner shell - base sphere */}
-        <Circle
-          cx={150}
-          cy={150}
-          r={100}
-          fill="#E6C2A6"
-          opacity={0.3}
-        />
+        {/* Removed dark base sphere - sphere is now transparent */}
 
         {/* Starfield particles - sterrenstelsel effect */}
         <G opacity={0.8}>
@@ -599,36 +560,16 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
             <Path
               key={`web-${index}`}
               d={connection.path}
-              stroke="#FFE4B5"
+              stroke={colors.lightning}
               strokeWidth={connection.width}
               fill="none"
               opacity={connection.opacity}
             />
           ))}
         </G>
-        
-        {/* Swirl/smoke patterns - animated rotation */}
-        <AnimatedG 
-          animatedProps={useAnimatedProps(() => ({
-            opacity: 0.3,
-            transform: [{ rotate: `${swirlRotation.value}deg` }]
-          }))}
-          originX={150}
-          originY={150}
-        >
-          {swirlPaths.map((swirl, index) => (
-            <Path
-              key={`swirl-${index}`}
-              d={swirl.path}
-              stroke={colors.glow}
-              strokeWidth={swirl.strokeWidth}
-              fill="none"
-              opacity={swirl.opacity}
-              strokeLinecap="round"
-            />
-          ))}
-        </AnimatedG>
 
+        {/* Main and secondary lightning paths removed */}
+        
         {/* Micro lightning layer - zeer fijne details */}
         <G opacity={0.6}>
           {microLightningPaths.map((lightning, index) => (
@@ -646,44 +587,47 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
 
         {/* Mistige wolkachtige kern structuur - organisch verspreid */}
         <G opacity={0.6}>
-          {/* Organisch verspreide plasma wolken - vrouwelijke energy kleuren */}
-          <Circle cx={130} cy={135} r={34} fill="#FFD700" opacity={0.15} />
-          <Circle cx={170} cy={140} r={30} fill="#FFDAB9" opacity={0.12} />
-          <Circle cx={145} cy={170} r={29} fill="#FFB6C1" opacity={0.18} />
-          <Circle cx={160} cy={130} r={32} fill="#FFA07A" opacity={0.1} />
-          <Circle cx={140} cy={160} r={26} fill="#FF8C69" opacity={0.2} />
-          <Circle cx={165} cy={155} r={24} fill="#FFCCCB" opacity={0.15} />
-          <Circle cx={125} cy={150} r={27} fill="#FFE4B5" opacity={0.12} />
-          <Circle cx={150} cy={125} r={23} fill="#FFC0CB" opacity={0.18} />
-          <Circle cx={145} cy={175} r={26} fill="#FF7F50" opacity={0.13} />
-          <Circle cx={155} cy={145} r={21} fill="#FFA07A" opacity={0.2} />
+          {/* Organisch verspreide plasma wolken */}
+          <Circle cx={81.25} cy={84.375} r={21.25} fill="#FFB6C1" opacity={0.15} />
+          <Circle cx={106.25} cy={87.5} r={18.75} fill="#FFDAB9" opacity={0.12} />
+          <Circle cx={90.625} cy={106.25} r={18.125} fill="#FFA07A" opacity={0.18} />
+          <Circle cx={100} cy={81.25} r={20} fill="#FFD700" opacity={0.1} />
+          <Circle cx={87.5} cy={100} r={16.25} fill="#FFB6C1" opacity={0.2} />
+          <Circle cx={103.125} cy={96.875} r={15} fill="#FFDAB9" opacity={0.15} />
+          <Circle cx={78.125} cy={93.75} r={16.875} fill="#FF7F50" opacity={0.12} />
+          <Circle cx={93.75} cy={78.125} r={14.375} fill="#FFB6C1" opacity={0.18} />
+          <Circle cx={90.625} cy={109.375} r={16.25} fill="#FFA07A" opacity={0.13} />
+          <Circle cx={96.875} cy={90.625} r={13.125} fill="#FFD700" opacity={0.2} />
           {/* Extra wolken voor meer body */}
-          <Circle cx={120} cy={170} r={30} fill="#FFD700" opacity={0.1} />
-          <Circle cx={180} cy={160} r={26} fill="#FFB6C1" opacity={0.12} />
-          <Circle cx={135} cy={120} r={29} fill="#FFDAB9" opacity={0.15} />
+          <Circle cx={75} cy={106.25} r={18.75} fill="#FFDAB9" opacity={0.1} />
+          <Circle cx={112.5} cy={100} r={16.25} fill="#FFB6C1" opacity={0.12} />
+          <Circle cx={84.375} cy={75} r={18.125} fill="#FFA07A" opacity={0.15} />
           {/* Nog meer plasma wolken voor volume */}
-          <Circle cx={110} cy={145} r={32} fill="#FFA07A" opacity={0.08} />
-          <Circle cx={190} cy={135} r={27} fill="#FFCCCB" opacity={0.11} />
-          <Circle cx={150} cy={190} r={25} fill="#FF8C69" opacity={0.14} />
-          <Circle cx={175} cy={115} r={29} fill="#FFE4B5" opacity={0.09} />
-          <Circle cx={125} cy={185} r={28} fill="#FFA07A" opacity={0.13} />
-          <Circle cx={165} cy={175} r={26} fill="#FFB6C1" opacity={0.1} />
+          <Circle cx={68.75} cy={90.625} r={20} fill="#FF7F50" opacity={0.08} />
+          <Circle cx={118.75} cy={84.375} r={16.875} fill="#FFD700" opacity={0.11} />
+          <Circle cx={93.75} cy={118.75} r={15.625} fill="#FFB6C1" opacity={0.14} />
+          <Circle cx={109.375} cy={71.875} r={18.125} fill="#FFDAB9" opacity={0.09} />
+          <Circle cx={78.125} cy={115.625} r={17.5} fill="#FFA07A" opacity={0.13} />
+          <Circle cx={103.125} cy={109.375} r={16.25} fill="#FF7F50" opacity={0.1} />
         </G>
 
-        {/* Kern met blur effect - 1 circle met gradient */}
-        <Circle cx={150} cy={150} r={50} fill="url(#kernBlur)" />
-        
-        {/* 3D highlight op kern */}
-        <Circle cx={140} cy={140} r={35} fill="url(#innerGlow3D)" opacity={0.6} />
-        
-        {/* Helder centrum punt */}
-        <Circle cx={150} cy={150} r={3} fill="#FFFFFF" opacity={1} />
+        {/* Kern glow effect - meerdere layers voor intense glow */}
+        <Circle cx={93.75} cy={93.75} r={23.75} fill="#FFFFFF" opacity={0.1} />
+        <Circle cx={93.75} cy={93.75} r={18.75} fill="#FFFFFF" opacity={0.15} />
+        <Circle cx={93.75} cy={93.75} r={16.25} fill="#FFFFFF" opacity={0.2} />
+        <Circle cx={93.75} cy={93.75} r={14.375} fill="#FFF8DC" opacity={0.3} />
+        <Circle cx={93.75} cy={93.75} r={11.875} fill="#FFB6C1" opacity={0.4} />
+        <Circle cx={93.75} cy={93.75} r={9.375} fill="#FFDAB9" opacity={0.5} />
+        <Circle cx={93.75} cy={93.75} r={6.875} fill="#FFFFFF" opacity={0.5} />
+        <Circle cx={93.75} cy={93.75} r={5} fill="#FFFFFF" opacity={0.7} />
+        <Circle cx={93.75} cy={93.75} r={2.5} fill="#FFFFFF" opacity={0.9} />
+        <Circle cx={93.75} cy={93.75} r={1.25} fill="#FFFFFF" opacity={1} />
 
         {/* Energy discharge ring */}
         <AnimatedCircle
-          cx={150}
-          cy={150}
-          r={108}
+          cx={93.75}
+          cy={93.75}
+          r={67.5}
           stroke={colors.ring}
           fill="none"
           animatedProps={useAnimatedProps(() => ({
@@ -691,26 +635,51 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
             strokeWidth: interpolate(
               energyDischarge.value,
               [0, 1],
-              [2, 5]
+              [1.25, 3.125]
             ),
           }))}
         />
 
-        {/* Corona met intense glow/blur - meerdere overlappende circles */}
-        <G>
-          {/* Simplified corona effect - fewer layers for performance */}
-          <Circle cx={150} cy={150} r={110} fill="url(#coronaBlur)" opacity={0.4} />
-          <Circle cx={150} cy={150} r={108} fill="url(#coronaBlur)" opacity={0.6} />
-          
-          {/* Single glow layer */}
-          <Circle cx={150} cy={150} r={105} fill="url(#outerGlow1)" opacity={0.5} />
-          
-          {/* Clean edge highlight */}
-          <Circle cx={150} cy={150} r={105} stroke={colors.ring} strokeWidth={2} fill="none" opacity={0.7} />
-          <Circle cx={150} cy={150} r={103} stroke="#FFFFFF" strokeWidth={0.5} fill="none" opacity={0.3} />
-        </G>
+        {/* Zachte outer ring - 1 layer met vrouwelijke kleuren */}
+        <Circle
+          cx={93.75}
+          cy={93.75}
+          r={65.625}
+          stroke={colors.ring}
+          strokeWidth={3.75}
+          fill="none"
+          opacity={0.35}
+        />
       </AnimatedSvg>
+
+      {/* Additional glow layer */}
+      <Animated.View 
+        style={[
+          styles.glowLayer,
+          {
+            shadowColor: colors.glow,
+          },
+          glowStyle
+        ]} 
+      />
       
+      {/* Extra glow for intense white core */}
+      <View 
+        style={{
+          position: 'absolute',
+          width: 31.25,
+          height: 31.25,
+          borderRadius: 15.625,
+          backgroundColor: 'transparent',
+          shadowColor: '#FFFFFF',
+          shadowOffset: { width: 0, height: 0 },
+          shadowRadius: 18.75,
+          shadowOpacity: 0.9,
+          elevation: 25,
+          left: 78.125,
+          top: 78.125,
+        }}
+      />
     </View>
   );
 };
@@ -718,15 +687,51 @@ export const EnergyCore: React.FC<EnergyCoreProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    left: SCREEN_WIDTH / 2 - 150,
-    top: SCREEN_HEIGHT * 0.3, // Gebruik top ipv bottom voor stabiele positie
-    width: 300,
-    height: 300,
+    left: SCREEN_WIDTH / 2 - 93.75,
+    top: SCREEN_HEIGHT * 0.6 - 93.75,
+    width: 187.5,
+    height: 187.5,
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    pointerEvents: 'none', // Laat touch events door naar input fields
+    justifyContent: 'center',
+    overflow: 'visible',
   },
   sphere: {
     zIndex: 2,
+  },
+  vibrationField: {
+    position: 'absolute',
+    width: 218.75,
+    height: 218.75,
+    borderRadius: 109.375,
+    backgroundColor: 'transparent',
+    shadowColor: '#FFDAB9',
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 50,
+    shadowOpacity: 0.8,
+    elevation: 10,
+    left: -15.625,
+    top: -15.625,
+  },
+  glowLayer: {
+    position: 'absolute',
+    width: 187.5,
+    height: 187.5,
+    borderRadius: 93.75,
+    backgroundColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 62.5,
+    elevation: 20,
+  },
+  glowLayer2: {
+    position: 'absolute',
+    width: 206.25,
+    height: 206.25,
+    borderRadius: 103.125,
+    backgroundColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 43.75,
+    elevation: 15,
+    left: -9.375,
+    top: -9.375,
   },
 });

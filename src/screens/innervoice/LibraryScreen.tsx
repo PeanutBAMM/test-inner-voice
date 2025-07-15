@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,12 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MOCK_LIBRARY_ITEMS } from '../../services/innervoice/mockLibraryData';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface LibraryItem {
   id: string;
@@ -25,9 +26,18 @@ interface LibraryItem {
 
 export default function LibraryScreen() {
   const navigation = useNavigation();
+  const { theme } = useTheme();
+  const scrollViewRef = useRef<ScrollView>(null);
   const [libraryItems, setLibraryItems] = useState<LibraryItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Reset scroll position when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+    }, [])
+  );
 
   useEffect(() => {
     loadLibraryItems();
@@ -61,27 +71,29 @@ export default function LibraryScreen() {
 
   const categories = Array.from(new Set(libraryItems.map(item => item.category).filter(Boolean)));
 
+  const dynamicStyles = createStyles(theme);
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={dynamicStyles.container}>
       <LinearGradient
-        colors={['#FAFAF8', '#F5F0FF']}
+        colors={theme.isDark ? ['#0F1419', '#1A2332'] : ['#FAFAF8', '#F5F0FF']}
         style={StyleSheet.absoluteFillObject}
       />
       
-      <View style={styles.header}>
+      <View style={dynamicStyles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#8B7BA7" />
+          <Ionicons name="arrow-back" size={24} color={theme.colors.textSecondary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mijn Bibliotheek</Text>
+        <Text style={dynamicStyles.headerTitle}>Mijn Bibliotheek</Text>
         <View style={{ width: 24 }} />
       </View>
 
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#C3B5E3" style={styles.searchIcon} />
+      <View style={dynamicStyles.searchContainer}>
+        <Ionicons name="search" size={20} color={theme.colors.textLight} style={dynamicStyles.searchIcon} />
         <TextInput
-          style={styles.searchInput}
+          style={dynamicStyles.searchInput}
           placeholder='Zoek in je inzichten...'
-          placeholderTextColor='#C3B5E380'
+          placeholderTextColor={theme.colors.textLight + '80'}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -91,18 +103,18 @@ export default function LibraryScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.categoriesContainer}
+          style={dynamicStyles.categoriesContainer}
         >
           <TouchableOpacity
             style={[
-              styles.categoryChip,
-              !selectedCategory && styles.categoryChipActive
+              dynamicStyles.categoryChip,
+              !selectedCategory && dynamicStyles.categoryChipActive
             ]}
             onPress={() => setSelectedCategory(null)}
           >
             <Text style={[
-              styles.categoryText,
-              !selectedCategory && styles.categoryTextActive
+              dynamicStyles.categoryText,
+              !selectedCategory && dynamicStyles.categoryTextActive
             ]}>Alles</Text>
           </TouchableOpacity>
           
@@ -110,28 +122,32 @@ export default function LibraryScreen() {
             <TouchableOpacity
               key={category}
               style={[
-                styles.categoryChip,
-                selectedCategory === category && styles.categoryChipActive
+                dynamicStyles.categoryChip,
+                selectedCategory === category && dynamicStyles.categoryChipActive
               ]}
               onPress={() => setSelectedCategory(selectedCategory === category ? null : category || null)}
             >
               <Text style={[
-                styles.categoryText,
-                selectedCategory === category && styles.categoryTextActive
+                dynamicStyles.categoryText,
+                selectedCategory === category && dynamicStyles.categoryTextActive
               ]}>{category}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
       )}
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        ref={scrollViewRef}
+        style={dynamicStyles.content} 
+        showsVerticalScrollIndicator={false}
+      >
         {filteredItems.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="book-outline" size={64} color="#E8DFFD" />
-            <Text style={styles.emptyTitle}>
+          <View style={dynamicStyles.emptyState}>
+            <Ionicons name="book-outline" size={64} color={theme.colors.peaceful.primary[2]} />
+            <Text style={dynamicStyles.emptyTitle}>
               {searchQuery ? 'Geen inzichten gevonden' : 'Je bibliotheek is nog leeg'}
             </Text>
-            <Text style={styles.emptySubtitle}>
+            <Text style={dynamicStyles.emptySubtitle}>
               {searchQuery ? 'Probeer een andere zoekterm' : 'Bewaar belangrijke momenten uit je gesprekken'}
             </Text>
           </View>
@@ -139,17 +155,17 @@ export default function LibraryScreen() {
           filteredItems.map((item) => (
             <TouchableOpacity
               key={item.id}
-              style={styles.libraryCard}
+              style={dynamicStyles.libraryCard}
               onPress={() => navigation.navigate('ConversationDetailScreen', { 
                 conversationId: item.conversationId,
               })}
             >
-              <Text style={styles.cardText}>{item.text}</Text>
+              <Text style={dynamicStyles.cardText}>{item.text}</Text>
               {item.note && (
-                <Text style={styles.cardNote}>{item.note}</Text>
+                <Text style={dynamicStyles.cardNote}>{item.note}</Text>
               )}
-              <View style={styles.cardFooter}>
-                <Text style={styles.cardDate}>
+              <View style={dynamicStyles.cardFooter}>
+                <Text style={dynamicStyles.cardDate}>
                   {item.timestamp.toLocaleDateString('nl-NL', {
                     day: 'numeric',
                     month: 'long',
@@ -157,8 +173,8 @@ export default function LibraryScreen() {
                   })}
                 </Text>
                 {item.category && (
-                  <View style={styles.cardCategory}>
-                    <Text style={styles.cardCategoryText}>{item.category}</Text>
+                  <View style={dynamicStyles.cardCategory}>
+                    <Text style={dynamicStyles.cardCategoryText}>{item.category}</Text>
                   </View>
                 )}
               </View>
@@ -170,7 +186,7 @@ export default function LibraryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -184,20 +200,20 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#4A4458',
+    color: theme.colors.text,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: theme.colors.card,
     marginHorizontal: 20,
     marginBottom: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 16,
-    shadowColor: '#000',
+    shadowColor: theme.isDark ? theme.colors.primary : '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: theme.isDark ? 0.2 : 0.05,
     shadowRadius: 4,
     elevation: 2,
   },
@@ -207,7 +223,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#4A4458',
+    color: theme.colors.text,
   },
   categoriesContainer: {
     paddingHorizontal: 20,
@@ -218,21 +234,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: 'white',
+    backgroundColor: theme.colors.card,
     marginRight: 8,
     borderWidth: 1,
-    borderColor: 'rgba(232, 223, 253, 0.3)',
+    borderColor: theme.colors.border + '4D',
   },
   categoryChipActive: {
-    backgroundColor: '#E8DFFD',
-    borderColor: '#C3B5E3',
+    backgroundColor: theme.isDark ? theme.colors.accent : theme.colors.peaceful.primary[2],
+    borderColor: theme.isDark ? theme.colors.accent : theme.colors.peaceful.accent[0],
   },
   categoryText: {
     fontSize: 14,
-    color: '#6B6478',
+    color: theme.colors.textSecondary,
   },
   categoryTextActive: {
-    color: '#8B7BA7',
+    color: theme.colors.textSecondary,
     fontWeight: '600',
   },
   content: {
@@ -247,34 +263,34 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#4A4458',
+    color: theme.colors.text,
     marginTop: 20,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: '#6B6478',
+    color: theme.colors.textSecondary,
     marginTop: 8,
     textAlign: 'center',
   },
   libraryCard: {
-    backgroundColor: 'white',
+    backgroundColor: theme.colors.card,
     padding: 20,
     borderRadius: 16,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: theme.isDark ? theme.colors.primary : '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: theme.isDark ? 0.2 : 0.05,
     shadowRadius: 4,
     elevation: 2,
   },
   cardText: {
     fontSize: 16,
-    color: '#4A4458',
+    color: theme.colors.text,
     lineHeight: 24,
   },
   cardNote: {
     fontSize: 14,
-    color: '#6B6478',
+    color: theme.colors.textSecondary,
     fontStyle: 'italic',
     marginTop: 8,
   },
@@ -286,16 +302,16 @@ const styles = StyleSheet.create({
   },
   cardDate: {
     fontSize: 12,
-    color: '#C3B5E3',
+    color: theme.colors.textLight,
   },
   cardCategory: {
-    backgroundColor: '#F5F0FF',
+    backgroundColor: theme.isDark ? theme.colors.accent + '1A' : theme.colors.peaceful.primary[1],
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
   },
   cardCategoryText: {
     fontSize: 12,
-    color: '#8B7BA7',
+    color: theme.colors.textSecondary,
   },
 });

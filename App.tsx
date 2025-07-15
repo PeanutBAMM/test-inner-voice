@@ -6,6 +6,7 @@ import RootNavigator from '@/navigation/RootNavigator';
 import useCachedResources from '@/hooks/useCachedResources';
 import useAuthStore from '@/store/useAuthStore';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 function App() {
   const isLoadingComplete = useCachedResources();
@@ -18,8 +19,10 @@ function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <RootNavigator />
-        <StatusBar style="auto" />
+        <ThemeProvider>
+          <RootNavigator />
+          <StatusBar style="auto" />
+        </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

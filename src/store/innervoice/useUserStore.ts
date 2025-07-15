@@ -9,7 +9,6 @@ export interface UserProfile {
   emotionalStyle: string;
   spiritualExperience?: string;
   currentFocus?: string;
-  coachPersonality: 'gentle' | 'wise' | 'earthly';
   allowNotifications: boolean;
   biometricEnabled: boolean;
   notificationPreference: string;
@@ -30,7 +29,6 @@ const defaultProfile: UserProfile = {
   preferredLanguage: 'Nederlands',
   primaryIntention: '',
   emotionalStyle: '',
-  coachPersonality: 'gentle',
   allowNotifications: true,
   biometricEnabled: false,
   notificationPreference: 'Af en toe, niet te vaak',

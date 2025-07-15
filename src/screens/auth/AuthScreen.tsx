@@ -11,13 +11,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '@/types/navigation';
-import { PhoneInput } from '@/components/inputs/PhoneInput';
-import { SocialLoginButton } from '@/components/buttons/SocialLoginButton';
-import { PrimaryButton } from '@/components/buttons/PrimaryButton';
-import { AuthIllustration } from '@/components/illustrations/AuthIllustration';
-import { Colors, Spacing, Typography, BorderRadius } from '@/constants/theme';
-import useAppStore from '@/store/useAppStore';
+import { AuthStackParamList } from '../../types/navigation';
+import { PhoneInput } from '../../components/inputs/PhoneInput';
+import { SocialLoginButton } from '../../components/buttons/SocialLoginButton';
+import { PrimaryButton } from '../../components/buttons/PrimaryButton';
+import { AuthIllustration } from '../../components/illustrations/AuthIllustration';
+import { Colors, Spacing, Typography, BorderRadius } from '../../constants/theme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import useAppStore from '../../store/useAppStore';
+import mockAuthService from '../../services/auth/mockAuthService';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Auth'>;
 
@@ -64,13 +66,19 @@ export default function AuthScreen({ navigation }: Props) {
 
     setIsLoading(true);
     try {
-      // In real app, this would send OTP
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+      const result = await mockAuthService.loginWithPhone(fullPhoneNumber);
       
-      // Navigate to OTP screen
-      navigation.navigate('OTPVerification', { 
-        phoneNumber: `${countryCode}${phoneNumber}` 
-      });
+      if (result.requiresOTP) {
+        // Navigate to OTP screen (not implemented in mock)
+        navigation.navigate('OTPVerification', { 
+          phoneNumber: fullPhoneNumber 
+        });
+      } else {
+        // Direct login successful - navigation will happen automatically
+        // when RootNavigator detects authentication status change
+        await AsyncStorage.setItem('triggerReload', 'true');
+      }
     } catch (error) {
       Alert.alert('Error', 'Something went wrong. Please try again.');
     } finally {
@@ -78,11 +86,20 @@ export default function AuthScreen({ navigation }: Props) {
     }
   };
 
-  const handleSocialLogin = async (provider: string) => {
-    Alert.alert(
-      'Coming Soon',
-      `${provider} login will be available soon!`
-    );
+  const handleSocialLogin = async (provider: 'google' | 'apple' | 'facebook' | 'email') => {
+    setIsLoading(true);
+    try {
+      const user = await mockAuthService.loginWithProvider(provider);
+      
+      // Successful login - trigger navigation update
+      // The RootNavigator will automatically navigate to OnboardingChat
+      // when it detects the authentication status change
+      await AsyncStorage.setItem('triggerReload', 'true');
+    } catch (error) {
+      Alert.alert('Login Error', 'Something went wrong during login. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -104,7 +121,7 @@ export default function AuthScreen({ navigation }: Props) {
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.subtitle}>
-              Log in or create an account to continue to StableWolt
+              Log in or create an account to continue to InnerVoice
             </Text>
           </View>
 
@@ -112,17 +129,17 @@ export default function AuthScreen({ navigation }: Props) {
           <View style={styles.socialSection}>
             <SocialLoginButton
               provider="google"
-              onPress={() => handleSocialLogin('Google')}
+              onPress={() => handleSocialLogin('google')}
               style={styles.socialButton}
             />
             <SocialLoginButton
               provider="apple"
-              onPress={() => handleSocialLogin('Apple')}
+              onPress={() => handleSocialLogin('apple')}
               style={styles.socialButton}
             />
             <SocialLoginButton
               provider="facebook"
-              onPress={() => handleSocialLogin('Facebook')}
+              onPress={() => handleSocialLogin('facebook')}
               style={styles.socialButton}
             />
             <SocialLoginButton
@@ -171,23 +188,68 @@ export default function AuthScreen({ navigation }: Props) {
           {/* Skip for now */}
           <TouchableOpacity 
             style={styles.skipButton}
-            onPress={() => {
-              // In real app, this would set a guest user state
-              // For now, we'll just show an alert
-              Alert.alert('Guest Mode', 'Guest mode is not implemented yet');
+            onPress={async () => {
+              setIsLoading(true);
+              try {
+                await mockAuthService.loginAsGuest();
+                navigation.navigate('OnboardingChat' as any);
+              } catch (error) {
+                Alert.alert('Error', 'Something went wrong. Please try again.');
+              } finally {
+                setIsLoading(false);
+              }
             }}
           >
             <Text style={styles.skipText}>Skip for now</Text>
           </TouchableOpacity>
 
-          {/* Back to onboarding (dev only) */}
+          {/* Development Quick Login (dev only) */}
           {isDev && (
-            <TouchableOpacity 
-              style={styles.backToOnboardingButton}
-              onPress={handleBackToOnboarding}
-            >
-              <Text style={styles.backToOnboardingText}>🔙 Terug naar onboarding</Text>
-            </TouchableOpacity>
+            <View style={styles.devSection}>
+              <Text style={styles.devSectionTitle}>🚀 Development Quick Login</Text>
+              <View style={styles.devButtonRow}>
+                <TouchableOpacity 
+                  style={styles.devButton}
+                  onPress={async () => {
+                    setIsLoading(true);
+                    try {
+                      await mockAuthService.quickLogin('user');
+                      navigation.navigate('OnboardingChat' as any);
+                    } catch (error) {
+                      Alert.alert('Error', 'Quick login failed');
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                >
+                  <Text style={styles.devButtonText}>👤 Test User</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.devButton}
+                  onPress={async () => {
+                    setIsLoading(true);
+                    try {
+                      await mockAuthService.quickLogin('admin');
+                      navigation.navigate('OnboardingChat' as any);
+                    } catch (error) {
+                      Alert.alert('Error', 'Quick login failed');
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                >
+                  <Text style={styles.devButtonText}>⚡ Admin</Text>
+                </TouchableOpacity>
+              </View>
+              
+              <TouchableOpacity 
+                style={styles.backToOnboardingButton}
+                onPress={handleBackToOnboarding}
+              >
+                <Text style={styles.backToOnboardingText}>🔙 Terug naar onboarding</Text>
+              </TouchableOpacity>
+            </View>
           )}
         </ScrollView>
       </KeyboardAvoidingView>
@@ -279,11 +341,46 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: '600',
   },
+  devSection: {
+    marginTop: Spacing.xl,
+    padding: Spacing.md,
+    backgroundColor: Colors.warning + '10',
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    borderColor: Colors.warning + '30',
+  },
+  devSectionTitle: {
+    fontSize: Typography.fontSize.sm,
+    fontWeight: '600',
+    color: Colors.warning,
+    textAlign: 'center',
+    marginBottom: Spacing.md,
+  },
+  devButtonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  devButton: {
+    flex: 1,
+    backgroundColor: Colors.primary + '20',
+    borderRadius: BorderRadius.sm,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.primary + '40',
+  },
+  devButtonText: {
+    color: Colors.primary,
+    fontSize: Typography.fontSize.sm,
+    fontWeight: '600',
+  },
   backToOnboardingButton: {
     alignSelf: 'center',
     backgroundColor: Colors.warning + '20',
     borderRadius: BorderRadius.md,
-    marginTop: Spacing.md,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
   },

@@ -5,13 +5,7 @@ import {
   StyleSheet,
   Animated,
 } from 'react-native';
-
-interface Message {
-  id: string;
-  text: string;
-  sender: 'user' | 'assistant';
-  timestamp: Date;
-}
+import { Message } from '../../../types/chat';
 
 interface MessageBubbleProps {
   message: Message;
@@ -89,12 +83,24 @@ const styles = StyleSheet.create({
   userBubble: {
     backgroundColor: '#E8DFFD',
     borderBottomRightRadius: 4,
+    // Schaduw aan rechterkant voor user messages
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
   assistantBubble: {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderBottomLeftRadius: 4,
     borderWidth: 1,
     borderColor: 'rgba(232, 223, 253, 0.3)',
+    // Schaduw aan linkerkant voor assistant messages
+    shadowColor: '#000',
+    shadowOffset: { width: -2, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
   text: {
     fontSize: 16,

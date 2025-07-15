@@ -45,16 +45,19 @@ export default function MainTabNavigator() {
           marginBottom: Platform.OS === 'ios' ? 0 : 4,
         },
         tabBarStyle: {
-          backgroundColor: Colors.background,
-          borderTopWidth: 0,
+          backgroundColor: 'rgba(255, 240, 245, 0.95)', // Lavender blush met transparantie
+          borderTopWidth: 1,
+          borderTopColor: 'rgba(255, 182, 193, 0.2)',
           height: Platform.OS === 'ios' ? 84 + insets.bottom : 64,
           paddingTop: Platform.OS === 'ios' ? 8 : 4,
           paddingBottom: Platform.OS === 'ios' ? insets.bottom : 8,
           elevation: 20,
-          shadowColor: Colors.shadow,
+          shadowColor: '#FFB6C1',
           shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.08,
+          shadowOpacity: 0.15,
           shadowRadius: 12,
+          // Glass morphism effect
+          backdropFilter: 'blur(10px)',
         },
         headerShown: false,
       })}

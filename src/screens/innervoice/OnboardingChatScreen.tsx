@@ -8,8 +8,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ChatContainer, GlassOverlay, SpiritualGradientBackground } from '../../components/chat';
-import useCoachStore, { type CoachPersonality } from '../../store/innervoice/useCoachStore';
 import useUserStore from '../../store/innervoice/useUserStore';
 import useConversationStore from '../../store/innervoice/useConversationStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -51,17 +51,6 @@ const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
   },
   {
     id: '4',
-    coach: 'Er zijn verschillende manieren waarop ik naast je kan staan. Welke spreekt je aan?',
-    inputType: 'choice',
-    choices: [
-      'Zachte Begeleider - Extra zacht en ruimte gevend',
-      'Wijze Mentor - Diepgaande vragen en filosofisch',
-      'Aardse Helper - Praktisch en in het hier-en-nu',
-    ],
-    storeAs: 'coachPersonality',
-  },
-  {
-    id: '5',
     coach: 'Hoe ervaar je meestal je emoties?',
     inputType: 'choice',
     choices: [
@@ -73,7 +62,7 @@ const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
     storeAs: 'emotionalStyle',
   },
   {
-    id: '6',
+    id: '5',
     coach: 'Wanneer voel je je het meest jezelf?',
     inputType: 'multiChoice',
     choices: [
@@ -87,7 +76,7 @@ const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
     storeAs: 'selfConnectionMoments',
   },
   {
-    id: '7',
+    id: '6',
     coach: 'Heb je ervaring met meditatieve of spirituele praktijken?',
     inputType: 'choice',
     choices: [
@@ -99,7 +88,7 @@ const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
     storeAs: 'spiritualExperience',
   },
   {
-    id: '8',
+    id: '7',
     coach: 'Op welk moment van de dag zou je graag even met me praten?',
     inputType: 'choice',
     choices: [
@@ -111,7 +100,7 @@ const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
     storeAs: 'preferredTimeOfDay',
   },
   {
-    id: '9',
+    id: '8',
     coach: 'Wil je dat ik je soms herinner aan ons moment samen?',
     inputType: 'choice',
     choices: [
@@ -122,7 +111,7 @@ const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
     storeAs: 'notificationPreference',
   },
   {
-    id: '10',
+    id: '9',
     coach: 'Is er iets specifieks waar je de komende tijd aandacht aan wilt geven?',
     inputType: 'text',
     storeAs: 'currentFocus',
@@ -136,24 +125,18 @@ export default function OnboardingChatScreen() {
   const [messages, setMessages] = useState<any[]>([]);
   const [userProfile, setUserProfile] = useState<any>({});
   const [selectedChoices, setSelectedChoices] = useState<string[]>([]);
-  const { setCoachPersonality } = useCoachStore();
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const { loadUserProfile: saveUserProfile } = useUserStore();
   const { addMessage: _addToConversationStore, setTyping: _setTyping } = useConversationStore();
 
-  // Helper to add messages to both local state and conversation store
+  // Optimized: only store locally during onboarding
   const addMessage = (message: any) => {
     setMessages(prev => [...prev, message]);
-    // Also add to conversation store
-    _addToConversationStore({
-      id: message.id,
-      text: message.text,
-      sender: message.sender as 'user' | 'assistant',
-      timestamp: message.timestamp,
-    });
+    // Skip conversation store during onboarding for performance
   };
 
   useEffect(() => {
-    // Add first question
+    // Add first question - optimized
     const firstQ = ONBOARDING_QUESTIONS[0];
     const firstMessage = {
       id: '1',
@@ -162,13 +145,8 @@ export default function OnboardingChatScreen() {
       timestamp: new Date(),
     };
     setMessages([firstMessage]);
-    _addToConversationStore({
-      id: firstMessage.id,
-      text: firstMessage.text,
-      sender: firstMessage.sender as 'assistant',
-      timestamp: firstMessage.timestamp,
-    });
-  }, [_addToConversationStore]);
+    // Skip conversation store for performance during onboarding
+  }, []);
 
   const interpolateUserData = (text: string, data: Record<string, string>) => {
     return text.replace(/{(\w+)}/g, (match, key) => data[key] || match);
@@ -206,39 +184,13 @@ export default function OnboardingChatScreen() {
     const newProfile = { ...userProfile, [question.storeAs]: answer };
     setUserProfile(newProfile);
 
-    // Special handling for coach personality selection
-    if (question.storeAs === 'coachPersonality') {
-      const personalityMap: Record<string, Partial<CoachPersonality>> = {
-        "Zachte Begeleider - Extra zacht en ruimte gevend": {
-          type: 'gentle' as const,
-          name: 'Zachte Begeleider',
-          temperature: 0.6,
-          traits: 'Extra zacht, veel ruimte gevend',
-        },
-        "Wijze Mentor - Diepgaande vragen en filosofisch": {
-          type: 'wise' as const,
-          name: 'Wijze Mentor',
-          temperature: 0.7,
-          traits: 'Diepgaand, filosofisch',
-        },
-        "Aardse Helper - Praktisch en in het hier-en-nu": {
-          type: 'earthly' as const,
-          name: 'Aardse Helper',
-          temperature: 0.8,
-          traits: 'Praktisch, hier-en-nu',
-        },
-      };
-      const selectedPersonality = typeof answer === 'string' ? personalityMap[answer] : undefined;
-      if (selectedPersonality) {
-        setCoachPersonality(selectedPersonality);
-      }
-    }
 
     // Move to next question or complete
     if (currentQuestion < ONBOARDING_QUESTIONS.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       
-      // Add next question with delay
+      // Add next question with optimized delay
+      setIsTransitioning(true);
       setTimeout(() => {
         const nextQ = ONBOARDING_QUESTIONS[currentQuestion + 1];
         setMessages(prev => [...prev, {
@@ -247,7 +199,8 @@ export default function OnboardingChatScreen() {
           sender: 'assistant',
           timestamp: new Date(),
         }]);
-      }, 800);
+        setIsTransitioning(false);
+      }, 300);
     } else {
       // Complete onboarding
       await completeOnboarding(newProfile);
@@ -263,7 +216,6 @@ export default function OnboardingChatScreen() {
       emotionalStyle: profile.emotionalStyle as string || '',
       spiritualExperience: profile.spiritualExperience as string,
       currentFocus: profile.currentFocus as string,
-      coachPersonality: (profile.coachPersonality as 'gentle' | 'wise' | 'earthly') || 'gentle',
       allowNotifications: profile.notificationPreference !== 'Nee, ik kom wel als ik er behoefte aan heb',
       biometricEnabled: false,
       notificationPreference: profile.notificationPreference as string || 'Af en toe, niet te vaak',
@@ -282,7 +234,7 @@ export default function OnboardingChatScreen() {
         sender: 'assistant',
         timestamp: new Date(),
       }]);
-    }, 800);
+    }, 300);
 
     // Trigger app reload to show MainTabs after delay
     setTimeout(() => {
@@ -317,15 +269,45 @@ export default function OnboardingChatScreen() {
     }
   };
 
+  const goToNextQuestion = () => {
+    if (currentQuestion < ONBOARDING_QUESTIONS.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+      const nextQ = ONBOARDING_QUESTIONS[currentQuestion + 1];
+      setMessages(prev => [...prev, {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        text: interpolateUserData(nextQ.coach, userProfile),
+        sender: 'assistant',
+        timestamp: new Date(),
+      }]);
+    }
+  };
+
+  const goToPreviousQuestion = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1);
+      // Remove last two messages (user answer + assistant question)
+      setMessages(prev => prev.slice(0, -2));
+    }
+  };
+
+  const skipCurrentQuestion = () => {
+    if (ONBOARDING_QUESTIONS[currentQuestion].optional) {
+      processAnswer('');
+    } else {
+      goToNextQuestion();
+    }
+  };
+
   const currentQ = ONBOARDING_QUESTIONS[currentQuestion];
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Spiritual gradient background */}
+      {/* Optimized background for onboarding performance */}
       <SpiritualGradientBackground 
         mood="peaceful"
         timeOfDay="morning" // Onboarding is like a new dawn
-        enableOrganicShapes={true}
+        enableOrganicShapes={false} // Disabled for better performance
+        enableEnergyCore={false}
       >
         <GlassOverlay intensity={8}>
         
@@ -338,6 +320,26 @@ export default function OnboardingChatScreen() {
         </TouchableOpacity>
         
         <View style={styles.progressContainer}>
+          <View style={styles.progressHeader}>
+            <Text style={styles.progressText}>
+              {currentQuestion + 1} van {ONBOARDING_QUESTIONS.length}
+            </Text>
+            <View style={styles.navigationButtons}>
+              <TouchableOpacity 
+                onPress={goToPreviousQuestion}
+                disabled={currentQuestion === 0}
+                style={[styles.navButton, currentQuestion === 0 && styles.navButtonDisabled]}
+              >
+                <Text style={[styles.navButtonText, currentQuestion === 0 && styles.navButtonTextDisabled]}>Terug</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                onPress={skipCurrentQuestion}
+                style={styles.navButton}
+              >
+                <Text style={styles.navButtonText}>Overslaan</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
           <View style={styles.progressBar}>
             <View 
               style={[
@@ -352,6 +354,8 @@ export default function OnboardingChatScreen() {
           messages={messages}
           onSendMessage={handleTextSubmit}
           inputComponent={
+            isTransitioning ? 
+              () => <View style={styles.loadingContainer}><Text style={styles.loadingText}>...</Text></View> :
             currentQ.inputType === 'choice' ? 
               () => <ChoiceInput choices={currentQ.choices!} onSelect={handleChoiceSelect} /> :
             currentQ.inputType === 'multiChoice' ?
@@ -378,19 +382,36 @@ export default function OnboardingChatScreen() {
 }
 
 // Choice Input Component
-const ChoiceInput: React.FC<{ choices: string[], onSelect: (choice: string) => void }> = ({ choices, onSelect }) => (
-  <ScrollView style={styles.choiceContainer} showsVerticalScrollIndicator={false}>
-    {choices.map((choice, index) => (
-      <TouchableOpacity
-        key={index}
-        style={styles.choiceButton}
-        onPress={() => onSelect(choice)}
+const ChoiceInput: React.FC<{ choices: string[], onSelect: (choice: string) => void }> = ({ choices, onSelect }) => {
+  const showScrollIndicator = choices.length > 4;
+  
+  return (
+    <View style={styles.choiceWrapper}>
+      <ScrollView 
+        style={styles.choiceContainer} 
+        showsVerticalScrollIndicator={showScrollIndicator}
+        contentContainerStyle={styles.choiceContentContainer}
       >
-        <Text style={styles.choiceText}>{choice}</Text>
-      </TouchableOpacity>
-    ))}
-  </ScrollView>
-);
+        {choices.map((choice, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.choiceButton}
+            onPress={() => onSelect(choice)}
+          >
+            <Text style={styles.choiceText}>{choice}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+      {showScrollIndicator && (
+        <LinearGradient
+          colors={['transparent', 'rgba(255, 255, 255, 0.9)']}
+          style={styles.fadeBottom}
+          pointerEvents="none"
+        />
+      )}
+    </View>
+  );
+};
 
 // Multi Choice Input Component
 const MultiChoiceInput: React.FC<{
@@ -398,46 +419,97 @@ const MultiChoiceInput: React.FC<{
   selected: string[],
   onToggle: (choice: string) => void,
   onSubmit: () => void
-}> = ({ choices, selected, onToggle, onSubmit }) => (
-  <View style={styles.multiChoiceContainer}>
-    <ScrollView showsVerticalScrollIndicator={false}>
-      {choices.map((choice, index) => (
-        <TouchableOpacity
-          key={index}
-          style={[
-            styles.multiChoiceButton,
-            selected.includes(choice) && styles.multiChoiceButtonSelected
-          ]}
-          onPress={() => onToggle(choice)}
+}> = ({ choices, selected, onToggle, onSubmit }) => {
+  const showScrollIndicator = choices.length > 5;
+  
+  return (
+    <View style={styles.multiChoiceWrapper}>
+      <View style={styles.multiChoiceContainer}>
+        <ScrollView 
+          showsVerticalScrollIndicator={showScrollIndicator}
+          contentContainerStyle={styles.multiChoiceContentContainer}
         >
-          <Text style={[
-            styles.choiceText,
-            selected.includes(choice) && styles.choiceTextSelected
-          ]}>{choice}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-    <TouchableOpacity
-      style={[styles.submitButton, selected.length === 0 && styles.submitButtonDisabled]}
-      onPress={onSubmit}
-      disabled={selected.length === 0}
-    >
-      <Text style={styles.submitButtonText}>Verder</Text>
-    </TouchableOpacity>
-  </View>
-);
+          {choices.map((choice, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.multiChoiceButton,
+                selected.includes(choice) && styles.multiChoiceButtonSelected
+              ]}
+              onPress={() => onToggle(choice)}
+            >
+              <Text style={[
+                styles.choiceText,
+                selected.includes(choice) && styles.choiceTextSelected
+              ]}>{choice}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        {showScrollIndicator && (
+          <LinearGradient
+            colors={['transparent', 'rgba(255, 255, 255, 0.9)']}
+            style={styles.fadeBottom}
+            pointerEvents="none"
+          />
+        )}
+      </View>
+      <TouchableOpacity
+        style={[styles.submitButton, selected.length === 0 && styles.submitButtonDisabled]}
+        onPress={onSubmit}
+        disabled={selected.length === 0}
+      >
+        <Text style={styles.submitButtonText}>Verder</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    overflow: 'visible',
   },
   progressContainer: {
     paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 10,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  progressText: {
+    fontSize: 13,
+    color: '#8B7BA7',
+    fontWeight: '500',
+  },
+  navigationButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  navButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 123, 167, 0.3)',
+  },
+  navButtonDisabled: {
+    opacity: 0.5,
+  },
+  navButtonText: {
+    fontSize: 11,
+    color: '#8B7BA7',
+    fontWeight: '500',
+  },
+  navButtonTextDisabled: {
+    color: '#C5B8E3',
   },
   progressBar: {
-    height: 4,
+    height: 3,
     backgroundColor: 'rgba(232, 223, 253, 0.2)',
     borderRadius: 2,
     overflow: 'hidden',
@@ -448,37 +520,50 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   choiceContainer: {
-    maxHeight: 250,
+    maxHeight: 350,
+    minHeight: 200,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 8,
   },
   choiceButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 16,
-    marginVertical: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(232, 223, 253, 0.3)',
-  },
-  choiceText: {
-    fontSize: 16,
-    color: '#4A4458',
-    textAlign: 'center',
-  },
-  multiChoiceContainer: {
-    paddingHorizontal: 16,
     paddingVertical: 12,
-    maxHeight: 300,
-  },
-  multiChoiceButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    paddingVertical: 14,
-    paddingHorizontal: 18,
-    borderRadius: 12,
+    paddingHorizontal: 16,
+    borderRadius: 14,
     marginVertical: 4,
     borderWidth: 1,
     borderColor: 'rgba(232, 223, 253, 0.3)',
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+  choiceText: {
+    fontSize: 15,
+    color: '#4A4458',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  multiChoiceContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    maxHeight: 400,
+    minHeight: 250,
+  },
+  multiChoiceButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    marginVertical: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(232, 223, 253, 0.3)',
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   multiChoiceButtonSelected: {
     backgroundColor: '#E8DFFD',
@@ -490,30 +575,59 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     backgroundColor: '#C3B5E3',
-    paddingVertical: 14,
+    paddingVertical: 12,
     borderRadius: 20,
-    marginTop: 12,
+    marginTop: 10,
   },
   submitButtonDisabled: {
     opacity: 0.5,
   },
   submitButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     textAlign: 'center',
   },
   skipButton: {
     position: 'absolute',
-    top: 20,
+    top: 16,
     right: 20,
     zIndex: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
   },
   skipText: {
     color: '#8B7BA7',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '500',
+  },
+  loadingContainer: {
+    padding: 16,
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#8B7BA7',
+    fontWeight: '500',
+  },
+  choiceWrapper: {
+    position: 'relative',
+  },
+  choiceContentContainer: {
+    paddingBottom: 8,
+  },
+  multiChoiceWrapper: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  multiChoiceContentContainer: {
+    paddingBottom: 8,
+  },
+  fadeBottom: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 40,
   },
 });

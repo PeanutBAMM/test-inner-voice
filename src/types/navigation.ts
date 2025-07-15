@@ -12,7 +12,7 @@ export type RootStackParamList = {
   
   // InnerVoice specific screens
   OnboardingChat: undefined;
-  MainTabs: undefined;
+  MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   ChatScreen: undefined;
   LibraryScreen: undefined;
   UpgradeModal: {

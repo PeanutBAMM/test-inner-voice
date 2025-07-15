@@ -16,6 +16,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
 import useUserStore from '../../store/innervoice/useUserStore';
 import useSubscriptionStore from '../../store/innervoice/useSubscriptionStore';
+import useAppStore from '../../store/useAppStore';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../../types/navigation';
 
 interface SettingItem {
   id: string;
@@ -27,10 +30,13 @@ interface SettingItem {
   onPress?: () => void;
 }
 
+type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 export default function SettingsScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<SettingsScreenNavigationProp>();
   const { userProfile, updateUserProfile } = useUserStore();
   const { tier, restorePurchases } = useSubscriptionStore();
+  const { theme, toggleTheme } = useAppStore();
   
   const [biometricEnabled, setBiometricEnabled] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(
@@ -124,6 +130,15 @@ export default function SettingsScreen() {
       icon: 'notifications-outline',
       value: notificationsEnabled,
       onPress: () => setNotificationsEnabled(!notificationsEnabled),
+    },
+    {
+      id: 'darkMode',
+      title: 'Donkere modus',
+      subtitle: 'Mannelijke energy kleuren',
+      type: 'toggle',
+      icon: theme === 'dark' ? 'sunny-outline' : 'moon-outline',
+      value: theme === 'dark',
+      onPress: toggleTheme,
     },
     {
       id: 'voiceOutput',

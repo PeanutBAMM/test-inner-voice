@@ -10,6 +10,7 @@ interface AppState {
   
   // App state
   isOnboarded: boolean;
+  isAppOnboarded: boolean;
   appVersion: string;
   
   // Actions
@@ -17,6 +18,7 @@ interface AppState {
   setLanguage: (language: 'nl' | 'en') => void;
   setNotificationsEnabled: (enabled: boolean) => void;
   completeOnboarding: () => void;
+  completeAppOnboarding: () => void;
   resetOnboarding: () => void;
 }
 
@@ -28,6 +30,7 @@ const useAppStore = create<AppState>()(
       language: 'nl',
       notificationsEnabled: true,
       isOnboarded: false,
+      isAppOnboarded: false,
       appVersion: '1.0.0',
       
       // Actions
@@ -43,7 +46,12 @@ const useAppStore = create<AppState>()(
       
       completeOnboarding: () => set({ isOnboarded: true }),
       
-      resetOnboarding: () => set({ isOnboarded: false }),
+      completeAppOnboarding: () => {
+        set({ isAppOnboarded: true });
+        AsyncStorage.setItem('appOnboardingCompleted', 'true');
+      },
+      
+      resetOnboarding: () => set({ isOnboarded: false, isAppOnboarded: false }),
     }),
     {
       name: 'app-storage',

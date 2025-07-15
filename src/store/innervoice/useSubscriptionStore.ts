@@ -37,7 +37,7 @@ const TIERS = {
   free: {
     type: 'free' as const,
     conversationLimit: 5,
-    dailyQuestionLimit: 3,
+    dailyQuestionLimit: 1000,
     retentionMonths: 0,
     features: {
       voiceOutput: false,

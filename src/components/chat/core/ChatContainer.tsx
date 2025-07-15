@@ -8,13 +8,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
-
-interface Message {
-  id: string;
-  text: string;
-  sender: 'user' | 'assistant';
-  timestamp: Date;
-}
+import { Message } from '../../../types/chat';
 
 interface ChatContainerProps {
   messages: Message[];
@@ -23,6 +17,9 @@ interface ChatContainerProps {
   inputComponent?: React.ComponentType<any>;
   isTyping?: boolean;
   placeholder?: string;
+  onSaveToLibrary?: (text: string, type: 'sentence' | 'paragraph') => void;
+  useSelectableMessages?: boolean;
+  style?: any;
 }
 
 export const ChatContainer: React.FC<ChatContainerProps> = ({
@@ -32,6 +29,9 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   inputComponent: InputComponent = ChatInput,
   isTyping = false,
   placeholder = "Type je bericht...",
+  onSaveToLibrary,
+  useSelectableMessages = false,
+  style,
 }) => {
   const insets = useSafeAreaInsets();
   const scrollViewRef = useRef<any>(null);
@@ -44,7 +44,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   }, [messages.length]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       {/* Background layer */}
       {background && (
         <View style={StyleSheet.absoluteFillObject}>
@@ -62,6 +62,8 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
             ref={scrollViewRef}
             messages={messages}
             isTyping={isTyping}
+            onSaveToLibrary={onSaveToLibrary}
+            useSelectableMessages={useSelectableMessages}
           />
           
           <InputComponent

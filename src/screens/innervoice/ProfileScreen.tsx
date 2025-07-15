@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,14 +10,23 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import useUserStore from '../../store/innervoice/useUserStore';
-import useCoachStore from '../../store/innervoice/useCoachStore';
 import useSubscriptionStore from '../../store/innervoice/useSubscriptionStore';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export default function ProfileScreen() {
   const { userProfile } = useUserStore();
-  const { coachPersonality } = useCoachStore();
   const { tier, usage } = useSubscriptionStore();
+  const { theme } = useTheme();
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  // Reset scroll position when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+    }, [])
+  );
 
   const stats = [
     { label: 'Gesprekken', value: usage.conversationCount },
@@ -28,22 +37,21 @@ export default function ProfileScreen() {
   const profileItems = [
     { label: 'Naam', value: userProfile?.userName || 'Niet ingesteld' },
     { label: 'Taal', value: userProfile?.preferredLanguage || 'Nederlands' },
-    { label: 'Coach', value: coachPersonality.name },
     { label: 'Focus', value: userProfile?.currentFocus || 'Geen specifieke focus' },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        colors={['#FAFAF8', '#F5F0FF']}
+        colors={theme.isDark ? ['#0F1419', '#1A2332'] : ['#FAFAF8', '#F5F0FF']}
         style={StyleSheet.absoluteFillObject}
       />
       
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.avatarContainer}>
             <LinearGradient
-              colors={['#E8E3F5', '#FAFAF8']}
+              colors={theme.isDark ? ['#2E5984', '#0F1419'] : [theme.colors.peaceful.primary[2], theme.colors.peaceful.primary[0]]}
               style={styles.avatarGradient}
             >
               <Text style={styles.avatarText}>
@@ -52,47 +60,47 @@ export default function ProfileScreen() {
             </LinearGradient>
           </View>
           
-          <Text style={styles.welcomeText}>Welkom terug,</Text>
-          <Text style={styles.nameText}>{userProfile?.userName || 'Gebruiker'}</Text>
+          <Text style={[styles.welcomeText, { color: theme.colors.textSecondary }]}>Welkom terug,</Text>
+          <Text style={[styles.nameText, { color: theme.colors.text }]}>{userProfile?.userName || 'Gebruiker'}</Text>
           
-          <View style={styles.tierBadge}>
+          <View style={[styles.tierBadge, { backgroundColor: theme.colors.card }]}>
             <Ionicons 
               name={tier.type === 'premium' ? 'star' : 'star-outline'} 
               size={16} 
-              color={tier.type === 'premium' ? '#FFD700' : '#C3B5E3'} 
+              color={tier.type === 'premium' ? '#FFD700' : theme.colors.textLight} 
             />
-            <Text style={styles.tierText}>
+            <Text style={[styles.tierText, { color: theme.colors.text }]}>
               {tier.type === 'premium' ? 'Premium' : 'Free'}
             </Text>
           </View>
         </View>
 
-        <View style={styles.statsContainer}>
+        <View style={[styles.statsContainer, { backgroundColor: theme.colors.card }]}>
           {stats.map((stat, index) => (
             <View key={index} style={styles.statItem}>
-              <Text style={styles.statValue}>{stat.value}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
+              <Text style={[styles.statValue, { color: theme.colors.textSecondary }]}>{stat.value}</Text>
+              <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>{stat.label}</Text>
             </View>
           ))}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Profiel Details</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Profiel Details</Text>
           {profileItems.map((item, index) => (
-            <View key={index} style={styles.profileItem}>
-              <Text style={styles.itemLabel}>{item.label}</Text>
-              <Text style={styles.itemValue}>{item.value}</Text>
+            <View key={index} style={[styles.profileItem, { borderBottomColor: theme.colors.border + '4D' }]}>
+              <Text style={[styles.itemLabel, { color: theme.colors.textSecondary }]}>{item.label}</Text>
+              <Text style={[styles.itemValue, { color: theme.colors.text }]}>{item.value}</Text>
             </View>
           ))}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Jouw Reis</Text>
-          <View style={styles.journeyCard}>
-            <Text style={styles.journeyText}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Jouw Reis</Text>
+          <View style={[styles.journeyCard, { backgroundColor: theme.colors.card }]}>
+            <Text style={[styles.journeyText, { color: theme.colors.text }]}>
               Je bent begonnen met: &quot;{userProfile?.primaryIntention || 'Zelfontdekking'}&quot;
             </Text>
-            <Text style={styles.journeySubtext}>
+            <Text style={[styles.journeySubtext, { color: theme.colors.textSecondary }]}>
               Blijf trouw aan je pad en vier elke kleine stap voorwaarts.
             </Text>
           </View>
@@ -101,7 +109,7 @@ export default function ProfileScreen() {
         {tier.type === 'free' && (
           <TouchableOpacity style={styles.upgradeButton}>
             <LinearGradient
-              colors={['#E8DFFD', '#C3B5E3']}
+              colors={[theme.colors.peaceful.primary[2], theme.colors.peaceful.accent[0]]}
               style={styles.upgradeGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
@@ -144,18 +152,15 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 16,
-    color: '#6B6478',
   },
   nameText: {
     fontSize: 28,
     fontWeight: '600',
-    color: '#4A4458',
     marginTop: 4,
   },
   tierBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -170,14 +175,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 6,
-    color: '#4A4458',
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 20,
     marginHorizontal: 20,
-    backgroundColor: 'white',
     borderRadius: 16,
     marginTop: 20,
     shadowColor: '#000',
@@ -192,11 +195,9 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#8B7BA7',
   },
   statLabel: {
     fontSize: 12,
-    color: '#6B6478',
     marginTop: 4,
   },
   section: {
@@ -206,7 +207,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#4A4458',
     marginBottom: 12,
   },
   profileItem: {
@@ -214,19 +214,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(232, 223, 253, 0.3)',
   },
   itemLabel: {
     fontSize: 14,
-    color: '#6B6478',
   },
   itemValue: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#4A4458',
   },
   journeyCard: {
-    backgroundColor: 'white',
     padding: 20,
     borderRadius: 16,
     shadowColor: '#000',
@@ -237,12 +233,10 @@ const styles = StyleSheet.create({
   },
   journeyText: {
     fontSize: 16,
-    color: '#4A4458',
     lineHeight: 24,
   },
   journeySubtext: {
     fontSize: 14,
-    color: '#6B6478',
     marginTop: 8,
     fontStyle: 'italic',
   },

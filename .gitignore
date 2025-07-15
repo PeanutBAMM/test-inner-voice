@@ -91,3 +91,7 @@ ios/Pods/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Security: Environment config with API keys
+src/config/environment.ts.backup
+src/config/environment.ts

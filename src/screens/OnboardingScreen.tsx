@@ -10,10 +10,10 @@ import {
   ViewToken,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { RootStackScreenProps } from '@/types/navigation';
-import { PrimaryButton } from '@/components/buttons/PrimaryButton';
-import { theme } from '@/constants/theme';
-import useAppStore from '@/store/useAppStore';
+import { RootStackScreenProps } from '../types/navigation';
+import { PrimaryButton } from '../components/buttons/PrimaryButton';
+import { theme } from '../constants/theme';
+import useAppStore from '../store/useAppStore';
 
 type Props = RootStackScreenProps<'Onboarding'>;
 
@@ -29,20 +29,20 @@ interface OnboardingItem {
 const onboardingData: OnboardingItem[] = [
   {
     id: '1',
-    title: 'Welkom bij Apex',
-    subtitle: 'De beste manier om je app te bouwen met React Native en Expo',
+    title: 'Welkom bij InnerVoice',
+    subtitle: 'Ontdek de kracht van je innerlijke stem en begin je spirituele reis',
     image: null, // Add your image here
   },
   {
     id: '2',
-    title: 'Snel en Schaalbaar',
-    subtitle: 'Gebouwd met performance in gedachten, klaar om mee te groeien',
+    title: 'Ontdek je innerlijke wijsheid',
+    subtitle: 'Leer luisteren naar je intuïtie en vind antwoorden binnen jezelf',
     image: null, // Add your image here
   },
   {
     id: '3',
-    title: 'Alles wat je nodig hebt',
-    subtitle: 'Componenten, navigatie, state management - alles is al geregeld',
+    title: 'Begin je spirituele reis',
+    subtitle: 'Mediteer, reflecteer en groei in een veilige en ondersteunende omgeving',
     image: null, // Add your image here
   },
 ];
@@ -50,7 +50,7 @@ const onboardingData: OnboardingItem[] = [
 export default function OnboardingScreen({ navigation }: Props) {
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { completeOnboarding } = useAppStore();
+  const { completeAppOnboarding } = useAppStore();
 
   const handleViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -77,8 +77,8 @@ export default function OnboardingScreen({ navigation }: Props) {
   };
 
   const handleComplete = async () => {
-    await completeOnboarding();
-    navigation.replace('Auth', { screen: 'Auth' });
+    await completeAppOnboarding();
+    // Navigation happens automatically via RootNavigator when appOnboardingCompleted is set
   };
 
   const renderItem = ({ item }: { item: OnboardingItem }) => (
@@ -88,7 +88,7 @@ export default function OnboardingScreen({ navigation }: Props) {
           <Image source={item.image} style={styles.image} resizeMode="contain" />
         ) : (
           <View style={styles.imagePlaceholder}>
-            <Text style={styles.imagePlaceholderText}>🚀</Text>
+            <Text style={styles.imagePlaceholderText}>🧘‍♀️</Text>
           </View>
         )}
       </View>
