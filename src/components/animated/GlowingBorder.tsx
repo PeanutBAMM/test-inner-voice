@@ -18,7 +18,7 @@ import { theme } from '@/constants/theme';
 interface GlowingBorderProps {
   children: React.ReactNode;
   style?: ViewStyle;
-  colors?: string[];
+  colors?: readonly [string, string, ...string[]];
   borderWidth?: number;
   glowIntensity?: number;
 }
@@ -26,7 +26,7 @@ interface GlowingBorderProps {
 export function GlowingBorder({
   children,
   style,
-  colors = [theme.colors.primary, theme.colors.secondary, theme.colors.primary],
+  colors = [theme.colors.primary, theme.colors.secondary, theme.colors.primary] as const,
   borderWidth = 2,
   glowIntensity = 0.8,
 }: GlowingBorderProps) {
@@ -51,7 +51,7 @@ export function GlowingBorder({
       -1,
       true
     );
-  }, []);
+  }, [rotation, scale]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -66,7 +66,7 @@ export function GlowingBorder({
     <View style={[styles.container, style]}>
       <Animated.View style={[styles.glowContainer, animatedStyle]}>
         <LinearGradient
-          colors={colors as any}
+          colors={colors}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={[

@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import Animated, {
   useAnimatedProps,
+  useAnimatedStyle,
   useSharedValue,
   withTiming,
   withSpring,
@@ -85,25 +86,25 @@ export function AnimatedText({
     } else {
       startAnimation();
     }
-  }, [animation, duration, delay, children.length]);
+  }, [animation, duration, delay, children.length, opacity, translateY, scale, textLength]);
 
   const animatedProps = useAnimatedProps(() => {
     if (animation === 'typewriter') {
       return {
         text: children.slice(0, Math.floor(textLength.value)),
-      } as any;
+      } as Partial<TextProps>;
     }
     return {};
   });
 
-  const animatedStyle = useAnimatedProps(() => {
+  const animatedStyle = useAnimatedStyle(() => {
     return {
       opacity: opacity.value,
       transform: [
         { translateY: translateY.value },
         { scale: scale.value },
       ],
-    } as any;
+    };
   });
 
   if (animation === 'typewriter') {

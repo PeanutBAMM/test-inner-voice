@@ -19,7 +19,7 @@ import Animated, {
 import { LinearGradient } from 'expo-linear-gradient';
 import { theme } from '@/constants/theme';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface ParallaxScrollViewProps extends ScrollViewProps {
   children: React.ReactNode;

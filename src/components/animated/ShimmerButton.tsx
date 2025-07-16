@@ -3,7 +3,6 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  View,
   ViewStyle,
 } from 'react-native';
 import Animated, {
@@ -11,7 +10,6 @@ import Animated, {
   useSharedValue,
   withRepeat,
   withTiming,
-  interpolate,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { theme } from '@/constants/theme';
@@ -32,7 +30,7 @@ export function ShimmerButton({ title, onPress, style, disabled }: ShimmerButton
       -1,
       false
     );
-  }, []);
+  }, [shimmerTranslateX]);
 
   const shimmerStyle = useAnimatedStyle(() => {
     return {

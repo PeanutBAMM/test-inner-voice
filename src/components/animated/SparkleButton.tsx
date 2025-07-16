@@ -40,42 +40,33 @@ const Sparkle = ({ index, color }: SparkleProps) => {
   useEffect(() => {
     const delay = index * 200;
     
-    scale.value = withDelay(
-      delay,
-      withRepeat(
-        withSequence(
-          withSpring(1, { damping: 5 }),
-          withTiming(0, { duration: 500 })
-        ),
-        -1,
-        false
-      )
+    scale.value = withRepeat(
+      withSequence(
+        withSpring(1, { damping: 5 }),
+        withTiming(0, { duration: 500 })
+      ),
+      -1,
+      false
     );
 
-    rotate.value = withDelay(
-      delay,
-      withRepeat(
-        withTiming(360, {
-          duration: 2000,
-          easing: Easing.linear,
-        }),
-        -1,
-        false
-      )
+    rotate.value = withRepeat(
+      withTiming(360, {
+        duration: 2000,
+        easing: Easing.linear,
+      }),
+      -1,
+      false
     );
 
-    opacity.value = withDelay(
-      delay,
-      withRepeat(
-        withSequence(
-          withTiming(1, { duration: 300 }),
-          withTiming(0, { duration: 700 })
-        ),
-        -1,
-        false
-      )
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 300 }),
+        withTiming(0, { duration: 700 })
+      ),
+      -1,
+      false
     );
-  }, [index]);
+  }, [index, opacity, rotate, scale]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const translateX = interpolate(
@@ -107,13 +98,6 @@ const Sparkle = ({ index, color }: SparkleProps) => {
   );
 };
 
-const withDelay = (delay: number, animation: any) => {
-  'worklet';
-  return withSequence(
-    withTiming(0, { duration: delay }),
-    animation
-  );
-};
 
 export function SparkleButton({
   title,

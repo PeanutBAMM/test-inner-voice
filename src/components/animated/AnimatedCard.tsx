@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  View,
   StyleSheet,
   TouchableWithoutFeedback,
   ViewStyle,
@@ -36,7 +35,7 @@ export function AnimatedCard({ children, style, onPress, delay = 0 }: AnimatedCa
     }, delay);
 
     return () => clearTimeout(timeout);
-  }, [delay]);
+  }, [delay, scale, opacity]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const pressedScale = interpolate(pressed.value, [0, 1], [1, 0.95]);

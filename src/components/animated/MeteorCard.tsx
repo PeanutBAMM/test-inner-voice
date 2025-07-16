@@ -22,13 +22,13 @@ interface MeteorCardProps {
   children: React.ReactNode;
   style?: ViewStyle;
   meteorCount?: number;
-  meteorColors?: string[];
+  meteorColors?: readonly [string, string, ...string[]];
 }
 
 interface MeteorProps {
   delay: number;
   duration: number;
-  colors: string[];
+  colors: readonly [string, string, ...string[]];
 }
 
 const Meteor = ({ delay, duration, colors }: MeteorProps) => {
@@ -69,7 +69,7 @@ const Meteor = ({ delay, duration, colors }: MeteorProps) => {
         false
       )
     );
-  }, [delay, duration]);
+  }, [delay, duration, opacity, translateX, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -85,7 +85,7 @@ const Meteor = ({ delay, duration, colors }: MeteorProps) => {
   return (
     <Animated.View style={[styles.meteor, animatedStyle]}>
       <LinearGradient
-        colors={colors as any}
+        colors={colors}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.meteorGradient}
@@ -98,7 +98,7 @@ export function MeteorCard({
   children,
   style,
   meteorCount = 5,
-  meteorColors = ['transparent', theme.colors.primary, 'transparent'],
+  meteorColors = ['transparent', theme.colors.primary, 'transparent'] as const,
 }: MeteorCardProps) {
   const meteors = Array.from({ length: meteorCount }, (_, i) => ({
     id: i,
