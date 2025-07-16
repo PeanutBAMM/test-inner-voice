@@ -4,33 +4,25 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 // Define your param lists
 export type RootStackParamList = {
-  // Original screens
+  // Main screens
   Onboarding: undefined;
   Auth: NavigatorScreenParams<AuthStackParamList>;
-  Main: NavigatorScreenParams<MainTabParamList>;
-  Modal: { title: string; message: string };
-  
-  // InnerVoice specific screens
   OnboardingChat: undefined;
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
-  ChatScreen: undefined;
-  LibraryScreen: undefined;
+  
+  // Modal screens
   UpgradeModal: {
     reason?: string;
     resetTime?: string;
   };
-  ConversationDetail: {
-    conversationId: string;
-  };
+  
+  // Detail screens
   ConversationDetailScreen: {
     conversationId: string;
     date?: string;
   };
-  LanguageSettings: undefined;
   LanguageSettingsScreen: undefined;
-  PrivacyPolicy: undefined;
   PrivacyPolicyScreen: undefined;
-  TermsOfService: undefined;
   TermsOfServiceScreen: undefined;
 };
 

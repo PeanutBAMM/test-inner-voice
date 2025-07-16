@@ -15,7 +15,7 @@ import { PrimaryButton } from '../components/buttons/PrimaryButton';
 import { theme } from '../constants/theme';
 import useAppStore from '../store/useAppStore';
 
-type Props = RootStackScreenProps<'Onboarding'>;
+// type Props = RootStackScreenProps<'Onboarding'>;
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -47,7 +47,7 @@ const onboardingData: OnboardingItem[] = [
   },
 ];
 
-export default function OnboardingScreen({ navigation }: Props) {
+export default function OnboardingScreen() {
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const { completeAppOnboarding } = useAppStore();
@@ -78,7 +78,7 @@ export default function OnboardingScreen({ navigation }: Props) {
 
   const handleComplete = async () => {
     await completeAppOnboarding();
-    // Navigation happens automatically via RootNavigator when appOnboardingCompleted is set
+    // Navigation happens automatically via RootNavigator when isAppOnboarded state changes
   };
 
   const renderItem = ({ item }: { item: OnboardingItem }) => (
@@ -100,7 +100,7 @@ export default function OnboardingScreen({ navigation }: Props) {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
         <Text style={styles.skipText}>Skip</Text>
       </TouchableOpacity>

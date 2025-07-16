@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
-  SafeAreaView,
   Text,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { ChatContainer, GlassOverlay, SpiritualGradientBackground } from '../../components/chat';
 import useUserStore from '../../store/innervoice/useUserStore';
 import useConversationStore from '../../store/innervoice/useConversationStore';
@@ -121,6 +122,7 @@ const ONBOARDING_QUESTIONS: OnboardingQuestion[] = [
 
 export default function OnboardingChatScreen() {
   const _navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [messages, setMessages] = useState<any[]>([]);
   const [userProfile, setUserProfile] = useState<any>({});
@@ -260,10 +262,8 @@ export default function OnboardingChatScreen() {
       // Save profile and mark onboarding as completed
       await AsyncStorage.setItem('userProfile', JSON.stringify(defaultProfile));
       await AsyncStorage.setItem('onboardingCompleted', 'true');
-      await AsyncStorage.setItem('triggerReload', Date.now().toString());
       
-      // Navigate to main app
-      _navigation.replace('MainTabs');
+      // RootNavigator will automatically navigate based on the updated state
     } catch (error) {
       console.error('Error skipping onboarding:', error);
     }
@@ -314,32 +314,12 @@ export default function OnboardingChatScreen() {
         {/* Skip button */}
         <TouchableOpacity 
           onPress={skipOnboarding} 
-          style={styles.skipButton}
+          style={[styles.skipButton, { top: insets.top + 16 }]}
         >
           <Text style={styles.skipText}>Overslaan</Text>
         </TouchableOpacity>
         
         <View style={styles.progressContainer}>
-          <View style={styles.progressHeader}>
-            <Text style={styles.progressText}>
-              {currentQuestion + 1} van {ONBOARDING_QUESTIONS.length}
-            </Text>
-            <View style={styles.navigationButtons}>
-              <TouchableOpacity 
-                onPress={goToPreviousQuestion}
-                disabled={currentQuestion === 0}
-                style={[styles.navButton, currentQuestion === 0 && styles.navButtonDisabled]}
-              >
-                <Text style={[styles.navButtonText, currentQuestion === 0 && styles.navButtonTextDisabled]}>Terug</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                onPress={skipCurrentQuestion}
-                style={styles.navButton}
-              >
-                <Text style={styles.navButtonText}>Overslaan</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
           <View style={styles.progressBar}>
             <View 
               style={[
@@ -357,7 +337,15 @@ export default function OnboardingChatScreen() {
             isTransitioning ? 
               () => <View style={styles.loadingContainer}><Text style={styles.loadingText}>...</Text></View> :
             currentQ.inputType === 'choice' ? 
-              () => <ChoiceInput choices={currentQ.choices!} onSelect={handleChoiceSelect} /> :
+              () => <ChoiceInput 
+                choices={currentQ.choices!} 
+                onSelect={handleChoiceSelect}
+                onPrevious={goToPreviousQuestion}
+                onSkip={skipCurrentQuestion}
+                canGoPrevious={currentQuestion > 0}
+                currentQuestion={currentQuestion}
+                totalQuestions={ONBOARDING_QUESTIONS.length}
+              /> :
             currentQ.inputType === 'multiChoice' ?
               () => <MultiChoiceInput 
                 choices={currentQ.choices!} 
@@ -370,6 +358,11 @@ export default function OnboardingChatScreen() {
                   );
                 }}
                 onSubmit={handleMultiChoiceSubmit}
+                onPrevious={goToPreviousQuestion}
+                onSkip={skipCurrentQuestion}
+                canGoPrevious={currentQuestion > 0}
+                currentQuestion={currentQuestion}
+                totalQuestions={ONBOARDING_QUESTIONS.length}
               /> :
               undefined
           }
@@ -382,7 +375,15 @@ export default function OnboardingChatScreen() {
 }
 
 // Choice Input Component
-const ChoiceInput: React.FC<{ choices: string[], onSelect: (choice: string) => void }> = ({ choices, onSelect }) => {
+const ChoiceInput: React.FC<{ 
+  choices: string[], 
+  onSelect: (choice: string) => void,
+  onPrevious: () => void,
+  onSkip: () => void,
+  canGoPrevious: boolean,
+  currentQuestion: number,
+  totalQuestions: number
+}> = ({ choices, onSelect, onPrevious, onSkip, canGoPrevious, currentQuestion, totalQuestions }) => {
   const showScrollIndicator = choices.length > 4;
   
   return (
@@ -409,6 +410,36 @@ const ChoiceInput: React.FC<{ choices: string[], onSelect: (choice: string) => v
           pointerEvents="none"
         />
       )}
+      
+      {/* Navigation buttons */}
+      <View style={styles.navigationContainer}>
+        <TouchableOpacity
+          style={[styles.navIconButton, !canGoPrevious && styles.navIconButtonDisabled]}
+          onPress={onPrevious}
+          disabled={!canGoPrevious}
+        >
+          <Ionicons 
+            name="arrow-back" 
+            size={24} 
+            color={canGoPrevious ? '#8B7BA7' : '#C5B8E3'} 
+          />
+        </TouchableOpacity>
+        
+        <Text style={styles.questionCounter}>
+          {currentQuestion + 1} / {totalQuestions}
+        </Text>
+        
+        <TouchableOpacity
+          style={styles.navIconButton}
+          onPress={onSkip}
+        >
+          <Ionicons 
+            name="arrow-forward" 
+            size={24} 
+            color="#8B7BA7" 
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -418,8 +449,13 @@ const MultiChoiceInput: React.FC<{
   choices: string[],
   selected: string[],
   onToggle: (choice: string) => void,
-  onSubmit: () => void
-}> = ({ choices, selected, onToggle, onSubmit }) => {
+  onSubmit: () => void,
+  onPrevious: () => void,
+  onSkip: () => void,
+  canGoPrevious: boolean,
+  currentQuestion: number,
+  totalQuestions: number
+}> = ({ choices, selected, onToggle, onSubmit, onPrevious, onSkip, canGoPrevious, currentQuestion, totalQuestions }) => {
   const showScrollIndicator = choices.length > 5;
   
   return (
@@ -453,6 +489,8 @@ const MultiChoiceInput: React.FC<{
           />
         )}
       </View>
+      
+      {/* Submit button */}
       <TouchableOpacity
         style={[styles.submitButton, selected.length === 0 && styles.submitButtonDisabled]}
         onPress={onSubmit}
@@ -460,6 +498,36 @@ const MultiChoiceInput: React.FC<{
       >
         <Text style={styles.submitButtonText}>Verder</Text>
       </TouchableOpacity>
+      
+      {/* Navigation buttons */}
+      <View style={styles.navigationContainer}>
+        <TouchableOpacity
+          style={[styles.navIconButton, !canGoPrevious && styles.navIconButtonDisabled]}
+          onPress={onPrevious}
+          disabled={!canGoPrevious}
+        >
+          <Ionicons 
+            name="arrow-back" 
+            size={24} 
+            color={canGoPrevious ? '#8B7BA7' : '#C5B8E3'} 
+          />
+        </TouchableOpacity>
+        
+        <Text style={styles.questionCounter}>
+          {currentQuestion + 1} / {totalQuestions}
+        </Text>
+        
+        <TouchableOpacity
+          style={styles.navIconButton}
+          onPress={onSkip}
+        >
+          <Ionicons 
+            name="arrow-forward" 
+            size={24} 
+            color="#8B7BA7" 
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -473,40 +541,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 8,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  progressText: {
-    fontSize: 13,
-    color: '#8B7BA7',
-    fontWeight: '500',
-  },
-  navigationButtons: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  navButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderWidth: 1,
-    borderColor: 'rgba(139, 123, 167, 0.3)',
-  },
-  navButtonDisabled: {
-    opacity: 0.5,
-  },
-  navButtonText: {
-    fontSize: 11,
-    color: '#8B7BA7',
-    fontWeight: '500',
-  },
-  navButtonTextDisabled: {
-    color: '#C5B8E3',
   },
   progressBar: {
     height: 3,
@@ -590,7 +624,6 @@ const styles = StyleSheet.create({
   },
   skipButton: {
     position: 'absolute',
-    top: 16,
     right: 20,
     zIndex: 10,
     paddingHorizontal: 14,
@@ -629,5 +662,37 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 40,
+  },
+  navigationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginTop: 8,
+  },
+  navIconButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 123, 167, 0.3)',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  navIconButtonDisabled: {
+    opacity: 0.5,
+    elevation: 0,
+  },
+  questionCounter: {
+    fontSize: 14,
+    color: '#8B7BA7',
+    fontWeight: '500',
   },
 });

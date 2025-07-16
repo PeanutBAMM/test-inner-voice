@@ -4,7 +4,6 @@ import {
   View,
   StyleSheet,
 } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { MessageBubble } from './MessageBubble';
 import { SelectableMessageBubbleWrapper } from './SelectableMessageBubbleWrapper';
 import { TypingIndicator } from './TypingIndicator';
@@ -20,12 +19,16 @@ interface MessageListProps {
 export const MessageList = forwardRef<ScrollView, MessageListProps>(
   ({ messages, isTyping, onSaveToLibrary, useSelectableMessages = false }, ref) => {
     return (
-      <GestureHandlerRootView style={styles.gestureContainer}>
-        <ScrollView
+      <ScrollView
           ref={ref}
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
           showsVerticalScrollIndicator={false}
+          scrollEnabled={true}
+          bounces={true}
+          alwaysBounceVertical={true}
+          overScrollMode="always"
+          keyboardShouldPersistTaps="handled"
         >
           {messages.map((message, index) => {
             const isFirstMessage = index === 0;
@@ -56,7 +59,6 @@ export const MessageList = forwardRef<ScrollView, MessageListProps>(
             </View>
           )}
         </ScrollView>
-      </GestureHandlerRootView>
     );
   }
 );
@@ -64,9 +66,6 @@ export const MessageList = forwardRef<ScrollView, MessageListProps>(
 MessageList.displayName = 'MessageList';
 
 const styles = StyleSheet.create({
-  gestureContainer: {
-    flex: 1,
-  },
   container: {
     flex: 1,
   },
@@ -74,6 +73,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 20,
     paddingBottom: 10,
+    flexGrow: 1,
+    minHeight: '100%',
   },
   typingContainer: {
     marginLeft: 16,

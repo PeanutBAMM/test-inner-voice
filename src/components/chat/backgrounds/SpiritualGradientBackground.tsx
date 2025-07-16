@@ -5,7 +5,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop, Circle } from 'react-native-svg';
+import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop, Circle, Pattern, Rect } from 'react-native-svg';
 import { EnergyCore } from './EnergyCore';
 import { useTheme } from '../../../contexts/ThemeContext';
 
@@ -233,8 +233,22 @@ export const SpiritualGradientBackground: React.FC<SpiritualGradientBackgroundPr
       {/* Time of day tint overlay */}
       <View style={[styles.tintOverlay, { backgroundColor: timeTint.tint }]} />
 
-      {/* Zand grain texture overlay */}
-      <View style={styles.grainOverlay} />
+      {/* Zand grain texture overlay met SVG pattern */}
+      <View style={styles.grainOverlay}>
+        <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT} style={StyleSheet.absoluteFillObject}>
+          <Defs>
+            <Pattern id="sandGrain" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
+              {/* Kleine dots voor grain effect */}
+              <Circle cx="1" cy="1" r="0.5" fill="rgba(255, 255, 255, 0.1)" />
+              <Circle cx="3" cy="0" r="0.3" fill="rgba(255, 255, 255, 0.08)" />
+              <Circle cx="0" cy="3" r="0.4" fill="rgba(255, 255, 255, 0.06)" />
+              <Circle cx="2" cy="2" r="0.3" fill="rgba(255, 255, 255, 0.1)" />
+              <Circle cx="3" cy="3" r="0.5" fill="rgba(255, 255, 255, 0.05)" />
+            </Pattern>
+          </Defs>
+          <Rect width="100%" height="100%" fill="url(#sandGrain)" opacity={0.3} />
+        </Svg>
+      </View>
 
       {/* Subtle vignette for focus */}
       <View style={styles.vignette} />
@@ -286,14 +300,6 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     backgroundColor: 'transparent',
-    // Subtiele grain texture effect
-    opacity: 0.08,
-    // CSS-like noise pattern simulatie
-    shadowColor: 'rgba(139, 123, 167, 0.5)',
-    shadowOffset: { width: 0.5, height: 0.5 },
-    shadowRadius: 0.5,
-    shadowOpacity: 0.3,
-    elevation: 1,
   },
   vignette: {
     position: 'absolute',

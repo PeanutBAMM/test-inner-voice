@@ -6,6 +6,7 @@ import {
   Animated,
 } from 'react-native';
 import { Message } from '../../../types/chat';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 interface MessageBubbleProps {
   message: Message;
@@ -14,6 +15,7 @@ interface MessageBubbleProps {
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
+  const { theme } = useTheme();
 
   useEffect(() => {
     Animated.parallel([
@@ -47,19 +49,16 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         style={[
           styles.bubble,
           isUser ? styles.userBubble : styles.assistantBubble,
+          {
+            shadowColor: theme.isDark ? 'rgba(255, 255, 255, 0.1)' : '#000',
+            shadowOpacity: theme.isDark ? 0.3 : 0.15,
+          }
         ]}
       >
         <Text style={[styles.text, isUser ? styles.userText : styles.assistantText]}>
           {message.text}
         </Text>
       </View>
-      
-      <Text style={styles.timestamp}>
-        {message.timestamp.toLocaleTimeString([], { 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        })}
-      </Text>
     </Animated.View>
   );
 };
@@ -111,11 +110,5 @@ const styles = StyleSheet.create({
   },
   assistantText: {
     color: '#6B6478',
-  },
-  timestamp: {
-    fontSize: 11,
-    color: '#C3B5E3',
-    marginTop: 4,
-    marginHorizontal: 8,
   },
 });

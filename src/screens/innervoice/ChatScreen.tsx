@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import {
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackScreenProps } from '../../types/navigation';
 import { Ionicons } from '@expo/vector-icons';
 import { ChatContainer, GlassOverlay, SpiritualGradientBackground } from '../../components/chat';
@@ -16,7 +15,7 @@ import useLibraryStore from '../../store/innervoice/useLibraryStore';
 import { useTheme } from '../../contexts/ThemeContext';
 
 export default function ChatScreen() {
-  const navigation = useNavigation<RootStackScreenProps<'ChatScreen'>['navigation']>();
+  const navigation = useNavigation<RootStackScreenProps<'MainTabs'>['navigation']>();
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
   const { getCoachResponse } = useCoachStore();
@@ -98,7 +97,6 @@ export default function ChatScreen() {
           placeholder='Deel je gedachten...'
           onSaveToLibrary={handleSaveToLibrary}
           useSelectableMessages={true}
-          style={{ paddingTop: insets.top + 80 }}
         />
         </GlassOverlay>
         

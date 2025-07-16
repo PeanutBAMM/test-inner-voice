@@ -7,13 +7,16 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import useUserStore from '../../store/innervoice/useUserStore';
 import useSubscriptionStore from '../../store/innervoice/useSubscriptionStore';
 import { useTheme } from '../../contexts/ThemeContext';
+import mockAuthService from '../../services/auth/mockAuthService';
 
 export default function ProfileScreen() {
   const { userProfile } = useUserStore();
@@ -30,7 +33,7 @@ export default function ProfileScreen() {
 
   const stats = [
     { label: 'Gesprekken', value: usage.conversationCount },
-    { label: 'Vragen vandaag', value: `${usage.questionsToday}${tier.type === 'free' ? '/3' : ''}` },
+    { label: 'Vragen vandaag', value: `${usage.questionsToday}${tier.type === 'free' ? '/1000' : ''}` },
     { label: 'Dagen actief', value: '7' }, // Mock value
   ];
 
@@ -43,7 +46,7 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        colors={theme.isDark ? ['#0F1419', '#1A2332'] : ['#FAFAF8', '#F5F0FF']}
+        colors={theme.isDark ? ['#0F1419', '#1A2332'] : [theme.colors.background, theme.colors.surface]}
         style={StyleSheet.absoluteFillObject}
       />
       
@@ -63,7 +66,11 @@ export default function ProfileScreen() {
           <Text style={[styles.welcomeText, { color: theme.colors.textSecondary }]}>Welkom terug,</Text>
           <Text style={[styles.nameText, { color: theme.colors.text }]}>{userProfile?.userName || 'Gebruiker'}</Text>
           
-          <View style={[styles.tierBadge, { backgroundColor: theme.colors.card }]}>
+          <View style={[styles.tierBadge, { 
+            backgroundColor: theme.colors.card,
+            shadowColor: theme.isDark ? theme.colors.primary : '#000',
+            shadowOpacity: theme.isDark ? 0.2 : 0.05,
+          }]}>
             <Ionicons 
               name={tier.type === 'premium' ? 'star' : 'star-outline'} 
               size={16} 
@@ -75,7 +82,11 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <View style={[styles.statsContainer, { backgroundColor: theme.colors.card }]}>
+        <View style={[styles.statsContainer, { 
+          backgroundColor: theme.colors.card,
+          shadowColor: theme.isDark ? theme.colors.primary : '#000',
+          shadowOpacity: theme.isDark ? 0.2 : 0.05,
+        }]}>
           {stats.map((stat, index) => (
             <View key={index} style={styles.statItem}>
               <Text style={[styles.statValue, { color: theme.colors.textSecondary }]}>{stat.value}</Text>
@@ -96,7 +107,11 @@ export default function ProfileScreen() {
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Jouw Reis</Text>
-          <View style={[styles.journeyCard, { backgroundColor: theme.colors.card }]}>
+          <View style={[styles.journeyCard, { 
+            backgroundColor: theme.colors.card,
+            shadowColor: theme.isDark ? theme.colors.primary : '#000',
+            shadowOpacity: theme.isDark ? 0.2 : 0.05,
+          }]}>
             <Text style={[styles.journeyText, { color: theme.colors.text }]}>
               Je bent begonnen met: &quot;{userProfile?.primaryIntention || 'Zelfontdekking'}&quot;
             </Text>
@@ -119,6 +134,40 @@ export default function ProfileScreen() {
             </LinearGradient>
           </TouchableOpacity>
         )}
+        
+        {/* Logout Button */}
+        <TouchableOpacity 
+          style={styles.logoutButton}
+          onPress={async () => {
+            Alert.alert(
+              'Uitloggen',
+              'Weet je zeker dat je wilt uitloggen?',
+              [
+                { text: 'Annuleren', style: 'cancel' },
+                { 
+                  text: 'Uitloggen', 
+                  style: 'destructive',
+                  onPress: async () => {
+                    // Clear auth status
+                    await mockAuthService.logout();
+                    // Clear user data
+                    await AsyncStorage.multiRemove([
+                      'userProfile',
+                      'onboardingCompleted',
+                      'conversation-store',
+                      'subscription-store',
+                      'user-store',
+                      'coach-store'
+                    ]);
+                    // Navigation wordt automatisch afgehandeld door RootNavigator
+                  }
+                }
+              ]
+            );
+          }}
+        >
+          <Text style={styles.logoutText}>Uitloggen</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -165,9 +214,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     marginTop: 12,
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
   },
@@ -183,9 +230,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     borderRadius: 16,
     marginTop: 20,
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
   },
@@ -225,9 +270,7 @@ const styles = StyleSheet.create({
   journeyCard: {
     padding: 20,
     borderRadius: 16,
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
   },
@@ -258,5 +301,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: 'white',
     marginLeft: 8,
+  },
+  logoutButton: {
+    marginHorizontal: 20,
+    marginTop: 20,
+    marginBottom: 40,
+    paddingVertical: 16,
+    alignItems: 'center',
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#FF6B6B',
+  },
+  logoutText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FF6B6B',
   },
 });

@@ -33,6 +33,8 @@ interface SubscriptionStore {
   getTimeUntilReset: () => string;
 }
 
+const STORE_VERSION = 2; // Increment when schema changes
+
 const TIERS = {
   free: {
     type: 'free' as const,
@@ -177,6 +179,22 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
     }),
     {
       name: 'subscription-store',
+      version: STORE_VERSION,
+      migrate: (persistedState: any, version: number) => {
+        if (version < STORE_VERSION) {
+          // Reset to defaults with new limit
+          return {
+            tier: TIERS.free,
+            usage: {
+              questionsToday: 0,
+              conversationCount: 0,
+              lastResetDate: new Date().toDateString(),
+            },
+            isPremium: false,
+          };
+        }
+        return persistedState;
+      },
       storage: {
         getItem: async (name) => {
           const value = await AsyncStorage.getItem(name);

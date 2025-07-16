@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CustomTabBar } from '../components/navigation/CustomTabBar';
 
 // Screens
 import OnboardingScreen from '../screens/OnboardingScreen';
@@ -22,6 +23,7 @@ import UpgradeModal from '../screens/innervoice/UpgradeModal';
 // Stores
 import useCoachStore from '../store/innervoice/useCoachStore';
 import useUserStore from '../store/innervoice/useUserStore';
+import useAppStore from '../store/useAppStore';
 
 // Services
 import mockAuthService from '../services/auth/mockAuthService';
@@ -32,33 +34,10 @@ const Tab = createBottomTabNavigator();
 function MainTabs() {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName: keyof typeof Ionicons.glyphMap = 'help-circle';
-
-          if (route.name === 'Chat') {
-            iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
-          } else if (route.name === 'Library') {
-            iconName = focused ? 'book' : 'book-outline';
-          } else if (route.name === 'Profile') {
-            iconName = focused ? 'person' : 'person-outline';
-          } else if (route.name === 'Settings') {
-            iconName = focused ? 'settings' : 'settings-outline';
-          }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: '#8B7BA7',
-        tabBarInactiveTintColor: '#C3B5E3',
-        tabBarStyle: {
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          borderTopColor: 'rgba(232, 223, 253, 0.3)',
-          paddingBottom: 5,
-          paddingTop: 5,
-          height: 60,
-        },
+      tabBar={(props) => <CustomTabBar {...props} />}
+      screenOptions={{
         headerShown: false,
-      })}
+      }}
     >
       <Tab.Screen name="Chat" component={ChatScreen} options={{ title: 'Gesprek' }} />
       <Tab.Screen name="Library" component={LibraryScreen} options={{ title: 'Bibliotheek' }} />
@@ -71,33 +50,37 @@ function MainTabs() {
 export default function RootNavigator() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
-  const [hasCompletedAppOnboarding, setHasCompletedAppOnboarding] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { initializeCoach } = useCoachStore();
   const { loadUserProfile } = useUserStore();
+  const { isAppOnboarded, initializeFromStorage } = useAppStore();
 
   useEffect(() => {
     checkOnboardingStatus();
     
-    // Listen for onboarding completion trigger
-    const checkReload = setInterval(async () => {
-      const trigger = await AsyncStorage.getItem('triggerReload');
-      if (trigger) {
-        await AsyncStorage.removeItem('triggerReload');
+    // Poll for auth status changes and reload triggers
+    const statusCheckInterval = setInterval(async () => {
+      const authStatus = await mockAuthService.isAuthenticated();
+      const triggerReload = await AsyncStorage.getItem('triggerReload');
+      
+      if (authStatus !== isAuthenticated || triggerReload) {
+        if (triggerReload) {
+          await AsyncStorage.removeItem('triggerReload');
+        }
         checkOnboardingStatus();
       }
     }, 1000);
     
-    return () => clearInterval(checkReload);
-  }, []);
+    return () => clearInterval(statusCheckInterval);
+  }, [isAuthenticated]);
 
   const checkOnboardingStatus = async () => {
     try {
-      const appOnboardingCompleted = await AsyncStorage.getItem('appOnboardingCompleted');
+      // Initialize app store from AsyncStorage
+      await initializeFromStorage();
+      
       const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
       const userProfile = await AsyncStorage.getItem('userProfile');
-      
-      setHasCompletedAppOnboarding(appOnboardingCompleted === 'true');
       
       // Check authentication status
       const authStatus = await mockAuthService.isAuthenticated();
@@ -129,15 +112,15 @@ export default function RootNavigator() {
           animation: 'fade',
         }}
       >
-        {!hasCompletedAppOnboarding ? (
+        {!isAppOnboarded ? (
           <Stack.Screen 
             name="Onboarding" 
-            component={OnboardingScreen as any} 
+            component={OnboardingScreen} 
           />
         ) : !isAuthenticated ? (
           <Stack.Screen 
             name="Auth" 
-            component={AuthScreen as any} 
+            component={AuthScreen} 
           />
         ) : !hasCompletedOnboarding ? (
           <Stack.Screen 
@@ -148,18 +131,6 @@ export default function RootNavigator() {
           <>
             <Stack.Screen 
               name="MainTabs" 
-              component={MainTabs} 
-            />
-            <Stack.Screen 
-              name="ChatScreen" 
-              component={ChatScreen} 
-            />
-            <Stack.Screen 
-              name="LibraryScreen" 
-              component={LibraryScreen} 
-            />
-            <Stack.Screen 
-              name="Main" 
               component={MainTabs} 
             />
             <Stack.Screen 

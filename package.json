@@ -21,7 +21,10 @@
     "prebuild": "expo prebuild",
     "build:android": "eas build --platform android",
     "build:ios": "eas build --platform ios",
-    "test:voice": "node scripts/test-voice-input.js"
+    "test:voice": "node scripts/test-voice-input.js",
+    "check": "bash scripts/full-app-check.sh",
+    "check:quick": "npm run type-check && npm run lint",
+    "check:full": "bash scripts/full-app-check.sh"
   },
   "dependencies": {
     "@expo/vector-icons": "14.0.4",

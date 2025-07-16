@@ -54,10 +54,10 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
 
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        behavior="padding"
+        keyboardVerticalOffset={0}
       >
-        <View style={[styles.content, { paddingBottom: insets.bottom }]}>
+        <View style={styles.content}>
           <MessageList
             ref={scrollViewRef}
             messages={messages}

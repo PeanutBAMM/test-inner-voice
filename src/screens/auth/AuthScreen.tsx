@@ -21,9 +21,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useAppStore from '../../store/useAppStore';
 import mockAuthService from '../../services/auth/mockAuthService';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'Auth'>;
+// type Props = NativeStackScreenProps<AuthStackParamList, 'Auth'>;
 
-export default function AuthScreen({ navigation }: Props) {
+export default function AuthScreen({ navigation }: any) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -77,7 +77,6 @@ export default function AuthScreen({ navigation }: Props) {
       } else {
         // Direct login successful - navigation will happen automatically
         // when RootNavigator detects authentication status change
-        await AsyncStorage.setItem('triggerReload', 'true');
       }
     } catch (error) {
       Alert.alert('Error', 'Something went wrong. Please try again.');
@@ -91,10 +90,8 @@ export default function AuthScreen({ navigation }: Props) {
     try {
       const user = await mockAuthService.loginWithProvider(provider);
       
-      // Successful login - trigger navigation update
-      // The RootNavigator will automatically navigate to OnboardingChat
-      // when it detects the authentication status change
-      await AsyncStorage.setItem('triggerReload', 'true');
+      // Successful login - navigation will happen automatically
+      // when RootNavigator detects authentication status change
     } catch (error) {
       Alert.alert('Login Error', 'Something went wrong during login. Please try again.');
     } finally {
@@ -192,7 +189,7 @@ export default function AuthScreen({ navigation }: Props) {
               setIsLoading(true);
               try {
                 await mockAuthService.loginAsGuest();
-                navigation.navigate('OnboardingChat' as any);
+                // Navigation will happen automatically via RootNavigator
               } catch (error) {
                 Alert.alert('Error', 'Something went wrong. Please try again.');
               } finally {
@@ -214,7 +211,11 @@ export default function AuthScreen({ navigation }: Props) {
                     setIsLoading(true);
                     try {
                       await mockAuthService.quickLogin('user');
-                      navigation.navigate('OnboardingChat' as any);
+                      // Clear onboarding for this test user
+                      await AsyncStorage.removeItem('onboardingCompleted');
+                      // Trigger RootNavigator to re-check status
+                      await AsyncStorage.setItem('triggerReload', Date.now().toString());
+                      // Navigation will happen automatically via RootNavigator
                     } catch (error) {
                       Alert.alert('Error', 'Quick login failed');
                     } finally {
@@ -222,7 +223,7 @@ export default function AuthScreen({ navigation }: Props) {
                     }
                   }}
                 >
-                  <Text style={styles.devButtonText}>👤 Test User</Text>
+                  <Text style={styles.devButtonText}>👤 Onboarding User</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
@@ -231,7 +232,7 @@ export default function AuthScreen({ navigation }: Props) {
                     setIsLoading(true);
                     try {
                       await mockAuthService.quickLogin('admin');
-                      navigation.navigate('OnboardingChat' as any);
+                      // Navigation will happen automatically via RootNavigator
                     } catch (error) {
                       Alert.alert('Error', 'Quick login failed');
                     } finally {

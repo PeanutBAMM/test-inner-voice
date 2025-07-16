@@ -16,7 +16,7 @@ import useSubscriptionStore from '../../store/innervoice/useSubscriptionStore';
 import { theme } from '../../constants/theme';
 
 export default function ChatScreen() {
-  const navigation = useNavigation<RootStackScreenProps<'ChatScreen'>['navigation']>();
+  const navigation = useNavigation<RootStackScreenProps<'MainTabs'>['navigation']>();
   const { getCoachResponse } = useCoachStore();
   const { messages, addMessage, isTyping, setTyping } = useConversationStore();
   const { canAskQuestion, recordQuestion } = useSubscriptionStore();
@@ -85,7 +85,7 @@ export default function ChatScreen() {
           <Text style={styles.headerTitle}>InnerVoice</Text>
 
           <TouchableOpacity
-            onPress={() => navigation.navigate('Main', { screen: 'Profile' })}
+            onPress={() => navigation.navigate('MainTabs', { screen: 'Profile' })}
             style={styles.headerButton}
           >
             <Ionicons name="person-circle-outline" size={28} color={theme.colors.textSecondary} />

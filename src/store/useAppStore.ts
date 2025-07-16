@@ -20,6 +20,7 @@ interface AppState {
   completeOnboarding: () => void;
   completeAppOnboarding: () => void;
   resetOnboarding: () => void;
+  initializeFromStorage: () => Promise<void>;
 }
 
 const useAppStore = create<AppState>()(
@@ -52,6 +53,20 @@ const useAppStore = create<AppState>()(
       },
       
       resetOnboarding: () => set({ isOnboarded: false, isAppOnboarded: false }),
+      
+      initializeFromStorage: async () => {
+        try {
+          const appOnboardingCompleted = await AsyncStorage.getItem('appOnboardingCompleted');
+          const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
+          
+          set({
+            isAppOnboarded: appOnboardingCompleted === 'true',
+            isOnboarded: onboardingCompleted === 'true',
+          });
+        } catch (error) {
+          console.error('Error initializing from storage:', error);
+        }
+      },
     }),
     {
       name: 'app-storage',
