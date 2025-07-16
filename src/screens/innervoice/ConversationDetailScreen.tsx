@@ -3,25 +3,30 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { RootStackParamList } from '../../types/navigation';
+import { TAB_BAR_HEIGHT } from '../../constants/navigation';
 
 type ConversationDetailRouteProp = RouteProp<RootStackParamList, 'ConversationDetailScreen'>;
 
 export default function ConversationDetailScreen() {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const route = useRoute<ConversationDetailRouteProp>();
   const { conversationId, date } = route.params || {};
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { 
+      paddingTop: insets.top,
+      paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
+    }]}>
       <LinearGradient
         colors={['rgba(232, 223, 253, 0.3)', 'rgba(255, 255, 255, 0)']}
         style={styles.gradient}
@@ -58,7 +63,7 @@ export default function ConversationDetailScreen() {
           </Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

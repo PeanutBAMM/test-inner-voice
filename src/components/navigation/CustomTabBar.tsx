@@ -13,9 +13,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../contexts/ThemeContext';
+import { TAB_BAR_HEIGHT } from '../../constants/navigation';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const TAB_BAR_HEIGHT = 64;
 
 export const CustomTabBar: React.FC<BottomTabBarProps> = ({
   state,
@@ -77,8 +77,8 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({
             StyleSheet.absoluteFillObject,
             {
               backgroundColor: theme.isDark
-                ? 'rgba(26, 35, 50, 0.92)'
-                : 'rgba(255, 245, 248, 0.92)',
+                ? 'rgba(26, 35, 50, 0.95)'
+                : 'rgba(255, 245, 248, 0.95)',
             },
           ]}
         />
@@ -199,16 +199,6 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({
                       : theme.colors.textSecondary
                   }
                 />
-                {isFocused && (
-                  <View
-                    style={[
-                      styles.activeDot,
-                      {
-                        backgroundColor: theme.isDark ? '#4A7BA7' : '#FF69B4',
-                      },
-                    ]}
-                  />
-                )}
               </Animated.View>
               <Text
                 style={[
@@ -241,6 +231,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'transparent',
+    zIndex: 1000,
   },
   container: {
     height: TAB_BAR_HEIGHT,
@@ -248,11 +239,11 @@ const styles = StyleSheet.create({
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
+        shadowOpacity: 0.15,
+        shadowRadius: 16,
       },
       android: {
-        elevation: 20,
+        elevation: 24,
       },
     }),
   },
@@ -288,13 +279,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 40,
     height: 32,
-  },
-  activeDot: {
-    position: 'absolute',
-    bottom: -4,
-    width: 4,
-    height: 4,
-    borderRadius: 2,
   },
   label: {
     fontSize: 11,

@@ -3,12 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Image,
   Alert,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -17,8 +17,10 @@ import useUserStore from '../../store/innervoice/useUserStore';
 import useSubscriptionStore from '../../store/innervoice/useSubscriptionStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import mockAuthService from '../../services/auth/mockAuthService';
+import { TAB_BAR_HEIGHT } from '../../constants/navigation';
 
 export default function ProfileScreen() {
+  const insets = useSafeAreaInsets();
   const { userProfile } = useUserStore();
   const { tier, usage } = useSubscriptionStore();
   const { theme } = useTheme();
@@ -44,7 +46,10 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { 
+      paddingTop: insets.top,
+      paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
+    }]}>
       <LinearGradient
         colors={theme.isDark ? ['#0F1419', '#1A2332'] : [theme.colors.background, theme.colors.surface]}
         style={StyleSheet.absoluteFillObject}
@@ -169,7 +174,7 @@ export default function ProfileScreen() {
           <Text style={styles.logoutText}>Uitloggen</Text>
         </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -179,7 +184,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 20,
     paddingBottom: 20,
   },
   avatarContainer: {

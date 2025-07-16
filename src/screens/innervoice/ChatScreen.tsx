@@ -10,12 +10,14 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient';
 import { RootStackScreenProps } from '../../types/navigation';
 import { Ionicons } from '@expo/vector-icons';
-import { ChatContainer, GlassOverlay, SpiritualGradientBackground } from '../../components/chat';
+import { ChatContainer, GlassOverlay } from '../../components/chat';
+import { UniversalBackground } from '../../components/backgrounds/UniversalBackground';
 import useCoachStore from '../../store/innervoice/useCoachStore';
 import useConversationStore from '../../store/innervoice/useConversationStore';
 import useSubscriptionStore from '../../store/innervoice/useSubscriptionStore';
 import useLibraryStore from '../../store/innervoice/useLibraryStore';
 import { useTheme } from '../../contexts/ThemeContext';
+import { TAB_BAR_HEIGHT } from '../../constants/navigation';
 
 export default function ChatScreen() {
   const navigation = useNavigation<RootStackScreenProps<'MainTabs'>['navigation']>();
@@ -26,6 +28,7 @@ export default function ChatScreen() {
   const { canAskQuestion, recordQuestion } = useSubscriptionStore();
   const { saveTextSelection } = useLibraryStore();
   const [messageSent, setMessageSent] = useState(false);
+  const [isVoiceRecording, setIsVoiceRecording] = useState(false);
 
   const handleSendMessage = async (text: string) => {
     // Check if user can ask question (free tier limit)
@@ -81,30 +84,55 @@ export default function ChatScreen() {
     console.log(`${type === 'sentence' ? 'Zin' : 'Alinea'} opgeslagen in bibliotheek`);
   };
 
+  const handleStartVoiceRecording = () => {
+    setIsVoiceRecording(true);
+    // TODO: Implement actual voice recording with expo-audio
+    console.log('Voice recording started');
+  };
+
+  const handleStopVoiceRecording = () => {
+    setIsVoiceRecording(false);
+    // TODO: Implement speech-to-text conversion
+    console.log('Voice recording stopped');
+    // For now, simulate voice input
+    setTimeout(() => {
+      handleSendMessage('Dit is een test spraakbericht');
+    }, 500);
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { 
+      paddingTop: insets.top,
+      paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
+    }]}>
       {/* Spiritual gradient background */}
-      <SpiritualGradientBackground 
+      <UniversalBackground 
+        variant="spiritual"
         mood="peaceful"
         timeOfDay="afternoon"
-        enableOrganicShapes={true}
-        enableEnergyCore={false}
-        onMessageSent={messageSent}
+        enableEffects={true}
       >
         {/* Chat UI on top */}
         <GlassOverlay intensity={8}>
           <ChatContainer
-          messages={messages}
-          onSendMessage={handleSendMessage}
-          isTyping={isTyping}
-          placeholder='Deel je gedachten...'
-          onSaveToLibrary={handleSaveToLibrary}
-          useSelectableMessages={true}
-        />
+            messages={messages}
+            onSendMessage={handleSendMessage}
+            isTyping={isTyping}
+            placeholder='Deel je gedachten...'
+            onSaveToLibrary={handleSaveToLibrary}
+            useSelectableMessages={true}
+            showVoiceButton={true}
+            onStartVoiceRecording={handleStartVoiceRecording}
+            onStopVoiceRecording={handleStopVoiceRecording}
+            isVoiceRecording={isVoiceRecording}
+            bottomPadding={0}
+            keyboardVerticalOffset={insets.top}
+          />
         </GlassOverlay>
-        
-        {/* Glass Morphism Floating Button */}
-        <View style={[styles.floatingButton, styles.profileButton, { top: insets.top + 20 }]}>
+      </UniversalBackground>
+      
+      {/* Glass Morphism Floating Button */}
+      <View style={[styles.floatingButton, styles.profileButton, { top: 20 }]}>
           {/* Background layers for glass effect */}
           <View style={StyleSheet.absoluteFillObject}>
             {/* Base layer */}
@@ -113,8 +141,8 @@ export default function ChatScreen() {
                 StyleSheet.absoluteFillObject,
                 {
                   backgroundColor: theme.isDark
-                    ? 'rgba(26, 35, 50, 0.95)'
-                    : 'rgba(255, 245, 248, 0.95)',
+                    ? 'rgba(26, 35, 50, 0.35)'
+                    : 'rgba(255, 245, 248, 0.35)',
                   borderRadius: 16,
                 },
               ]}
@@ -124,8 +152,8 @@ export default function ChatScreen() {
             <LinearGradient
               colors={
                 theme.isDark
-                  ? ['rgba(46, 89, 132, 0.20)', 'rgba(46, 89, 132, 0.08)']
-                  : ['rgba(255, 182, 193, 0.20)', 'rgba(255, 218, 185, 0.08)']
+                  ? ['rgba(46, 89, 132, 0.10)', 'rgba(46, 89, 132, 0.05)']
+                  : ['rgba(255, 182, 193, 0.10)', 'rgba(255, 218, 185, 0.05)']
               }
               style={[StyleSheet.absoluteFillObject, { borderRadius: 16 }]}
               start={{ x: 0, y: 0 }}
@@ -136,8 +164,8 @@ export default function ChatScreen() {
             <LinearGradient
               colors={
                 theme.isDark
-                  ? ['transparent', 'rgba(15, 20, 25, 0.4)']
-                  : ['transparent', 'rgba(255, 255, 255, 0.4)']
+                  ? ['transparent', 'rgba(15, 20, 25, 0.2)']
+                  : ['transparent', 'rgba(255, 255, 255, 0.2)']
               }
               style={[StyleSheet.absoluteFillObject, { borderRadius: 16 }]}
               start={{ x: 0, y: 0 }}
@@ -153,8 +181,8 @@ export default function ChatScreen() {
                 borderRadius: 16,
                 borderWidth: 1,
                 borderColor: theme.isDark
-                  ? 'rgba(255, 255, 255, 0.12)'
-                  : 'rgba(255, 182, 193, 0.35)',
+                  ? 'rgba(255, 255, 255, 0.08)'
+                  : 'rgba(255, 182, 193, 0.20)',
               },
             ]}
           />
@@ -170,9 +198,8 @@ export default function ChatScreen() {
               color={theme.isDark ? '#4A7BA7' : '#FF69B4'} 
             />
           </TouchableOpacity>
-        </View>
-      </SpiritualGradientBackground>
-    </SafeAreaView>
+      </View>
+    </View>
   );
 }
 

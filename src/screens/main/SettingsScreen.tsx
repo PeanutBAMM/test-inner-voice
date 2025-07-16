@@ -3,12 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Switch,
   Alert,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -34,6 +34,7 @@ type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList
 
 export default function SettingsScreen() {
   const navigation = useNavigation<SettingsScreenNavigationProp>();
+  const insets = useSafeAreaInsets();
   const { userProfile, updateUserProfile } = useUserStore();
   const { tier, restorePurchases } = useSubscriptionStore();
   const { theme, toggleTheme } = useAppStore();
@@ -241,7 +242,7 @@ export default function SettingsScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <LinearGradient
         colors={['#FAFAF8', '#F5F0FF']}
         style={StyleSheet.absoluteFillObject}
@@ -277,7 +278,7 @@ export default function SettingsScreen() {
           <Text style={styles.footerText}>Met liefde gemaakt voor jouw innerlijke reis</Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

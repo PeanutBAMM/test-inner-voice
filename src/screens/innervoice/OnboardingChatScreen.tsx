@@ -7,10 +7,11 @@ import {
   ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { ChatContainer, GlassOverlay, SpiritualGradientBackground } from '../../components/chat';
+import { ChatContainer, GlassOverlay } from '../../components/chat';
+import { UniversalBackground } from '../../components/backgrounds/UniversalBackground';
 import useUserStore from '../../store/innervoice/useUserStore';
 import useConversationStore from '../../store/innervoice/useConversationStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -301,20 +302,20 @@ export default function OnboardingChatScreen() {
   const currentQ = ONBOARDING_QUESTIONS[currentQuestion];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Optimized background for onboarding performance */}
-      <SpiritualGradientBackground 
+      <UniversalBackground 
+        variant="spiritual"
         mood="peaceful"
         timeOfDay="morning" // Onboarding is like a new dawn
-        enableOrganicShapes={false} // Disabled for better performance
-        enableEnergyCore={false}
+        enableEffects={false} // Disabled for better performance
       >
         <GlassOverlay intensity={8}>
         
         {/* Skip button */}
         <TouchableOpacity 
           onPress={skipOnboarding} 
-          style={[styles.skipButton, { top: insets.top + 16 }]}
+          style={[styles.skipButton, { top: 16 }]}
         >
           <Text style={styles.skipText}>Overslaan</Text>
         </TouchableOpacity>
@@ -367,10 +368,12 @@ export default function OnboardingChatScreen() {
               undefined
           }
           placeholder={currentQ.optional ? 'Dit mag je overslaan...' : 'Type je antwoord...'}
+          bottomPadding={0}
+          keyboardVerticalOffset={insets.top + 60}
         />
       </GlassOverlay>
-      </SpiritualGradientBackground>
-    </SafeAreaView>
+      </UniversalBackground>
+    </View>
   );
 }
 

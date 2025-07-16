@@ -20,6 +20,12 @@ interface ChatContainerProps {
   onSaveToLibrary?: (text: string, type: 'sentence' | 'paragraph') => void;
   useSelectableMessages?: boolean;
   style?: any;
+  showVoiceButton?: boolean;
+  onStartVoiceRecording?: () => void;
+  onStopVoiceRecording?: () => void;
+  isVoiceRecording?: boolean;
+  bottomPadding?: number;
+  keyboardVerticalOffset?: number;
 }
 
 export const ChatContainer: React.FC<ChatContainerProps> = ({
@@ -32,6 +38,12 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   onSaveToLibrary,
   useSelectableMessages = false,
   style,
+  showVoiceButton = true,
+  onStartVoiceRecording,
+  onStopVoiceRecording,
+  isVoiceRecording = false,
+  bottomPadding = 0,
+  keyboardVerticalOffset = 0,
 }) => {
   const insets = useSafeAreaInsets();
   const scrollViewRef = useRef<any>(null);
@@ -55,9 +67,9 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
         behavior="padding"
-        keyboardVerticalOffset={0}
+        keyboardVerticalOffset={keyboardVerticalOffset}
       >
-        <View style={styles.content}>
+        <View style={[styles.content, { paddingBottom: bottomPadding }]}>
           <MessageList
             ref={scrollViewRef}
             messages={messages}
@@ -69,6 +81,10 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
           <InputComponent
             onSend={onSendMessage}
             placeholder={placeholder}
+            showVoiceButton={showVoiceButton}
+            onStartVoiceRecording={onStartVoiceRecording}
+            onStopVoiceRecording={onStopVoiceRecording}
+            isVoiceRecording={isVoiceRecording}
           />
         </View>
       </KeyboardAvoidingView>
@@ -85,5 +101,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    justifyContent: 'space-between',
   },
 });

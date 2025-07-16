@@ -3,16 +3,17 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function TermsOfServiceScreen() {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   const sections = [
     {
@@ -42,7 +43,7 @@ export default function TermsOfServiceScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <LinearGradient
         colors={['rgba(232, 223, 253, 0.3)', 'rgba(255, 255, 255, 0)']}
         style={styles.gradient}
@@ -89,7 +90,7 @@ export default function TermsOfServiceScreen() {
           <Text style={styles.contactEmail}>legal@innervoice.app</Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

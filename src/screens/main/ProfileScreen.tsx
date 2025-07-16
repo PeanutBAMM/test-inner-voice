@@ -3,11 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Image,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import useUserStore from '../../store/innervoice/useUserStore';
@@ -16,6 +16,7 @@ import { UniversalBackground } from '../../components/backgrounds/UniversalBackg
 import { useTheme } from '../../contexts/ThemeContext';
 
 export default function ProfileScreen() {
+  const insets = useSafeAreaInsets();
   const { userProfile } = useUserStore();
   const { tier, usage } = useSubscriptionStore();
   const { theme } = useTheme();
@@ -39,7 +40,7 @@ export default function ProfileScreen() {
       timeOfDay="afternoon"
       enableEffects={false}
     >
-      <SafeAreaView style={styles.container}>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
       
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
@@ -118,7 +119,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         )}
       </ScrollView>
-      </SafeAreaView>
+      </View>
     </UniversalBackground>
   );
 }

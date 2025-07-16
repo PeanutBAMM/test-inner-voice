@@ -3,18 +3,19 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   TextInput,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MOCK_LIBRARY_ITEMS } from '../../services/innervoice/mockLibraryData';
 import { useTheme } from '../../contexts/ThemeContext';
 import { UniversalBackground } from '../../components/backgrounds/UniversalBackground';
+import { TAB_BAR_HEIGHT } from '../../constants/navigation';
 
 interface LibraryItem {
   id: string;
@@ -27,6 +28,7 @@ interface LibraryItem {
 
 export default function LibraryScreen() {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const { theme } = useTheme();
   const scrollViewRef = useRef<ScrollView>(null);
   const [libraryItems, setLibraryItems] = useState<LibraryItem[]>([]);
@@ -79,7 +81,10 @@ export default function LibraryScreen() {
       timeOfDay="afternoon"
       enableEffects={false}
     >
-      <SafeAreaView style={styles.container}>
+      <View style={[styles.container, { 
+        paddingTop: insets.top,
+        paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
+      }]}>
       
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -209,7 +214,7 @@ export default function LibraryScreen() {
           ))
         )}
       </ScrollView>
-      </SafeAreaView>
+      </View>
     </UniversalBackground>
   );
 }

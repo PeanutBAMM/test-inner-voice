@@ -6,7 +6,6 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop, Circle, Pattern, Rect } from 'react-native-svg';
-import { EnergyCore } from './EnergyCore';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { getMoodPalette, getTimeTint, MoodPalette } from '../../../constants/moodPalettes';
 import { MoodType, TimeOfDay } from '../../../contexts/BackgroundContext';
@@ -19,9 +18,7 @@ interface SpiritualGradientBackgroundProps {
   mood?: MoodType;
   timeOfDay?: TimeOfDay;
   enableOrganicShapes?: boolean;
-  enableEnergyCore?: boolean;
   children?: React.ReactNode;
-  onMessageSent?: boolean;
 }
 
 // Mood palettes are now imported from centralized moodPalettes.ts
@@ -30,9 +27,7 @@ export const SpiritualGradientBackground: React.FC<SpiritualGradientBackgroundPr
   mood = 'peaceful',
   timeOfDay = 'afternoon',
   enableOrganicShapes = true,
-  enableEnergyCore = true,
   children,
-  onMessageSent = false,
 }) => {
   const { isDark } = useTheme();
   const palette = getMoodPalette(mood, isDark);
@@ -129,14 +124,6 @@ export const SpiritualGradientBackground: React.FC<SpiritualGradientBackgroundPr
 
       {/* Floating orbs removed for performance optimization */}
 
-      {/* Energy Core - Het kloppende hart van de app */}
-      {enableEnergyCore && (
-        <EnergyCore
-          mood={mood}
-          onPulse={onMessageSent}
-          intensity={0.7}
-        />
-      )}
 
       {/* Time of day tint overlay */}
       <View style={[styles.tintOverlay, { backgroundColor: timeTint.tint }]} />

@@ -36,7 +36,7 @@ export const MessageList = forwardRef<ScrollView, MessageListProps>(
           {messages.map((message, index) => {
             const isFirstMessage = index === 0;
             const messageStyle = isFirstMessage ? 
-              { ...styles.firstMessage, marginTop: insets.top + 80 } : {};
+              { ...styles.firstMessage, marginTop: 20 } : {};
             
             if (useSelectableMessages) {
               return (

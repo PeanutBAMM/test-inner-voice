@@ -3,9 +3,9 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -18,6 +18,7 @@ const languages = [
 
 export default function LanguageSettingsScreen() {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const { userProfile, updateUserProfile } = useUserStore();
   const [selectedLanguage, setSelectedLanguage] = useState(
     userProfile?.preferredLanguage || 'Nederlands'
@@ -29,7 +30,7 @@ export default function LanguageSettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <LinearGradient
         colors={['rgba(232, 223, 253, 0.3)', 'rgba(255, 255, 255, 0)']}
         style={styles.gradient}
@@ -85,7 +86,7 @@ export default function LanguageSettingsScreen() {
           </Text>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

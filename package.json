@@ -41,6 +41,7 @@
     "expo": "52.0.47",
     "expo-audio": "~0.3.5",
     "expo-font": "13.0.4",
+    "expo-haptics": "~14.0.1",
     "expo-image": "2.0.7",
     "expo-linear-gradient": "14.0.2",
     "expo-local-authentication": "~15.0.2",

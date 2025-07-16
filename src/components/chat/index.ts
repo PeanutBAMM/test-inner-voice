@@ -9,4 +9,3 @@ export { VoiceInput } from './core/VoiceInput';
 // Background components
 export { GlassOverlay } from './backgrounds/GlassOverlay';
 export { SpiritualGradientBackground } from './backgrounds/SpiritualGradientBackground';
-export { EnergyCore } from './backgrounds/EnergyCore';

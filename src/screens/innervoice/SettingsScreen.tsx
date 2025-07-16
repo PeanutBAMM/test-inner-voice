@@ -3,12 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Switch,
   Alert,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +18,7 @@ import useUserStore from '../../store/innervoice/useUserStore';
 import useSubscriptionStore from '../../store/innervoice/useSubscriptionStore';
 import useAppStore from '../../store/useAppStore';
 import { theme, getThemeColors } from '../../constants/theme';
+import { TAB_BAR_HEIGHT } from '../../constants/navigation';
 
 interface SettingItem {
   id: string;
@@ -31,6 +32,7 @@ interface SettingItem {
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const { userProfile, updateUserProfile } = useUserStore();
   const { tier, restorePurchases } = useSubscriptionStore();
   const { theme: currentTheme, toggleTheme } = useAppStore();
@@ -241,7 +243,10 @@ export default function SettingsScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { 
+      paddingTop: insets.top,
+      paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
+    }]}>
       <LinearGradient
         colors={themeColors.peaceful.primary as [string, string, ...string[]]}
         style={StyleSheet.absoluteFillObject}
@@ -277,7 +282,7 @@ export default function SettingsScreen() {
           <Text style={[styles.footerText, { color: themeColors.textSecondary }]}>Met liefde gemaakt voor jouw innerlijke reis</Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -287,7 +292,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 10,
     paddingBottom: 10,
   },
   headerTitle: {

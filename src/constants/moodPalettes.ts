@@ -15,13 +15,13 @@ export interface MoodPalettes {
   neutral: MoodPalette;
 }
 
-// Mood-based color palettes - Dynamische paletten voor light/dark mode
+// Mood-based color palettes - Feminine energy voor light mode
 export const MOOD_PALETTES: MoodPalettes = {
   peaceful: {
     primary: ['#FFF0F5', '#FFE4E1', '#FFD6E8', '#FFC8DD', '#FFB6C1', '#FFDAB9'], // Lavender blush naar perzik
     accent: ['#FFB6C1', '#FFA07A', '#FF7F50'], // Roze naar koraal accenten
     glow: '#FFB6C1', // Zachte roze gloed
-    sparkle: '#FFD700', // Gouden sparkle
+    sparkle: '#FFD700', // Gouden sparkle ✨
     orb1: '#FF69B4', // Hot pink voor diepte
     orb2: '#FFDAB9', // Perzik voor contrast
   },
@@ -29,7 +29,7 @@ export const MOOD_PALETTES: MoodPalettes = {
     primary: ['#F8F0F8', '#F5E6F5', '#F2DCF2', '#EFD2EF', '#ECC8EC', '#E9BEE9'], // Koele roze-lila
     accent: ['#DDA0DD', '#DA70D6', '#D8BFD8'], // Plum naar thistle
     glow: '#DDA0DD', // Plum gloed
-    sparkle: '#E6E6FA', // Lavender sparkle
+    sparkle: '#FFD700', // Gouden sparkle ✨
     orb1: '#DA70D6', // Orchid
     orb2: '#FFE4E1', // Misty rose
   },
@@ -37,69 +37,69 @@ export const MOOD_PALETTES: MoodPalettes = {
     primary: ['#FFF5EE', '#FFEFD5', '#FFE4B5', '#FFDAB9', '#FFD39B', '#FFCBA4'], // Seashell naar perzik
     accent: ['#FFA07A', '#FF7F50', '#FF6347'], // Zalm naar tomaat
     glow: '#FFA07A', // Zalm gloed
-    sparkle: '#FFD700', // Gouden sparkle
+    sparkle: '#FFD700', // Gouden sparkle ✨
     orb1: '#FF7F50', // Koraal
     orb2: '#FFE4B5', // Moccasin
   },
   grounded: {
-    primary: ['#F8F8F6', '#F5F3F0', '#F0F0E8', '#EAE8E0', '#E5E3DB', '#E0DDD6'], // Subtiele creme naar warm beige
-    accent: ['#D4C4A0', '#C8B99C', '#B8A082'], // Zachte taupe accenten
-    glow: '#D4C4A0', // Warme taupe gloed
-    sparkle: '#F0D700', // Gedempte gouden sparkle
-    orb1: '#C8B99C', // Zachte taupe
-    orb2: '#F5F3F0', // Warm wit
+    primary: ['#F5E6E6', '#F0DADA', '#EBCECE', '#E6C2C2', '#E1B6B6', '#DCAAAA'], // Aardse roze
+    accent: ['#CD5C5C', '#BC8F8F', '#F4A460'], // Indian red naar sandy brown
+    glow: '#BC8F8F', // Rosy brown gloed
+    sparkle: '#FFD700', // Gouden sparkle ✨
+    orb1: '#CD5C5C', // Indian red
+    orb2: '#FFE4E1', // Misty rose
   },
   neutral: {
-    primary: ['#F8F8FF', '#F5F5F5', '#E6E6FA', '#D3D3D3', '#C0C0C0', '#B0B0B0'], // Ghost white naar zilver
-    accent: ['#9370DB', '#8A2BE2', '#7B68EE'], // Medium purple naar medium slate blue
-    glow: '#9370DB', // Medium purple gloed
-    sparkle: '#E6E6FA', // Lavender sparkle
-    orb1: '#8A2BE2', // Blue violet
-    orb2: '#F8F8FF', // Ghost white
+    primary: ['#FFF0F5', '#F5E6EA', '#EBDCE0', '#E1D2D6', '#D7C8CC', '#CDBEC2'], // Lavender blush naar grijs-roze
+    accent: ['#E6E6FA', '#D8BFD8', '#DDA0DD'], // Lavender naar plum
+    glow: '#E6E6FA', // Lavender gloed
+    sparkle: '#FFD700', // Gouden sparkle ✨
+    orb1: '#D8BFD8', // Thistle
+    orb2: '#FFE4E1', // Misty rose
   },
 };
 
-// Dark mode variants voor mood palettes
+// Dark mode variants voor mood palettes - Masculine energy
 export const DARK_MOOD_PALETTES: MoodPalettes = {
   peaceful: {
-    primary: ['#2E1A2E', '#3A2A3A', '#4A3A4A', '#5A4A5A', '#6A5A6A', '#7A6A7A'], // Donkere tinten
-    accent: ['#8B7BA7', '#9A8AB7', '#A999C7'], // Zachte paarse accenten
-    glow: '#8B7BA7',
-    sparkle: '#B8B8B8',
-    orb1: '#9A8AB7',
-    orb2: '#7A6A7A',
+    primary: ['#0F1419', '#1A2332', '#2E5984', '#4A7BA7', '#7FB3D3', '#B3D9FF'], // Deep ocean progression
+    accent: ['#2E5984', '#4A7BA7', '#7FB3D3'], // Steel blue spectrum
+    glow: '#00CED1', // Dark turquoise glow
+    sparkle: '#00BFFF', // Deep sky blue sparkle
+    orb1: '#1A3A5C', // Dark navy
+    orb2: '#00CED1', // Turquoise accent
   },
   contemplative: {
-    primary: ['#1A1A2E', '#2A2A3E', '#3A3A4E', '#4A4A5E', '#5A5A6E', '#6A6A7E'], // Diepe navy tinten
-    accent: ['#6B6B9E', '#7B7BAE', '#8B8BBE'], // Zachte blauw-paarse accenten
-    glow: '#6B6B9E',
-    sparkle: '#A8A8A8',
-    orb1: '#7B7BAE',
-    orb2: '#6A6A7E',
+    primary: ['#1A1625', '#2D2A3D', '#4A3D5C', '#6B5B73', '#8B7BA7', '#B8A9C9'], // Deep purple progression
+    accent: ['#663399', '#8A2BE2', '#9370DB'], // Purple spectrum
+    glow: '#8A2BE2', // Blue violet glow
+    sparkle: '#9370DB', // Medium purple sparkle
+    orb1: '#4A3D5C', // Dark purple
+    orb2: '#8A2BE2', // Blue violet accent
   },
   joyful: {
-    primary: ['#2E2E1A', '#3E3E2A', '#4E4E3A', '#5E5E4A', '#6E6E5A', '#7E7E6A'], // Warme donkere tinten
-    accent: ['#A7A77B', '#B7B78B', '#C7C79B'], // Zachte gouden accenten
-    glow: '#A7A77B',
-    sparkle: '#C8C8C8',
-    orb1: '#B7B78B',
-    orb2: '#7E7E6A',
+    primary: ['#0F1F1C', '#1A332E', '#2E5984', '#20B2AA', '#40E0D0', '#7FFFD4'], // Teal progression
+    accent: ['#00CED1', '#20B2AA', '#40E0D0'], // Turquoise spectrum
+    glow: '#00FFFF', // Cyan glow
+    sparkle: '#7FFFD4', // Aquamarine sparkle
+    orb1: '#1A332E', // Dark sea green
+    orb2: '#00CED1', // Dark turquoise accent
   },
   grounded: {
-    primary: ['#1A1A1A', '#2A2A2A', '#3A3A3A', '#4A4A4A', '#5A5A5A', '#6A6A6A'], // Neutrale donkere tinten
-    accent: ['#8A8A8A', '#9A9A9A', '#AAAAAA'], // Grijze accenten
-    glow: '#8A8A8A',
-    sparkle: '#B8B8B8',
-    orb1: '#9A9A9A',
-    orb2: '#6A6A6A',
+    primary: ['#191F25', '#2A3F5F', '#4682B4', '#5F9EA0', '#708090', '#B0C4DE'], // Steel blue progression
+    accent: ['#4682B4', '#5F9EA0', '#708090'], // Steel spectrum
+    glow: '#4682B4', // Steel blue glow
+    sparkle: '#87CEEB', // Sky blue sparkle
+    orb1: '#2A3F5F', // Dark steel
+    orb2: '#708090', // Slate gray accent
   },
   neutral: {
-    primary: ['#0F1419', '#1A2332', '#243447', '#2E455C', '#385671', '#426786'], // Deep space tinten
-    accent: ['#4A7BA7', '#5A8BB7', '#6A9BC7'], // Steel blue accenten
-    glow: '#4A7BA7',
-    sparkle: '#8AB8D8',
-    orb1: '#5A8BB7',
-    orb2: '#426786',
+    primary: ['#191919', '#2E3A4F', '#4A5568', '#718096', '#A0AEC0', '#CBD5E0'], // Gray-blue progression
+    accent: ['#4169E1', '#6495ED', '#87CEEB'], // Royal blue spectrum
+    glow: '#6495ED', // Cornflower blue glow
+    sparkle: '#B0E0E6', // Powder blue sparkle
+    orb1: '#2E3A4F', // Dark blue-gray
+    orb2: '#778899', // Light slate gray accent
   },
 };
 
