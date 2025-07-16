@@ -42,12 +42,12 @@ export const MOOD_PALETTES: MoodPalettes = {
     orb2: '#FFE4B5', // Moccasin
   },
   grounded: {
-    primary: ['#F5F5DC', '#F0E68C', '#DDA0DD', '#D2B48C', '#DEB887', '#F4A460'], // Beige naar sandy brown
-    accent: ['#CD853F', '#D2691E', '#A0522D'], // Peru naar sienna
-    glow: '#DDA0DD', // Plum gloed voor warmte
-    sparkle: '#FFD700', // Gouden sparkle
-    orb1: '#CD853F', // Peru
-    orb2: '#F5DEB3', // Wheat
+    primary: ['#F8F8F6', '#F5F3F0', '#F0F0E8', '#EAE8E0', '#E5E3DB', '#E0DDD6'], // Subtiele creme naar warm beige
+    accent: ['#D4C4A0', '#C8B99C', '#B8A082'], // Zachte taupe accenten
+    glow: '#D4C4A0', // Warme taupe gloed
+    sparkle: '#F0D700', // Gedempte gouden sparkle
+    orb1: '#C8B99C', // Zachte taupe
+    orb2: '#F5F3F0', // Warm wit
   },
   neutral: {
     primary: ['#F8F8FF', '#F5F5F5', '#E6E6FA', '#D3D3D3', '#C0C0C0', '#B0B0B0'], // Ghost white naar zilver
