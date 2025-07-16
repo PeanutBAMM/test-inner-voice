@@ -11,6 +11,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { UniversalBackground } from '../../components/backgrounds/UniversalBackground';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -247,9 +248,11 @@ export default function SettingsScreen() {
       paddingTop: insets.top,
       paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
     }]}>
-      <LinearGradient
-        colors={themeColors.peaceful.primary as [string, string, ...string[]]}
-        style={StyleSheet.absoluteFillObject}
+      <UniversalBackground 
+        variant="gradient"
+        mood="peaceful"
+        timeOfDay="afternoon"
+        enableEffects={false}
       />
       
       <ScrollView showsVerticalScrollIndicator={false}>

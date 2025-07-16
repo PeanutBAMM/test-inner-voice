@@ -11,6 +11,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { RouteProp } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { UniversalBackground } from '../../components/backgrounds/UniversalBackground';
 import { RootStackParamList } from '../../types/navigation';
 import { TAB_BAR_HEIGHT } from '../../constants/navigation';
 
@@ -27,9 +28,11 @@ export default function ConversationDetailScreen() {
       paddingTop: insets.top,
       paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
     }]}>
-      <LinearGradient
-        colors={['rgba(232, 223, 253, 0.3)', 'rgba(255, 255, 255, 0)']}
-        style={styles.gradient}
+      <UniversalBackground 
+        variant="gradient"
+        mood="peaceful"
+        timeOfDay="afternoon"
+        enableEffects={false}
       />
       
       <View style={styles.header}>

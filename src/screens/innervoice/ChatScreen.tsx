@@ -17,12 +17,16 @@ import useConversationStore from '../../store/innervoice/useConversationStore';
 import useSubscriptionStore from '../../store/innervoice/useSubscriptionStore';
 import useLibraryStore from '../../store/innervoice/useLibraryStore';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useBackground } from '../../contexts/BackgroundContext';
+import { getMoodPalette } from '../../constants/moodPalettes';
 import { TAB_BAR_HEIGHT } from '../../constants/navigation';
 
 export default function ChatScreen() {
   const navigation = useNavigation<RootStackScreenProps<'MainTabs'>['navigation']>();
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
+  const { currentMood } = useBackground();
+  const moodPalette = getMoodPalette(currentMood, theme.isDark);
   const { getCoachResponse } = useCoachStore();
   const { messages, addMessage, isTyping, setTyping } = useConversationStore();
   const { canAskQuestion, recordQuestion } = useSubscriptionStore();
@@ -111,25 +115,25 @@ export default function ChatScreen() {
         mood="peaceful"
         timeOfDay="afternoon"
         enableEffects={true}
-      >
-        {/* Chat UI on top */}
-        <GlassOverlay intensity={8}>
-          <ChatContainer
-            messages={messages}
-            onSendMessage={handleSendMessage}
-            isTyping={isTyping}
-            placeholder='Deel je gedachten...'
-            onSaveToLibrary={handleSaveToLibrary}
-            useSelectableMessages={true}
-            showVoiceButton={true}
-            onStartVoiceRecording={handleStartVoiceRecording}
-            onStopVoiceRecording={handleStopVoiceRecording}
-            isVoiceRecording={isVoiceRecording}
-            bottomPadding={0}
-            keyboardVerticalOffset={insets.top}
-          />
-        </GlassOverlay>
-      </UniversalBackground>
+      />
+      
+      {/* Chat UI on top */}
+      <GlassOverlay intensity={8}>
+        <ChatContainer
+          messages={messages}
+          onSendMessage={handleSendMessage}
+          isTyping={isTyping}
+          placeholder='Deel je gedachten...'
+          onSaveToLibrary={handleSaveToLibrary}
+          useSelectableMessages={true}
+          showVoiceButton={true}
+          onStartVoiceRecording={handleStartVoiceRecording}
+          onStopVoiceRecording={handleStopVoiceRecording}
+          isVoiceRecording={isVoiceRecording}
+          bottomPadding={0}
+          keyboardVerticalOffset={insets.top}
+        />
+      </GlassOverlay>
       
       {/* Glass Morphism Floating Button */}
       <View style={[styles.floatingButton, styles.profileButton, { top: 20 }]}>
@@ -141,8 +145,8 @@ export default function ChatScreen() {
                 StyleSheet.absoluteFillObject,
                 {
                   backgroundColor: theme.isDark
-                    ? 'rgba(26, 35, 50, 0.35)'
-                    : 'rgba(255, 245, 248, 0.35)',
+                    ? `rgba(${parseInt(moodPalette.primary[5]?.slice(1, 3) || '1A', 16)}, ${parseInt(moodPalette.primary[5]?.slice(3, 5) || '23', 16)}, ${parseInt(moodPalette.primary[5]?.slice(5, 7) || '32', 16)}, 0.85)`
+                    : `rgba(${parseInt(moodPalette.primary[0]?.slice(1, 3) || 'FF', 16)}, ${parseInt(moodPalette.primary[0]?.slice(3, 5) || 'F5', 16)}, ${parseInt(moodPalette.primary[0]?.slice(5, 7) || 'F8', 16)}, 0.85)`,
                   borderRadius: 16,
                 },
               ]}
@@ -152,8 +156,8 @@ export default function ChatScreen() {
             <LinearGradient
               colors={
                 theme.isDark
-                  ? ['rgba(46, 89, 132, 0.10)', 'rgba(46, 89, 132, 0.05)']
-                  : ['rgba(255, 182, 193, 0.10)', 'rgba(255, 218, 185, 0.05)']
+                  ? [`rgba(${parseInt(moodPalette.accent[0]?.slice(1, 3) || '2E', 16)}, ${parseInt(moodPalette.accent[0]?.slice(3, 5) || '59', 16)}, ${parseInt(moodPalette.accent[0]?.slice(5, 7) || '84', 16)}, 0.10)`, `rgba(${parseInt(moodPalette.accent[0]?.slice(1, 3) || '2E', 16)}, ${parseInt(moodPalette.accent[0]?.slice(3, 5) || '59', 16)}, ${parseInt(moodPalette.accent[0]?.slice(5, 7) || '84', 16)}, 0.05)`]
+                  : [`rgba(${parseInt(moodPalette.accent[0]?.slice(1, 3) || 'FF', 16)}, ${parseInt(moodPalette.accent[0]?.slice(3, 5) || 'B6', 16)}, ${parseInt(moodPalette.accent[0]?.slice(5, 7) || 'C1', 16)}, 0.10)`, `rgba(${parseInt(moodPalette.accent[1]?.slice(1, 3) || 'FF', 16)}, ${parseInt(moodPalette.accent[1]?.slice(3, 5) || 'DA', 16)}, ${parseInt(moodPalette.accent[1]?.slice(5, 7) || 'B9', 16)}, 0.05)`]
               }
               style={[StyleSheet.absoluteFillObject, { borderRadius: 16 }]}
               start={{ x: 0, y: 0 }}
@@ -164,8 +168,8 @@ export default function ChatScreen() {
             <LinearGradient
               colors={
                 theme.isDark
-                  ? ['transparent', 'rgba(15, 20, 25, 0.2)']
-                  : ['transparent', 'rgba(255, 255, 255, 0.2)']
+                  ? ['transparent', `rgba(${parseInt(moodPalette.primary[5]?.slice(1, 3) || '0F', 16)}, ${parseInt(moodPalette.primary[5]?.slice(3, 5) || '14', 16)}, ${parseInt(moodPalette.primary[5]?.slice(5, 7) || '19', 16)}, 0.2)`]
+                  : ['transparent', `rgba(${parseInt(moodPalette.primary[0]?.slice(1, 3) || 'FF', 16)}, ${parseInt(moodPalette.primary[0]?.slice(3, 5) || 'FF', 16)}, ${parseInt(moodPalette.primary[0]?.slice(5, 7) || 'FF', 16)}, 0.2)`]
               }
               style={[StyleSheet.absoluteFillObject, { borderRadius: 16 }]}
               start={{ x: 0, y: 0 }}
@@ -181,8 +185,8 @@ export default function ChatScreen() {
                 borderRadius: 16,
                 borderWidth: 1,
                 borderColor: theme.isDark
-                  ? 'rgba(255, 255, 255, 0.08)'
-                  : 'rgba(255, 182, 193, 0.20)',
+                  ? `rgba(${parseInt(moodPalette.accent[0]?.slice(1, 3) || 'FF', 16)}, ${parseInt(moodPalette.accent[0]?.slice(3, 5) || 'FF', 16)}, ${parseInt(moodPalette.accent[0]?.slice(5, 7) || 'FF', 16)}, 0.08)`
+                  : `rgba(${parseInt(moodPalette.accent[0]?.slice(1, 3) || 'FF', 16)}, ${parseInt(moodPalette.accent[0]?.slice(3, 5) || 'B6', 16)}, ${parseInt(moodPalette.accent[0]?.slice(5, 7) || 'C1', 16)}, 0.20)`,
               },
             ]}
           />
@@ -195,7 +199,7 @@ export default function ChatScreen() {
             <Ionicons 
               name="person-circle-outline" 
               size={28} 
-              color={theme.isDark ? '#4A7BA7' : '#FF69B4'} 
+              color={theme.isDark ? moodPalette.accent[0] : moodPalette.sparkle} 
             />
           </TouchableOpacity>
       </View>

@@ -201,7 +201,7 @@ export const UniversalBackground: React.FC<UniversalBackgroundProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
   },
   baseGradient: {
     position: 'absolute',

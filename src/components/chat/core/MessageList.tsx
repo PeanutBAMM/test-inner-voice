@@ -36,7 +36,7 @@ export const MessageList = forwardRef<ScrollView, MessageListProps>(
           {messages.map((message, index) => {
             const isFirstMessage = index === 0;
             const messageStyle = isFirstMessage ? 
-              { ...styles.firstMessage, marginTop: 20 } : {};
+              { ...styles.firstMessage, marginTop: 8 } : {};
             
             if (useSelectableMessages) {
               return (
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 16,
-    paddingTop: 20,
+    paddingTop: 8,
     paddingBottom: 10,
     flexGrow: 1,
     minHeight: '100%',

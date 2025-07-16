@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { UniversalBackground } from '../../components/backgrounds/UniversalBackground';
 import useUserStore from '../../store/innervoice/useUserStore';
 
 const languages = [
@@ -31,9 +32,11 @@ export default function LanguageSettingsScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <LinearGradient
-        colors={['rgba(232, 223, 253, 0.3)', 'rgba(255, 255, 255, 0)']}
-        style={styles.gradient}
+      <UniversalBackground 
+        variant="gradient"
+        mood="peaceful"
+        timeOfDay="afternoon"
+        enableEffects={false}
       />
       
       <View style={styles.header}>

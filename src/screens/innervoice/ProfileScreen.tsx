@@ -18,6 +18,7 @@ import useSubscriptionStore from '../../store/innervoice/useSubscriptionStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import mockAuthService from '../../services/auth/mockAuthService';
 import { TAB_BAR_HEIGHT } from '../../constants/navigation';
+import { UniversalBackground } from '../../components/backgrounds/UniversalBackground';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -50,9 +51,11 @@ export default function ProfileScreen() {
       paddingTop: insets.top,
       paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
     }]}>
-      <LinearGradient
-        colors={theme.isDark ? ['#0F1419', '#1A2332'] : [theme.colors.background, theme.colors.surface]}
-        style={StyleSheet.absoluteFillObject}
+      <UniversalBackground 
+        variant="gradient"
+        mood="peaceful"
+        timeOfDay="afternoon"
+        enableEffects={false}
       />
       
       <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false}>
@@ -291,7 +294,7 @@ const styles = StyleSheet.create({
   upgradeButton: {
     marginHorizontal: 20,
     marginTop: 32,
-    marginBottom: 40,
+    marginBottom: 16,
     borderRadius: 24,
     overflow: 'hidden',
   },
@@ -309,7 +312,7 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     marginHorizontal: 20,
-    marginTop: 20,
+    marginTop: 16,
     marginBottom: 40,
     paddingVertical: 16,
     alignItems: 'center',

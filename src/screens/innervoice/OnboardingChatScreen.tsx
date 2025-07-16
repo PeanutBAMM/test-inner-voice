@@ -250,21 +250,26 @@ export default function OnboardingChatScreen() {
   const skipOnboarding = async () => {
     console.log('Skip button pressed');
     try {
-      // Set default values for skipped onboarding
+      // Default profile voor skip
       const defaultProfile = {
         userName: 'Gebruiker',
-        preferences: {
-          language: 'nl',
-          notifications: true,
-          voiceEnabled: false,
-        },
+        preferredLanguage: 'Nederlands' as 'Nederlands' | 'English',
+        primaryIntention: 'Ik zoek meer innerlijke rust',
+        emotionalStyle: 'Wisselend, afhankelijk van de dag',
+        spiritualExperience: 'Weinig, maar sta er voor open',
+        currentFocus: '',
+        allowNotifications: true,
+        biometricEnabled: false,
+        notificationPreference: 'Af en toe, niet te vaak',
       };
       
-      // Save profile and mark onboarding as completed
-      await AsyncStorage.setItem('userProfile', JSON.stringify(defaultProfile));
+      // Save met useUserStore
+      saveUserProfile(defaultProfile);
       await AsyncStorage.setItem('onboardingCompleted', 'true');
+      await AsyncStorage.setItem('userProfile', JSON.stringify(defaultProfile));
       
-      // RootNavigator will automatically navigate based on the updated state
+      // Trigger reload voor navigatie
+      await AsyncStorage.setItem('triggerReload', Date.now().toString());
     } catch (error) {
       console.error('Error skipping onboarding:', error);
     }
@@ -309,9 +314,9 @@ export default function OnboardingChatScreen() {
         mood="peaceful"
         timeOfDay="morning" // Onboarding is like a new dawn
         enableEffects={false} // Disabled for better performance
-      >
-        <GlassOverlay intensity={8}>
-        
+      />
+      
+      <GlassOverlay intensity={8}>
         {/* Skip button */}
         <TouchableOpacity 
           onPress={skipOnboarding} 
@@ -372,7 +377,6 @@ export default function OnboardingChatScreen() {
           keyboardVerticalOffset={insets.top + 60}
         />
       </GlassOverlay>
-      </UniversalBackground>
     </View>
   );
 }

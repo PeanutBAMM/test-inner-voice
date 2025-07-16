@@ -10,6 +10,8 @@ import {
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../../contexts/ThemeContext';
+import { useBackground } from '../../../contexts/BackgroundContext';
+import { getMoodPalette } from '../../../constants/moodPalettes';
 import { LinearGradient } from 'expo-linear-gradient';
 
 interface ChatInputProps {
@@ -35,6 +37,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [inputHeight, setInputHeight] = useState(40);
   const { theme } = useTheme();
+  const { currentMood, timeOfDay } = useBackground();
+  const moodPalette = getMoodPalette(currentMood, theme.isDark);
   
   const glowAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -141,6 +145,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         {
           shadowOpacity: animatedShadowOpacity,
           shadowRadius: animatedShadowRadius,
+          shadowColor: moodPalette.glow,
           elevation: isFocused ? 8 : 4,
         },
       ]}
@@ -148,10 +153,15 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       <LinearGradient
         colors={
           theme.isDark 
-            ? ['rgba(139, 123, 167, 0.1)', 'rgba(195, 181, 227, 0.05)']
-            : ['rgba(255, 255, 255, 0.9)', 'rgba(255, 255, 255, 0.8)']
+            ? ['rgba(255, 255, 255, 0.12)', 'rgba(255, 255, 255, 0.08)']
+            : ['rgba(255, 255, 255, 0.95)', 'rgba(255, 255, 255, 0.85)']
         }
-        style={styles.gradientContainer}
+        style={[
+          styles.gradientContainer,
+          {
+            borderColor: moodPalette.accent[0] + '20', // 20% opacity accent
+          }
+        ]}
       >
         <View style={styles.inputWrapper}>
           {showVoiceButton && (
@@ -166,10 +176,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                   {
                     transform: [{ scale: voiceButtonScale }],
                     backgroundColor: isVoiceRecording 
-                      ? theme.colors.accent 
+                      ? moodPalette.accent[0] 
                       : theme.isDark 
-                        ? 'rgba(139, 123, 167, 0.2)' 
-                        : 'rgba(195, 181, 227, 0.2)',
+                        ? moodPalette.glow + '30' 
+                        : moodPalette.accent[0] + '20',
                   },
                 ]}
               >
@@ -179,7 +189,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                     {
                       transform: [{ scale: pulseAnim }],
                       opacity: isVoiceRecording ? 0.3 : 0,
-                      backgroundColor: theme.colors.accent,
+                      backgroundColor: moodPalette.accent[0],
                     },
                   ]}
                 />
@@ -188,8 +198,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                   size={20} 
                   color={
                     isVoiceRecording 
-                      ? theme.isDark ? '#FFFFFF' : '#000000'
-                      : theme.colors.accent
+                      ? '#FFFFFF' 
+                      : theme.isDark 
+                        ? moodPalette.sparkle 
+                        : moodPalette.accent[0]
                   } 
                 />
               </Animated.View>
@@ -204,14 +216,23 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 color: theme.colors.text,
                 borderRadius: inputHeight / 2,
                 backgroundColor: theme.isDark 
-                  ? 'rgba(255, 255, 255, 0.1)' 
-                  : 'rgba(139, 123, 167, 0.05)',
+                  ? 'rgba(0, 0, 0, 0.15)' 
+                  : moodPalette.primary[0] + '10',
+                borderWidth: 1,
+                borderColor: theme.isDark 
+                  ? 'rgba(255, 255, 255, 0.1)'
+                  : moodPalette.accent[0] + '15',
+                textAlign: text ? 'left' : 'center',
               },
             ]}
             value={text}
             onChangeText={setText}
             placeholder={placeholder}
-            placeholderTextColor={theme.colors.textSecondary}
+            placeholderTextColor={
+              theme.isDark 
+                ? 'rgba(255, 255, 255, 0.6)' 
+                : moodPalette.accent[1] + '80'
+            }
             onFocus={handleFocus}
             onBlur={handleBlur}
             onSubmitEditing={handleSend}
@@ -227,10 +248,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               styles.sendButton,
               {
                 backgroundColor: text.trim() 
-                  ? theme.colors.accent 
+                  ? moodPalette.accent[0] 
                   : theme.isDark 
-                    ? 'rgba(139, 123, 167, 0.2)' 
-                    : 'rgba(195, 181, 227, 0.2)',
+                    ? moodPalette.glow + '30' 
+                    : moodPalette.accent[0] + '20',
+                shadowColor: moodPalette.glow,
               },
               !text.trim() && styles.sendButtonDisabled
             ]}
@@ -242,8 +264,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               size={18} 
               color={
                 text.trim() 
-                  ? theme.isDark ? '#FFFFFF' : '#000000'
-                  : theme.colors.textSecondary
+                  ? '#FFFFFF'
+                  : theme.isDark 
+                    ? moodPalette.sparkle 
+                    : moodPalette.accent[1]
               } 
             />
           </TouchableOpacity>
@@ -259,7 +283,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 8,
     borderRadius: 28,
-    shadowColor: '#C3B5E3',
+    shadowColor: '#C3B5E3', // This will be overridden dynamically
     shadowOffset: {
       width: 0,
       height: 2,
@@ -269,7 +293,7 @@ const styles = StyleSheet.create({
   gradientContainer: {
     borderRadius: 28,
     borderWidth: 1,
-    borderColor: 'rgba(195, 181, 227, 0.2)',
+    borderColor: 'rgba(195, 181, 227, 0.2)', // This will be overridden dynamically
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -313,7 +337,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#8B7BA7',
+    shadowColor: '#8B7BA7', // This will be overridden dynamically
     shadowOffset: {
       width: 0,
       height: 1,
