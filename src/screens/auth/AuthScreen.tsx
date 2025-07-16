@@ -20,6 +20,8 @@ import { Colors, Spacing, Typography, BorderRadius } from '../../constants/theme
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useAppStore from '../../store/useAppStore';
 import mockAuthService from '../../services/auth/mockAuthService';
+import { UniversalBackground } from '../../components/backgrounds/UniversalBackground';
+import { useTheme } from '../../contexts/ThemeContext';
 
 // type Props = NativeStackScreenProps<AuthStackParamList, 'Auth'>;
 
@@ -30,6 +32,7 @@ export default function AuthScreen({ navigation }: any) {
   const [countryCode, setCountryCode] = useState('+31');
   
   const { resetOnboarding } = useAppStore();
+  const { theme } = useTheme();
   const isDev = __DEV__;
 
   const handleBackToOnboarding = () => {
@@ -100,7 +103,13 @@ export default function AuthScreen({ navigation }: any) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <UniversalBackground 
+      variant="minimal" 
+      mood="neutral" 
+      timeOfDay="afternoon"
+      enableEffects={false}
+    >
+      <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -117,7 +126,7 @@ export default function AuthScreen({ navigation }: any) {
 
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.subtitle}>
+            <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
               Log in or create an account to continue to InnerVoice
             </Text>
           </View>
@@ -148,14 +157,14 @@ export default function AuthScreen({ navigation }: any) {
 
           {/* Divider */}
           <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>OR</Text>
-            <View style={styles.dividerLine} />
+            <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
+            <Text style={[styles.dividerText, { color: theme.colors.textSecondary }]}>OR</Text>
+            <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
           </View>
 
           {/* Phone Input Section */}
           <View style={styles.phoneSection}>
-            <Text style={styles.inputLabel}>Phone Number</Text>
+            <Text style={[styles.inputLabel, { color: theme.colors.text }]}>Phone Number</Text>
             <PhoneInput
               value={phoneNumber}
               onChangeText={setPhoneNumber}
@@ -174,11 +183,11 @@ export default function AuthScreen({ navigation }: any) {
 
           {/* Terms */}
           <View style={styles.termsContainer}>
-            <Text style={styles.termsText}>
+            <Text style={[styles.termsText, { color: theme.colors.textSecondary }]}>
               By continuing, you agree to our{' '}
-              <Text style={styles.termsLink}>Terms of Service</Text>
+              <Text style={[styles.termsLink, { color: theme.colors.primary }]}>Terms of Service</Text>
               {' '}and{' '}
-              <Text style={styles.termsLink}>Privacy Policy</Text>
+              <Text style={[styles.termsLink, { color: theme.colors.primary }]}>Privacy Policy</Text>
             </Text>
           </View>
 
@@ -197,16 +206,22 @@ export default function AuthScreen({ navigation }: any) {
               }
             }}
           >
-            <Text style={styles.skipText}>Skip for now</Text>
+            <Text style={[styles.skipText, { color: theme.colors.primary }]}>Skip for now</Text>
           </TouchableOpacity>
 
           {/* Development Quick Login (dev only) */}
           {isDev && (
-            <View style={styles.devSection}>
-              <Text style={styles.devSectionTitle}>🚀 Development Quick Login</Text>
+            <View style={[styles.devSection, { 
+              backgroundColor: theme.colors.warning + '10',
+              borderColor: theme.colors.warning + '30'
+            }]}>
+              <Text style={[styles.devSectionTitle, { color: theme.colors.warning }]}>🚀 Development Quick Login</Text>
               <View style={styles.devButtonRow}>
                 <TouchableOpacity 
-                  style={styles.devButton}
+                  style={[styles.devButton, { 
+                    backgroundColor: theme.colors.primary + '20',
+                    borderColor: theme.colors.primary + '40'
+                  }]}
                   onPress={async () => {
                     setIsLoading(true);
                     try {
@@ -223,11 +238,14 @@ export default function AuthScreen({ navigation }: any) {
                     }
                   }}
                 >
-                  <Text style={styles.devButtonText}>👤 Onboarding User</Text>
+                  <Text style={[styles.devButtonText, { color: theme.colors.primary }]}>👤 Onboarding User</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  style={styles.devButton}
+                  style={[styles.devButton, { 
+                    backgroundColor: theme.colors.primary + '20',
+                    borderColor: theme.colors.primary + '40'
+                  }]}
                   onPress={async () => {
                     setIsLoading(true);
                     try {
@@ -240,28 +258,31 @@ export default function AuthScreen({ navigation }: any) {
                     }
                   }}
                 >
-                  <Text style={styles.devButtonText}>⚡ Admin</Text>
+                  <Text style={[styles.devButtonText, { color: theme.colors.primary }]}>⚡ Admin</Text>
                 </TouchableOpacity>
               </View>
               
               <TouchableOpacity 
-                style={styles.backToOnboardingButton}
+                style={[styles.backToOnboardingButton, { 
+                  backgroundColor: theme.colors.warning + '20'
+                }]}
                 onPress={handleBackToOnboarding}
               >
-                <Text style={styles.backToOnboardingText}>🔙 Terug naar onboarding</Text>
+                <Text style={[styles.backToOnboardingText, { color: theme.colors.warning }]}>🔙 Terug naar onboarding</Text>
               </TouchableOpacity>
             </View>
           )}
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </UniversalBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: 'transparent',
   },
   keyboardView: {
     flex: 1,
@@ -281,7 +302,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: Typography.fontSize.base,
-    color: Colors.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
   },
@@ -299,11 +319,10 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: Colors.border,
+    backgroundColor: 'transparent',
   },
   dividerText: {
     marginHorizontal: Spacing.md,
-    color: Colors.textSecondary,
     fontSize: Typography.fontSize.sm,
     fontWeight: '600',
   },
@@ -313,7 +332,6 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: Typography.fontSize.base,
     fontWeight: '600',
-    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   continueButton: {
@@ -324,12 +342,10 @@ const styles = StyleSheet.create({
   },
   termsText: {
     fontSize: Typography.fontSize.sm,
-    color: Colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
   },
   termsLink: {
-    color: Colors.primary,
     fontWeight: '600',
   },
   skipButton: {
@@ -339,21 +355,19 @@ const styles = StyleSheet.create({
   },
   skipText: {
     fontSize: Typography.fontSize.base,
-    color: Colors.primary,
     fontWeight: '600',
   },
   devSection: {
     marginTop: Spacing.xl,
     padding: Spacing.md,
-    backgroundColor: Colors.warning + '10',
+    backgroundColor: 'transparent',
     borderRadius: BorderRadius.md,
     borderWidth: 1,
-    borderColor: Colors.warning + '30',
+    borderColor: 'transparent',
   },
   devSectionTitle: {
     fontSize: Typography.fontSize.sm,
     fontWeight: '600',
-    color: Colors.warning,
     textAlign: 'center',
     marginBottom: Spacing.md,
   },
@@ -365,28 +379,26 @@ const styles = StyleSheet.create({
   },
   devButton: {
     flex: 1,
-    backgroundColor: Colors.primary + '20',
+    backgroundColor: 'transparent',
     borderRadius: BorderRadius.sm,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: Colors.primary + '40',
+    borderColor: 'transparent',
   },
   devButtonText: {
-    color: Colors.primary,
     fontSize: Typography.fontSize.sm,
     fontWeight: '600',
   },
   backToOnboardingButton: {
     alignSelf: 'center',
-    backgroundColor: Colors.warning + '20',
+    backgroundColor: 'transparent',
     borderRadius: BorderRadius.md,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
   },
   backToOnboardingText: {
-    color: Colors.warning,
     fontSize: Typography.fontSize.sm,
     fontWeight: '600',
   },

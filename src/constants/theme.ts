@@ -1,5 +1,5 @@
 // Import mood palettes for consistent theming
-import { MOOD_PALETTES } from '../components/chat/backgrounds/SpiritualGradientBackground';
+import { MOOD_PALETTES, DARK_MOOD_PALETTES } from './moodPalettes';
 
 export const LightColors = {
   // Vrouwelijke energy brand colors
@@ -38,7 +38,7 @@ export const LightColors = {
   // Shadows
   shadow: '#000000',
   
-  // Mood-based colors from SpiritualGradientBackground
+  // Mood-based colors from mood palettes
   peaceful: {
     primary: MOOD_PALETTES.peaceful.primary,
     accent: MOOD_PALETTES.peaceful.accent,
@@ -103,31 +103,31 @@ export const DarkColors = {
   // Shadows
   shadow: '#000000',
   
-  // Dark masculine mood-based colors
+  // Dark mood-based colors from mood palettes
   peaceful: {
-    primary: ['#0F1419', '#1A2332', '#2E5984', '#4A7BA7', '#7FB3D3', '#B3D9FF'],
-    accent: ['#2E5984', '#4A7BA7', '#7FB3D3'],
-    glow: '#00CED1',
+    primary: DARK_MOOD_PALETTES.peaceful.primary,
+    accent: DARK_MOOD_PALETTES.peaceful.accent,
+    glow: DARK_MOOD_PALETTES.peaceful.glow,
   },
   contemplative: {
-    primary: ['#1A1625', '#2D2A3D', '#4A3D5C', '#6B5B73', '#8B7BA7', '#B8A9C9'],
-    accent: ['#663399', '#8A2BE2', '#9370DB'],
-    glow: '#8A2BE2',
+    primary: DARK_MOOD_PALETTES.contemplative.primary,
+    accent: DARK_MOOD_PALETTES.contemplative.accent,
+    glow: DARK_MOOD_PALETTES.contemplative.glow,
   },
   joyful: {
-    primary: ['#0F1F1C', '#1A332E', '#2E5984', '#20B2AA', '#40E0D0', '#7FFFD4'],
-    accent: ['#00CED1', '#20B2AA', '#40E0D0'],
-    glow: '#00FFFF',
+    primary: DARK_MOOD_PALETTES.joyful.primary,
+    accent: DARK_MOOD_PALETTES.joyful.accent,
+    glow: DARK_MOOD_PALETTES.joyful.glow,
   },
   grounded: {
-    primary: ['#191F25', '#2A3F5F', '#4682B4', '#5F9EA0', '#708090', '#B0C4DE'],
-    accent: ['#4682B4', '#5F9EA0', '#708090'],
-    glow: '#4682B4',
+    primary: DARK_MOOD_PALETTES.grounded.primary,
+    accent: DARK_MOOD_PALETTES.grounded.accent,
+    glow: DARK_MOOD_PALETTES.grounded.glow,
   },
   neutral: {
-    primary: ['#0F1419', '#2A3F5F', '#5F9EA0', '#778899', '#A9A9A9', '#D3D3D3'],
-    accent: ['#708090', '#778899', '#A9A9A9'],
-    glow: '#5F9EA0',
+    primary: DARK_MOOD_PALETTES.neutral.primary,
+    accent: DARK_MOOD_PALETTES.neutral.accent,
+    glow: DARK_MOOD_PALETTES.neutral.glow,
   },
 } as const;
 

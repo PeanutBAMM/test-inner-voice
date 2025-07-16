@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
+  View,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { RootStackScreenProps } from '../../types/navigation';
 import { Ionicons } from '@expo/vector-icons';
 import { ChatContainer, GlassOverlay, SpiritualGradientBackground } from '../../components/chat';
@@ -100,40 +103,74 @@ export default function ChatScreen() {
         />
         </GlassOverlay>
         
-        {/* Glass Morphism Floating Buttons */}
-        <TouchableOpacity
-          style={[
-            styles.floatingButton, 
-            styles.libraryButton, 
-            { 
-              top: insets.top + 20,
-              backgroundColor: theme.isDark ? 'rgba(46, 89, 132, 0.25)' : 'rgba(255, 218, 185, 0.15)',
-              shadowColor: theme.isDark ? '#2E5984' : '#FFB6C1',
-              borderColor: theme.isDark ? 'rgba(74, 123, 167, 0.3)' : 'rgba(255, 255, 255, 0.2)',
-            }
-          ]}
-          onPress={() => navigation.navigate('MainTabs', { screen: 'Library' })}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="book-outline" size={28} color={theme.colors.primary} />
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[
-            styles.floatingButton, 
-            styles.profileButton, 
-            { 
-              top: insets.top + 20,
-              backgroundColor: theme.isDark ? 'rgba(46, 89, 132, 0.25)' : 'rgba(255, 182, 193, 0.15)',
-              shadowColor: theme.isDark ? '#2E5984' : '#FFB6C1',
-              borderColor: theme.isDark ? 'rgba(74, 123, 167, 0.3)' : 'rgba(255, 255, 255, 0.2)',
-            }
-          ]}
-          onPress={() => navigation.navigate('MainTabs', { screen: 'Profile' })}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="person-circle-outline" size={28} color={theme.colors.primary} />
-        </TouchableOpacity>
+        {/* Glass Morphism Floating Button */}
+        <View style={[styles.floatingButton, styles.profileButton, { top: insets.top + 20 }]}>
+          {/* Background layers for glass effect */}
+          <View style={StyleSheet.absoluteFillObject}>
+            {/* Base layer */}
+            <View
+              style={[
+                StyleSheet.absoluteFillObject,
+                {
+                  backgroundColor: theme.isDark
+                    ? 'rgba(26, 35, 50, 0.95)'
+                    : 'rgba(255, 245, 248, 0.95)',
+                  borderRadius: 16,
+                },
+              ]}
+            />
+            
+            {/* Gradient overlay 1 */}
+            <LinearGradient
+              colors={
+                theme.isDark
+                  ? ['rgba(46, 89, 132, 0.20)', 'rgba(46, 89, 132, 0.08)']
+                  : ['rgba(255, 182, 193, 0.20)', 'rgba(255, 218, 185, 0.08)']
+              }
+              style={[StyleSheet.absoluteFillObject, { borderRadius: 16 }]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            />
+            
+            {/* Gradient overlay 2 for depth */}
+            <LinearGradient
+              colors={
+                theme.isDark
+                  ? ['transparent', 'rgba(15, 20, 25, 0.4)']
+                  : ['transparent', 'rgba(255, 255, 255, 0.4)']
+              }
+              style={[StyleSheet.absoluteFillObject, { borderRadius: 16 }]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+            />
+          </View>
+
+          {/* Border for glass edge effect */}
+          <View
+            style={[
+              StyleSheet.absoluteFillObject,
+              {
+                borderRadius: 16,
+                borderWidth: 1,
+                borderColor: theme.isDark
+                  ? 'rgba(255, 255, 255, 0.12)'
+                  : 'rgba(255, 182, 193, 0.35)',
+              },
+            ]}
+          />
+
+          <TouchableOpacity
+            style={styles.buttonContent}
+            onPress={() => navigation.navigate('MainTabs', { screen: 'Profile' })}
+            activeOpacity={0.7}
+          >
+            <Ionicons 
+              name="person-circle-outline" 
+              size={28} 
+              color={theme.isDark ? '#4A7BA7' : '#FF69B4'} 
+            />
+          </TouchableOpacity>
+        </View>
       </SpiritualGradientBackground>
     </SafeAreaView>
   );
@@ -147,20 +184,26 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 56,
     height: 56,
-    borderRadius: 8, // Vierkante frames
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 8,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    // Glass morphism effect
-    borderWidth: 1,
-  },
-  libraryButton: {
-    left: 20,
+    borderRadius: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 12,
+      },
+    }),
   },
   profileButton: {
     right: 20,
+  },
+  buttonContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 16,
   },
 });

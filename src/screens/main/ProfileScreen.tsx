@@ -12,10 +12,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import useUserStore from '../../store/innervoice/useUserStore';
 import useSubscriptionStore from '../../store/innervoice/useSubscriptionStore';
+import { UniversalBackground } from '../../components/backgrounds/UniversalBackground';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export default function ProfileScreen() {
   const { userProfile } = useUserStore();
   const { tier, usage } = useSubscriptionStore();
+  const { theme } = useTheme();
 
   const stats = [
     { label: 'Gesprekken', value: usage.conversationCount },
@@ -30,17 +33,21 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={['#FAFAF8', '#F5F0FF']}
-        style={StyleSheet.absoluteFillObject}
-      />
+    <UniversalBackground 
+      variant="gradient" 
+      mood="contemplative" 
+      timeOfDay="afternoon"
+      enableEffects={false}
+    >
+      <SafeAreaView style={styles.container}>
       
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.avatarContainer}>
             <LinearGradient
-              colors={['#E8E3F5', '#FAFAF8']}
+              colors={theme.isDark 
+                ? ['#4A3D5C', '#6B5B73'] 
+                : ['#E8E3F5', '#FAFAF8']}
               style={styles.avatarGradient}
             >
               <Text style={styles.avatarText}>
@@ -49,47 +56,47 @@ export default function ProfileScreen() {
             </LinearGradient>
           </View>
           
-          <Text style={styles.welcomeText}>Welkom terug,</Text>
-          <Text style={styles.nameText}>{userProfile?.userName || 'Gebruiker'}</Text>
+          <Text style={[styles.welcomeText, { color: theme.colors.textSecondary }]}>Welkom terug,</Text>
+          <Text style={[styles.nameText, { color: theme.colors.text }]}>{userProfile?.userName || 'Gebruiker'}</Text>
           
-          <View style={styles.tierBadge}>
+          <View style={[styles.tierBadge, { backgroundColor: theme.colors.card }]}>
             <Ionicons 
               name={tier.type === 'premium' ? 'star' : 'star-outline'} 
               size={16} 
               color={tier.type === 'premium' ? '#FFD700' : '#C3B5E3'} 
             />
-            <Text style={styles.tierText}>
+            <Text style={[styles.tierText, { color: theme.colors.text }]}>
               {tier.type === 'premium' ? 'Premium' : 'Free'}
             </Text>
           </View>
         </View>
 
-        <View style={styles.statsContainer}>
+        <View style={[styles.statsContainer, { backgroundColor: theme.colors.card }]}>
           {stats.map((stat, index) => (
             <View key={index} style={styles.statItem}>
-              <Text style={styles.statValue}>{stat.value}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
+              <Text style={[styles.statValue, { color: theme.colors.primary }]}>{stat.value}</Text>
+              <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>{stat.label}</Text>
             </View>
           ))}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Profiel Details</Text>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Profiel Details</Text>
           {profileItems.map((item, index) => (
-            <View key={index} style={styles.profileItem}>
-              <Text style={styles.itemLabel}>{item.label}</Text>
-              <Text style={styles.itemValue}>{item.value}</Text>
+            <View key={index} style={[styles.profileItem, { borderBottomColor: theme.colors.border }]}>
+              <Text style={[styles.itemLabel, { color: theme.colors.textSecondary }]}>{item.label}</Text>
+              <Text style={[styles.itemValue, { color: theme.colors.text }]}>{item.value}</Text>
             </View>
           ))}
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Jouw Reis</Text>
-          <View style={styles.journeyCard}>
-            <Text style={styles.journeyText}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Jouw Reis</Text>
+          <View style={[styles.journeyCard, { backgroundColor: theme.colors.card }]}>
+            <Text style={[styles.journeyText, { color: theme.colors.text }]}>
               Je bent begonnen met: &quot;{userProfile?.primaryIntention || 'Zelfontdekking'}&quot;
             </Text>
-            <Text style={styles.journeySubtext}>
+            <Text style={[styles.journeySubtext, { color: theme.colors.textSecondary }]}>
               Blijf trouw aan je pad en vier elke kleine stap voorwaarts.
             </Text>
           </View>
@@ -98,7 +105,9 @@ export default function ProfileScreen() {
         {tier.type === 'free' && (
           <TouchableOpacity style={styles.upgradeButton}>
             <LinearGradient
-              colors={['#E8DFFD', '#C3B5E3']}
+              colors={theme.isDark 
+                ? ['#4A3D5C', '#6B5B73'] 
+                : ['#E8DFFD', '#C3B5E3']}
               style={styles.upgradeGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
@@ -109,7 +118,8 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         )}
       </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </UniversalBackground>
   );
 }
 
@@ -141,18 +151,16 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 16,
-    color: '#6B6478',
   },
   nameText: {
     fontSize: 28,
     fontWeight: '600',
-    color: '#4A4458',
     marginTop: 4,
   },
   tierBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -167,14 +175,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 6,
-    color: '#4A4458',
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 20,
     marginHorizontal: 20,
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     borderRadius: 16,
     marginTop: 20,
     shadowColor: '#000',
@@ -189,11 +196,9 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#8B7BA7',
   },
   statLabel: {
     fontSize: 12,
-    color: '#6B6478',
     marginTop: 4,
   },
   section: {
@@ -203,7 +208,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#4A4458',
     marginBottom: 12,
   },
   profileItem: {
@@ -211,19 +215,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(232, 223, 253, 0.3)',
+    borderBottomColor: 'transparent',
   },
   itemLabel: {
     fontSize: 14,
-    color: '#6B6478',
   },
   itemValue: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#4A4458',
   },
   journeyCard: {
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     padding: 20,
     borderRadius: 16,
     shadowColor: '#000',
@@ -234,12 +236,10 @@ const styles = StyleSheet.create({
   },
   journeyText: {
     fontSize: 16,
-    color: '#4A4458',
     lineHeight: 24,
   },
   journeySubtext: {
     fontSize: 14,
-    color: '#6B6478',
     marginTop: 8,
     fontStyle: 'italic',
   },

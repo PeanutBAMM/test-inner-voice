@@ -4,6 +4,7 @@ import {
   View,
   StyleSheet,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MessageBubble } from './MessageBubble';
 import { SelectableMessageBubbleWrapper } from './SelectableMessageBubbleWrapper';
 import { TypingIndicator } from './TypingIndicator';
@@ -18,6 +19,8 @@ interface MessageListProps {
 
 export const MessageList = forwardRef<ScrollView, MessageListProps>(
   ({ messages, isTyping, onSaveToLibrary, useSelectableMessages = false }, ref) => {
+    const insets = useSafeAreaInsets();
+    
     return (
       <ScrollView
           ref={ref}
@@ -32,7 +35,8 @@ export const MessageList = forwardRef<ScrollView, MessageListProps>(
         >
           {messages.map((message, index) => {
             const isFirstMessage = index === 0;
-            const messageStyle = isFirstMessage ? styles.firstMessage : {};
+            const messageStyle = isFirstMessage ? 
+              { ...styles.firstMessage, marginTop: insets.top + 80 } : {};
             
             if (useSelectableMessages) {
               return (
@@ -81,6 +85,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   firstMessage: {
-    marginTop: 40, // Extra spacing voor welkomst bericht onder buttons
+    // Dynamic spacing will be applied inline based on safe area
   },
 });

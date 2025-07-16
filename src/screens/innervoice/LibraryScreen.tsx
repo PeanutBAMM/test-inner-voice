@@ -14,6 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MOCK_LIBRARY_ITEMS } from '../../services/innervoice/mockLibraryData';
 import { useTheme } from '../../contexts/ThemeContext';
+import { UniversalBackground } from '../../components/backgrounds/UniversalBackground';
 
 interface LibraryItem {
   id: string;
@@ -72,11 +73,13 @@ export default function LibraryScreen() {
   const categories = Array.from(new Set(libraryItems.map(item => item.category).filter(Boolean)));
 
   return (
-    <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={theme.isDark ? ['#0F1419', '#1A2332'] : [theme.colors.background, theme.colors.surface]}
-        style={StyleSheet.absoluteFillObject}
-      />
+    <UniversalBackground 
+      variant="gradient" 
+      mood="grounded" 
+      timeOfDay="afternoon"
+      enableEffects={false}
+    >
+      <SafeAreaView style={styles.container}>
       
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -206,7 +209,8 @@ export default function LibraryScreen() {
           ))
         )}
       </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </UniversalBackground>
   );
 }
 

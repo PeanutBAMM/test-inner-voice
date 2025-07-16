@@ -12,8 +12,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackScreenProps } from '../types/navigation';
 import { PrimaryButton } from '../components/buttons/PrimaryButton';
-import { theme } from '../constants/theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { Spacing } from '../constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
 import useAppStore from '../store/useAppStore';
+import { UniversalBackground } from '../components/backgrounds/UniversalBackground';
 
 // type Props = RootStackScreenProps<'Onboarding'>;
 
@@ -23,7 +26,7 @@ interface OnboardingItem {
   id: string;
   title: string;
   subtitle: string;
-  image: any; // Replace with actual image imports
+  image: unknown; // Replace with actual image imports
 }
 
 const onboardingData: OnboardingItem[] = [
@@ -51,6 +54,7 @@ export default function OnboardingScreen() {
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const { completeAppOnboarding } = useAppStore();
+  const { theme } = useTheme();
 
   const handleViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -72,13 +76,17 @@ export default function OnboardingScreen() {
     }
   };
 
-  const handleSkip = () => {
-    handleComplete();
+  const handleSkip = async () => {
+    await handleComplete();
   };
 
   const handleComplete = async () => {
-    await completeAppOnboarding();
-    // Navigation happens automatically via RootNavigator when isAppOnboarded state changes
+    try {
+      await completeAppOnboarding();
+      // Navigation happens automatically via RootNavigator when isAppOnboarded state changes
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+    }
   };
 
   const renderItem = ({ item }: { item: OnboardingItem }) => (
@@ -87,22 +95,44 @@ export default function OnboardingScreen() {
         {item.image ? (
           <Image source={item.image} style={styles.image} resizeMode="contain" />
         ) : (
-          <View style={styles.imagePlaceholder}>
+          <View style={[styles.imagePlaceholder, { backgroundColor: theme.colors.primary + '20' }]}>
             <Text style={styles.imagePlaceholderText}>🧘‍♀️</Text>
           </View>
         )}
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.subtitle}>{item.subtitle}</Text>
+        <Text style={[styles.title, { color: theme.colors.text }]}>{item.title}</Text>
+        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>{item.subtitle}</Text>
       </View>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
-        <Text style={styles.skipText}>Skip</Text>
+    <UniversalBackground 
+      variant="minimal" 
+      mood="joyful" 
+      timeOfDay="morning"
+      enableEffects={false}
+    >
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      
+      <TouchableOpacity 
+        style={[
+          styles.skipButton, 
+          {
+            backgroundColor: theme.isDark 
+              ? 'rgba(46, 89, 132, 0.15)' 
+              : 'rgba(255, 182, 193, 0.15)',
+            borderRadius: 20,
+            borderWidth: 1,
+            borderColor: theme.isDark 
+              ? 'rgba(255, 255, 255, 0.1)' 
+              : 'rgba(255, 182, 193, 0.2)',
+          }
+        ]} 
+        onPress={handleSkip}
+      >
+        <Text style={[styles.skipText, { color: theme.colors.textSecondary }]}>Skip</Text>
       </TouchableOpacity>
 
       <FlatList
@@ -124,7 +154,8 @@ export default function OnboardingScreen() {
               key={index}
               style={[
                 styles.paginationDot,
-                currentIndex === index && styles.paginationDotActive,
+                { backgroundColor: theme.colors.border },
+                currentIndex === index && [styles.paginationDotActive, { backgroundColor: theme.colors.primary }],
               ]}
             />
           ))}
@@ -136,18 +167,18 @@ export default function OnboardingScreen() {
           style={styles.nextButton}
         />
       </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </UniversalBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.background,
     flex: 1,
   },
   footer: {
-    paddingBottom: theme.spacing.xl,
-    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: Spacing.xl,
+    paddingHorizontal: Spacing.lg,
   },
   image: {
     height: SCREEN_WIDTH * 0.8,
@@ -160,7 +191,6 @@ const styles = StyleSheet.create({
   },
   imagePlaceholder: {
     alignItems: 'center',
-    backgroundColor: theme.colors.primary + '20',
     borderRadius: SCREEN_WIDTH * 0.3,
     height: SCREEN_WIDTH * 0.6,
     justifyContent: 'center',
@@ -170,44 +200,40 @@ const styles = StyleSheet.create({
     fontSize: 100,
   },
   nextButton: {
-    marginBottom: theme.spacing.md,
+    marginBottom: Spacing.md,
   },
   pagination: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: theme.spacing.sm,
+    gap: Spacing.sm,
     justifyContent: 'center',
-    marginBottom: theme.spacing.xl,
+    marginBottom: Spacing.xl,
   },
   paginationDot: {
-    backgroundColor: theme.colors.border,
     borderRadius: 4,
     height: 8,
     width: 8,
   },
   paginationDotActive: {
-    backgroundColor: theme.colors.primary,
     width: 24,
   },
   skipButton: {
-    padding: theme.spacing.sm,
+    padding: Spacing.sm,
     position: 'absolute',
-    right: theme.spacing.lg,
-    top: theme.spacing.xl,
+    right: Spacing.lg,
+    top: Spacing.xl,
     zIndex: 1,
   },
   skipText: {
-    color: theme.colors.textSecondary,
     fontSize: 16,
     fontWeight: '600',
   },
   slide: {
     flex: 1,
-    paddingHorizontal: theme.spacing.lg,
+    paddingHorizontal: Spacing.lg,
     width: SCREEN_WIDTH,
   },
   subtitle: {
-    color: theme.colors.textSecondary,
     fontSize: 16,
     lineHeight: 24,
     textAlign: 'center',
@@ -215,13 +241,12 @@ const styles = StyleSheet.create({
   textContainer: {
     alignItems: 'center',
     flex: 1,
-    paddingHorizontal: theme.spacing.md,
+    paddingHorizontal: Spacing.md,
   },
   title: {
-    color: theme.colors.text,
     fontSize: 28,
     fontWeight: '700',
-    marginBottom: theme.spacing.md,
+    marginBottom: Spacing.md,
     textAlign: 'center',
   },
 });
