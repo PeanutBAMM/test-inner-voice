@@ -6,16 +6,20 @@ interface LibraryState {
   items: LibraryItem[];
   isLoading: boolean;
   error: string | null;
-  
+
   // Actions
   loadItems: () => Promise<void>;
   addItem: (item: Omit<LibraryItem, 'id' | 'timestamp'>) => Promise<void>;
   updateItem: (id: string, updates: Partial<LibraryItem>) => Promise<void>;
   deleteItem: (id: string) => Promise<void>;
   clearError: () => void;
-  
+
   // Text selection specific
-  saveTextSelection: (text: string, type: 'sentence' | 'paragraph', sourceMessageId?: string) => Promise<void>;
+  saveTextSelection: (
+    text: string,
+    type: 'sentence' | 'paragraph',
+    sourceMessageId?: string
+  ) => Promise<void>;
 }
 
 const STORAGE_KEY = 'personal_library';
@@ -31,20 +35,20 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
       const stored = await AsyncStorage.getItem(STORAGE_KEY);
       if (stored) {
         const items = JSON.parse(stored);
-        set({ 
+        set({
           items: items.map((item: LibraryItem) => ({
             ...item,
             timestamp: new Date(item.timestamp),
-          })), 
-          isLoading: false 
+          })),
+          isLoading: false,
         });
       } else {
         set({ items: [], isLoading: false });
       }
     } catch (error) {
-      set({ 
+      set({
         error: error instanceof Error ? error.message : 'Failed to load library items',
-        isLoading: false 
+        isLoading: false,
       });
     }
   },
@@ -56,15 +60,15 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         timestamp: new Date(),
       };
-      
+
       const currentItems = get().items;
       const updatedItems = [...currentItems, newItem];
-      
+
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedItems));
       set({ items: updatedItems, error: null });
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to add item to library' 
+      set({
+        error: error instanceof Error ? error.message : 'Failed to add item to library',
       });
     }
   },
@@ -72,15 +76,15 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
   updateItem: async (id, updates) => {
     try {
       const currentItems = get().items;
-      const updatedItems = currentItems.map(item => 
+      const updatedItems = currentItems.map((item) =>
         item.id === id ? { ...item, ...updates } : item
       );
-      
+
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedItems));
       set({ items: updatedItems, error: null });
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to update item' 
+      set({
+        error: error instanceof Error ? error.message : 'Failed to update item',
       });
     }
   },
@@ -88,13 +92,13 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
   deleteItem: async (id) => {
     try {
       const currentItems = get().items;
-      const filteredItems = currentItems.filter(item => item.id !== id);
-      
+      const filteredItems = currentItems.filter((item) => item.id !== id);
+
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filteredItems));
       set({ items: filteredItems, error: null });
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to delete item' 
+      set({
+        error: error instanceof Error ? error.message : 'Failed to delete item',
       });
     }
   },
@@ -109,20 +113,20 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
         timestamp: new Date(),
         type,
         sourceMessageId,
-        category: type === 'sentence' ? 'Zinnen' : 'Alinea\'s',
+        category: type === 'sentence' ? 'Zinnen' : "Alinea's",
       };
-      
+
       const currentItems = get().items;
       const updatedItems = [...currentItems, newItem];
-      
+
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedItems));
       set({ items: updatedItems, error: null });
-      
+
       // Optional: Show success feedback
       // console.log(`${type === 'sentence' ? 'Zin' : 'Alinea'} opgeslagen in bibliotheek`);
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to save text selection' 
+      set({
+        error: error instanceof Error ? error.message : 'Failed to save text selection',
       });
     }
   },

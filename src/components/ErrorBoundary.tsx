@@ -10,7 +10,7 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
-  errorInfo: any;
+  errorInfo: React.ErrorInfo | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -24,15 +24,15 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error to console in development
     if (__DEV__) {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
-    
+
     // In production, you might want to log to an error reporting service
     // logErrorToService(error, errorInfo);
-    
+
     this.setState({ errorInfo });
   }
 
@@ -55,16 +55,14 @@ export class ErrorBoundary extends Component<Props, State> {
             <Text style={styles.message}>
               {this.state.error?.message || 'An unexpected error occurred'}
             </Text>
-            
+
             {__DEV__ && (
               <ScrollView style={styles.errorDetails}>
                 <Text style={styles.errorDetailsTitle}>Error Details:</Text>
-                <Text style={styles.errorDetailsText}>
-                  {this.state.error?.stack}
-                </Text>
+                <Text style={styles.errorDetailsText}>{this.state.error?.stack}</Text>
               </ScrollView>
             )}
-            
+
             <TouchableOpacity style={styles.button} onPress={this.handleReset}>
               <Text style={styles.buttonText}>Try Again</Text>
             </TouchableOpacity>

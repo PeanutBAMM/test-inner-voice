@@ -1,11 +1,5 @@
 import React, { useRef, useState } from 'react';
-import {
-  TouchableOpacity,
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-} from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface VoiceInputProps {
@@ -77,12 +71,8 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
           },
         ]}
       />
-      
-      <TouchableOpacity
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        activeOpacity={0.8}
-      >
+
+      <TouchableOpacity onPressIn={handlePressIn} onPressOut={handlePressOut} activeOpacity={0.8}>
         <Animated.View
           style={[
             styles.button,
@@ -92,17 +82,11 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
             },
           ]}
         >
-          <Ionicons 
-            name="mic" 
-            size={32} 
-            color={isRecording ? '#FF6B6B' : '#8B7BA7'} 
-          />
+          <Ionicons name="mic" size={32} color={isRecording ? '#FF6B6B' : '#8B7BA7'} />
         </Animated.View>
       </TouchableOpacity>
 
-      {isRecording && (
-        <Text style={styles.recordingText}>Aan het luisteren...</Text>
-      )}
+      {isRecording && <Text style={styles.recordingText}>Aan het luisteren...</Text>}
     </View>
   );
 };

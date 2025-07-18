@@ -81,11 +81,11 @@ export class MockAuthService {
    */
   async loginWithProvider(provider: 'google' | 'apple' | 'facebook' | 'email'): Promise<MockUser> {
     // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const user = MOCK_USERS[provider];
     this.currentUser = user;
-    
+
     // Store in AsyncStorage for persistence
     await AsyncStorage.setItem('mockUser', JSON.stringify(user));
     await AsyncStorage.setItem('isAuthenticated', 'true');
@@ -102,7 +102,7 @@ export class MockAuthService {
    */
   async loginWithPhone(phoneNumber: string): Promise<{ requiresOTP: boolean; user?: MockUser }> {
     // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
     // In development, we'll skip OTP and login directly
     const user = {
@@ -113,7 +113,7 @@ export class MockAuthService {
     };
 
     this.currentUser = user;
-    
+
     // Store in AsyncStorage for persistence
     await AsyncStorage.setItem('mockUser', JSON.stringify(user));
     await AsyncStorage.setItem('isAuthenticated', 'true');
@@ -130,7 +130,7 @@ export class MockAuthService {
    */
   async verifyOTP(phoneNumber: string, otp: string): Promise<MockUser> {
     // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise((resolve) => setTimeout(resolve, 600));
 
     const user = {
       ...MOCK_USERS.phone,
@@ -140,7 +140,7 @@ export class MockAuthService {
     };
 
     this.currentUser = user;
-    
+
     // Store in AsyncStorage for persistence
     await AsyncStorage.setItem('mockUser', JSON.stringify(user));
     await AsyncStorage.setItem('isAuthenticated', 'true');
@@ -158,7 +158,7 @@ export class MockAuthService {
   async loginAsGuest(): Promise<MockUser> {
     const user = MOCK_USERS.guest;
     this.currentUser = user;
-    
+
     // Store in AsyncStorage for persistence
     await AsyncStorage.setItem('mockUser', JSON.stringify(user));
     await AsyncStorage.setItem('isAuthenticated', 'true');
@@ -233,7 +233,7 @@ export class MockAuthService {
     }
 
     this.currentUser = user;
-    
+
     // Store in AsyncStorage for persistence
     await AsyncStorage.setItem('mockUser', JSON.stringify(user));
     await AsyncStorage.setItem('isAuthenticated', 'true');

@@ -1,18 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-  Platform,
-} from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Animated, Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useBackground } from '../../../contexts/BackgroundContext';
 import { getMoodPalette } from '../../../constants/moodPalettes';
-import { LinearGradient } from 'expo-linear-gradient';
 
 interface ChatInputProps {
   onSend: (text: string) => void;
@@ -26,7 +18,7 @@ interface ChatInputProps {
 
 export const ChatInput: React.FC<ChatInputProps> = ({
   onSend,
-  placeholder = "Type je bericht...",
+  placeholder = 'Type je bericht...',
   showVoiceButton = true,
   onVoicePress,
   onStartVoiceRecording,
@@ -35,12 +27,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 }) => {
   const [text, setText] = useState('');
   const [isFocused, setIsFocused] = useState(false);
-  const [inputHeight, setInputHeight] = useState(40);
   const { theme } = useTheme();
   const { currentMood, timeOfDay } = useBackground();
   const moodPalette = getMoodPalette(currentMood, theme.isDark);
-  
-  const glowAnim = useRef(new Animated.Value(0)).current;
+
+  const heightAnim = useRef(new Animated.Value(44)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const voiceButtonScale = useRef(new Animated.Value(1)).current;
 
@@ -73,27 +64,22 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   const handleFocus = () => {
     setIsFocused(true);
-    Animated.timing(glowAnim, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
   };
 
   const handleBlur = () => {
     setIsFocused(false);
-    Animated.timing(glowAnim, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
   };
 
   const handleSend = () => {
     if (text.trim()) {
       onSend(text.trim());
       setText('');
-      setInputHeight(40); // Reset height after sending
+      // Animate height back to default
+      Animated.timing(heightAnim, {
+        toValue: 44,
+        duration: 200,
+        useNativeDriver: false,
+      }).start();
     }
   };
 
@@ -101,7 +87,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     if (Platform.OS === 'ios') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    
+
     Animated.sequence([
       Animated.timing(voiceButtonScale, {
         toValue: 0.9,
@@ -124,196 +110,133 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   const handleContentSizeChange = (event: any) => {
     const { height } = event.nativeEvent.contentSize;
-    const newHeight = Math.max(40, Math.min(120, height + 20));
-    setInputHeight(newHeight);
+    const baseHeight = 44;
+    
+    // Gebruik contentHeight direct
+    const newHeight = Math.min(120, Math.max(baseHeight, height));
+
+    Animated.timing(heightAnim, {
+      toValue: newHeight,
+      duration: 100,
+      useNativeDriver: false,
+    }).start();
   };
 
-  const animatedShadowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 0.15],
-  });
-
-  const animatedShadowRadius = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 20],
-  });
-
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          shadowOpacity: animatedShadowOpacity,
-          shadowRadius: animatedShadowRadius,
-          shadowColor: moodPalette.glow,
-          elevation: isFocused ? 8 : 4,
-        },
-      ]}
-    >
-      <LinearGradient
-        colors={
-          theme.isDark 
-            ? ['rgba(30, 30, 30, 0.95)', 'rgba(20, 20, 20, 0.95)']
-            : ['rgba(255, 251, 247, 0.98)', 'rgba(255, 248, 243, 0.98)']
-        }
+    <View style={styles.container}>
+      {/* Voice button BUITEN de input bubble */}
+      {showVoiceButton && (
+        <TouchableOpacity onPress={handleVoicePress} style={styles.voiceButton} activeOpacity={0.7}>
+          <Animated.View
+            style={[
+              styles.voiceButtonContainer,
+              {
+                transform: [{ scale: voiceButtonScale }],
+                backgroundColor: moodPalette.accent[1],
+              },
+            ]}
+          >
+            <Animated.View
+              style={[
+                styles.voiceButtonPulse,
+                {
+                  transform: [{ scale: pulseAnim }],
+                  opacity: isVoiceRecording ? 0.3 : 0,
+                  backgroundColor: moodPalette.accent[0],
+                },
+              ]}
+            />
+            <Ionicons name={isVoiceRecording ? 'stop' : 'mic'} size={24} color="#FFFFFF" />
+          </Animated.View>
+        </TouchableOpacity>
+      )}
+
+      {/* Input bubble met text input en send button BINNEN */}
+      <Animated.View
         style={[
-          styles.gradientContainer,
+          styles.inputBubble,
           {
-            borderColor: moodPalette.accent[0] + '20', // 20% opacity accent
-          }
+            backgroundColor: theme.isDark ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+            borderColor: theme.isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+          },
         ]}
       >
-        <View style={styles.inputWrapper}>
-          {showVoiceButton && (
-            <TouchableOpacity
-              onPress={handleVoicePress}
-              style={styles.voiceButton}
-              activeOpacity={0.7}
-            >
-              <Animated.View
-                style={[
-                  styles.voiceButtonContainer,
-                  {
-                    transform: [{ scale: voiceButtonScale }],
-                    backgroundColor: isVoiceRecording 
-                      ? moodPalette.accent[0] 
-                      : theme.isDark 
-                        ? 'rgba(255, 255, 255, 0.1)' 
-                        : 'rgba(139, 123, 167, 0.1)',
-                  },
-                ]}
-              >
-                <Animated.View
-                  style={[
-                    styles.voiceButtonPulse,
-                    {
-                      transform: [{ scale: pulseAnim }],
-                      opacity: isVoiceRecording ? 0.3 : 0,
-                      backgroundColor: moodPalette.accent[0],
-                    },
-                  ]}
-                />
-                <Ionicons 
-                  name={isVoiceRecording ? "stop" : "mic"} 
-                  size={20} 
-                  color={
-                    isVoiceRecording 
-                      ? '#FFFFFF' 
-                      : theme.isDark 
-                        ? moodPalette.sparkle 
-                        : moodPalette.accent[0]
-                  } 
-                />
-              </Animated.View>
-            </TouchableOpacity>
-          )}
+        <TextInput
+          style={[
+            styles.input,
+            {
+              color: theme.colors.text,
+            },
+          ]}
+          value={text}
+          onChangeText={setText}
+          placeholder={placeholder}
+          placeholderTextColor={
+            theme.isDark ? 'rgba(255, 255, 255, 0.6)' : moodPalette.accent[1] + '80'
+          }
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onSubmitEditing={handleSend}
+          onContentSizeChange={handleContentSizeChange}
+          returnKeyType="send"
+          multiline
+          numberOfLines={4}
+          maxLength={500}
+        />
 
-          <TextInput
-            style={[
-              styles.input,
-              { 
-                height: inputHeight,
-                color: theme.colors.text,
-                borderRadius: 22,
-                backgroundColor: theme.isDark 
-                  ? 'rgba(0, 0, 0, 0.3)' 
-                  : 'rgba(255, 255, 255, 0.95)',
-                textAlign: 'left',
-              },
-            ]}
-            value={text}
-            onChangeText={setText}
-            placeholder={placeholder}
-            placeholderTextColor={
-              theme.isDark 
-                ? 'rgba(255, 255, 255, 0.6)' 
-                : moodPalette.accent[1] + '80'
-            }
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onSubmitEditing={handleSend}
-            onContentSizeChange={handleContentSizeChange}
-            returnKeyType="send"
-            multiline
-            maxLength={500}
-          />
-
-          <TouchableOpacity
-            onPress={handleSend}
-            style={[
-              styles.sendButton,
-              {
-                backgroundColor: text.trim() 
-                  ? moodPalette.accent[0] 
-                  : theme.isDark 
-                    ? 'rgba(255, 255, 255, 0.1)' 
-                    : 'rgba(139, 123, 167, 0.1)',
-                shadowColor: moodPalette.glow,
-              },
-              !text.trim() && styles.sendButtonDisabled
-            ]}
-            disabled={!text.trim()}
-            activeOpacity={0.7}
-          >
-            <Ionicons 
-              name="send" 
-              size={20} 
-              color={
-                text.trim() 
-                  ? '#FFFFFF'
-                  : theme.isDark 
-                    ? moodPalette.sparkle 
-                    : moodPalette.accent[1]
-              } 
-            />
+        {/* Send button alleen zichtbaar als er text is */}
+        {text.trim() && (
+          <TouchableOpacity onPress={handleSend} style={styles.sendButton} activeOpacity={0.7}>
+            <Ionicons name="send" size={20} color={moodPalette.accent[1]} />
           </TouchableOpacity>
-        </View>
-      </LinearGradient>
-    </Animated.View>
+        )}
+      </Animated.View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 16,
-    marginBottom: 16,
-    marginTop: 8,
-    borderRadius: 28,
-    shadowColor: '#C3B5E3', // This will be overridden dynamically
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    overflow: 'hidden',
-  },
-  gradientContainer: {
-    borderRadius: 28,
-  },
-  inputWrapper: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    gap: 12,
+    alignItems: 'flex-end',
+    minHeight: 44,
+    marginHorizontal: 16,
+    marginBottom: 20,
+    marginTop: 4,
+    gap: 8,
+  },
+  inputBubble: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    paddingLeft: 16,
+    paddingRight: 4,
+    paddingVertical: 0,
+    borderRadius: 22,
+    borderWidth: 1,
+    minHeight: 44,
+    maxHeight: 120,
+    overflow: 'hidden',
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     maxHeight: 120,
-    minHeight: 44,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    lineHeight: 20,
-    textAlignVertical: 'center',
+    paddingVertical: 10,
+    paddingRight: 8,
+    lineHeight: 22,
   },
   voiceButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },
   voiceButtonContainer: {
     width: 44,
     height: 44,
-    borderRadius: 14,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -327,23 +250,11 @@ const styles = StyleSheet.create({
     left: -10,
   },
   sendButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#8B7BA7',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  sendButtonDisabled: {
-    opacity: 0.6,
-    shadowOpacity: 0,
-    elevation: 0,
+    marginRight: 4,
+    marginBottom: 0,
   },
 });

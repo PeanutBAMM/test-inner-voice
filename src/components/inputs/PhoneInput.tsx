@@ -57,10 +57,7 @@ export function PhoneInput({
   return (
     <View>
       <View style={[styles.container, error && styles.containerError]}>
-        <TouchableOpacity
-          style={styles.countrySelector}
-          onPress={() => setShowCountryPicker(true)}
-        >
+        <TouchableOpacity style={styles.countrySelector} onPress={() => setShowCountryPicker(true)}>
           <Text style={styles.flag}>{selectedCountry.flag}</Text>
           <Text style={styles.dialCode}>{selectedCountry.dial_code}</Text>
           <Ionicons name="chevron-down" size={16} color={theme.colors.textSecondary} />

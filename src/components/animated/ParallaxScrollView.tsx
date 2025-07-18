@@ -81,12 +81,7 @@ export function ParallaxScrollView({
         )
       : 1;
 
-    const translateY = interpolate(
-      scrollY.value,
-      [0, headerHeight],
-      [0, -50],
-      Extrapolate.CLAMP
-    );
+    const translateY = interpolate(scrollY.value, [0, headerHeight], [0, -50], Extrapolate.CLAMP);
 
     return {
       opacity,
@@ -118,37 +113,28 @@ export function ParallaxScrollView({
             resizeMode="cover"
           />
         )}
-        
+
         <LinearGradient
           colors={['transparent', 'rgba(0,0,0,0.6)']}
           style={StyleSheet.absoluteFillObject}
         />
-        
+
         {(headerTitle || headerSubtitle) && (
           <Animated.View style={[styles.headerTextContainer, headerTextStyle]}>
-            {headerTitle && (
-              <Text style={styles.headerTitle}>{headerTitle}</Text>
-            )}
-            {headerSubtitle && (
-              <Text style={styles.headerSubtitle}>{headerSubtitle}</Text>
-            )}
+            {headerTitle && <Text style={styles.headerTitle}>{headerTitle}</Text>}
+            {headerSubtitle && <Text style={styles.headerSubtitle}>{headerSubtitle}</Text>}
           </Animated.View>
         )}
       </Animated.View>
 
       <AnimatedScrollView
         style={[styles.scrollView, style]}
-        contentContainerStyle={[
-          styles.contentContainer,
-          { paddingTop: headerHeight },
-        ]}
+        contentContainerStyle={[styles.contentContainer, { paddingTop: headerHeight }]}
         scrollEventThrottle={16}
         onScroll={scrollHandler}
         {...props}
       >
-        <Animated.View style={[styles.content, contentStyle]}>
-          {children}
-        </Animated.View>
+        <Animated.View style={[styles.content, contentStyle]}>{children}</Animated.View>
       </AnimatedScrollView>
     </View>
   );

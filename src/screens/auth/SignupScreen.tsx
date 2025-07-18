@@ -27,29 +27,29 @@ export default function SignupScreen({ navigation }: Props) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [marketingEmails, setMarketingEmails] = useState(false);
-  
+
   const [nameError, setNameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [termsError, setTermsError] = useState('');
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   const { signup } = useAuthStore();
 
   const validateForm = () => {
     let isValid = true;
-    
+
     if (!name || name.length < 2) {
       setNameError('Naam moet minimaal 2 karakters zijn');
       isValid = false;
     } else {
       setNameError('');
     }
-    
+
     if (!email) {
       setEmailError('Email is vereist');
       isValid = false;
@@ -59,7 +59,7 @@ export default function SignupScreen({ navigation }: Props) {
     } else {
       setEmailError('');
     }
-    
+
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
       setPasswordError(passwordValidation.message);
@@ -67,37 +67,34 @@ export default function SignupScreen({ navigation }: Props) {
     } else {
       setPasswordError('');
     }
-    
+
     if (password !== confirmPassword) {
       setConfirmPasswordError('Wachtwoorden komen niet overeen');
       isValid = false;
     } else {
       setConfirmPasswordError('');
     }
-    
+
     if (!acceptTerms) {
       setTermsError('Je moet de voorwaarden accepteren');
       isValid = false;
     } else {
       setTermsError('');
     }
-    
+
     return isValid;
   };
 
   const handleSignup = async () => {
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
     try {
       await signup(email, password, name);
       // TODO: Save marketing email preference
       // Navigation handled by auth state change
     } catch (error) {
-      Alert.alert(
-        'Registratie Mislukt',
-        'Er is iets misgegaan. Probeer het later opnieuw.'
-      );
+      Alert.alert('Registratie Mislukt', 'Er is iets misgegaan. Probeer het later opnieuw.');
     } finally {
       setIsLoading(false);
     }
@@ -109,13 +106,13 @@ export default function SignupScreen({ navigation }: Props) {
 
   const getPasswordStrength = () => {
     if (!password) return { strength: 0, color: theme.colors.border };
-    
+
     let strength = 0;
     if (password.length >= 8) strength++;
     if (/[A-Z]/.test(password)) strength++;
     if (/[0-9]/.test(password)) strength++;
     if (/[^A-Za-z0-9]/.test(password)) strength++;
-    
+
     const colors = [
       theme.colors.border,
       theme.colors.error,
@@ -123,7 +120,7 @@ export default function SignupScreen({ navigation }: Props) {
       theme.colors.success,
       theme.colors.primary,
     ];
-    
+
     return { strength, color: colors[strength] };
   };
 

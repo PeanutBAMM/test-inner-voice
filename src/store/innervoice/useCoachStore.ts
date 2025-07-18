@@ -6,9 +6,12 @@ import { getLLMResponse } from '../../services/innervoice/llmService';
 interface CoachStore {
   systemPrompt: string;
   isInitialized: boolean;
-  
+
   initializeCoach: (userProfile: Record<string, string | string[]>) => void;
-  getCoachResponse: (message: string, history: Array<{ role: string; content: string }>) => Promise<string>;
+  getCoachResponse: (
+    message: string,
+    history: Array<{ role: string; content: string }>
+  ) => Promise<string>;
 }
 
 const DEFAULT_TEMPERATURE = 0.6;
@@ -52,35 +55,34 @@ Pas je begeleiding aan zonder deze informatie expliciet te noemen. Spreek in het
 
         set({
           systemPrompt: personalizedPrompt,
-          isInitialized: true
+          isInitialized: true,
         });
       },
 
       getCoachResponse: async (message, history) => {
         const { systemPrompt } = get();
-        
+
         try {
           // Always try to use LLM first - convert history to ChatMessage format
-          const formattedHistory = history.map(msg => ({
+          const formattedHistory = history.map((msg) => ({
             role: msg.role as 'user' | 'assistant' | 'system',
-            content: msg.content
+            content: msg.content,
           }));
-          
+
           const response = await getLLMResponse(
-            message, 
+            message,
             formattedHistory,
             systemPrompt,
             'gentle',
             DEFAULT_TEMPERATURE
           );
-          
+
           return response;
-          
         } catch (error) {
           console.error('Coach response error:', error);
           return 'Even een moment... Ik ben er voor je. Wat wilde je delen?';
         }
-      }
+      },
     }),
     {
       name: 'coach-store',

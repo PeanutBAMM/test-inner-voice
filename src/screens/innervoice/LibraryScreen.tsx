@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -51,10 +44,12 @@ export default function LibraryScreen() {
       const stored = await AsyncStorage.getItem('personal_library');
       if (stored) {
         const items = JSON.parse(stored);
-        setLibraryItems(items.map((item: LibraryItem) => ({
-          ...item,
-          timestamp: new Date(item.timestamp),
-        })));
+        setLibraryItems(
+          items.map((item: LibraryItem) => ({
+            ...item,
+            timestamp: new Date(item.timestamp),
+          }))
+        );
       } else {
         // For POC: Load mock data
         setLibraryItems(MOCK_LIBRARY_ITEMS);
@@ -65,155 +60,202 @@ export default function LibraryScreen() {
     }
   };
 
-  const filteredItems = libraryItems.filter(item => {
-    const matchesSearch = item.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         (item.note && item.note.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredItems = libraryItems.filter((item) => {
+    const matchesSearch =
+      item.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.note && item.note.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesCategory = !selectedCategory || item.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const categories = Array.from(new Set(libraryItems.map(item => item.category).filter(Boolean)));
+  const categories = Array.from(new Set(libraryItems.map((item) => item.category).filter(Boolean)));
 
   return (
-    <UniversalBackground 
-      variant="gradient" 
-      mood="grounded" 
+    <UniversalBackground
+      variant="gradient"
+      mood="grounded"
       timeOfDay="afternoon"
       enableEffects={false}
     >
-      <View style={[styles.container, { 
-        paddingTop: insets.top,
-        paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
-      }]}>
-      
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.textSecondary} />
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Mijn Bibliotheek</Text>
-        <View style={{ width: 24 }} />
-      </View>
-
-      <View style={[styles.searchContainer, { 
-        backgroundColor: theme.colors.card,
-        shadowColor: theme.isDark ? theme.colors.primary : '#000',
-        shadowOpacity: theme.isDark ? 0.2 : 0.05,
-      }]}>
-        <Ionicons name="search" size={20} color={theme.colors.textLight} style={styles.searchIcon} />
-        <TextInput
-          style={[styles.searchInput, { color: theme.colors.text }]}
-          placeholder='Zoek in je inzichten...'
-          placeholderTextColor={theme.colors.textLight + '80'}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
-
-      {categories.length > 0 && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.categoriesContainer}
-        >
-          <TouchableOpacity
-            style={[
-              styles.categoryChip,
-              { 
-                backgroundColor: theme.colors.card,
-                borderColor: theme.colors.border + '4D'
-              },
-              !selectedCategory && {
-                backgroundColor: theme.isDark ? theme.colors.accent : theme.colors.peaceful.primary[2],
-                borderColor: theme.isDark ? theme.colors.accent : theme.colors.peaceful.accent[0],
-              }
-            ]}
-            onPress={() => setSelectedCategory(null)}
-          >
-            <Text style={[
-              styles.categoryText,
-              { color: theme.colors.textSecondary },
-              !selectedCategory && styles.categoryTextActive
-            ]}>Alles</Text>
+      <View
+        style={[
+          styles.container,
+          {
+            paddingTop: insets.top,
+            paddingBottom: TAB_BAR_HEIGHT + insets.bottom,
+          },
+        ]}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color={theme.colors.textSecondary} />
           </TouchableOpacity>
-          
-          {categories.map((category) => (
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Mijn Bibliotheek</Text>
+          <View style={{ width: 24 }} />
+        </View>
+
+        <View
+          style={[
+            styles.searchContainer,
+            {
+              backgroundColor: theme.colors.card,
+              shadowColor: theme.isDark ? theme.colors.primary : '#000',
+              shadowOpacity: theme.isDark ? 0.2 : 0.05,
+            },
+          ]}
+        >
+          <Ionicons
+            name="search"
+            size={20}
+            color={theme.colors.textLight}
+            style={styles.searchIcon}
+          />
+          <TextInput
+            style={[styles.searchInput, { color: theme.colors.text }]}
+            placeholder="Zoek in je inzichten..."
+            placeholderTextColor={theme.colors.textLight + '80'}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+
+        {categories.length > 0 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.categoriesContainer}
+          >
             <TouchableOpacity
-              key={category}
               style={[
                 styles.categoryChip,
-                { 
+                {
                   backgroundColor: theme.colors.card,
-                  borderColor: theme.colors.border + '4D'
+                  borderColor: theme.colors.border + '4D',
                 },
-                selectedCategory === category && {
-                  backgroundColor: theme.isDark ? theme.colors.accent : theme.colors.peaceful.primary[2],
+                !selectedCategory && {
+                  backgroundColor: theme.isDark
+                    ? theme.colors.accent
+                    : theme.colors.peaceful.primary[2],
                   borderColor: theme.isDark ? theme.colors.accent : theme.colors.peaceful.accent[0],
-                }
+                },
               ]}
-              onPress={() => setSelectedCategory(selectedCategory === category ? null : category || null)}
+              onPress={() => setSelectedCategory(null)}
             >
-              <Text style={[
-                styles.categoryText,
-                { color: theme.colors.textSecondary },
-                selectedCategory === category && styles.categoryTextActive
-              ]}>{category}</Text>
+              <Text
+                style={[
+                  styles.categoryText,
+                  { color: theme.colors.textSecondary },
+                  !selectedCategory && styles.categoryTextActive,
+                ]}
+              >
+                Alles
+              </Text>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
-      )}
 
-      <ScrollView 
-        ref={scrollViewRef}
-        style={styles.content} 
-        showsVerticalScrollIndicator={false}
-      >
-        {filteredItems.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="book-outline" size={64} color={theme.colors.peaceful.primary[2]} />
-            <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
-              {searchQuery ? 'Geen inzichten gevonden' : 'Je bibliotheek is nog leeg'}
-            </Text>
-            <Text style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}>
-              {searchQuery ? 'Probeer een andere zoekterm' : 'Bewaar belangrijke momenten uit je gesprekken'}
-            </Text>
-          </View>
-        ) : (
-          filteredItems.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={[styles.libraryCard, {
-                backgroundColor: theme.colors.card,
-                shadowColor: theme.isDark ? theme.colors.primary : '#000',
-                shadowOpacity: theme.isDark ? 0.2 : 0.05,
-              }]}
-              onPress={() => navigation.navigate('ConversationDetailScreen', { 
-                conversationId: item.conversationId,
-              })}
-            >
-              <Text style={[styles.cardText, { color: theme.colors.text }]}>{item.text}</Text>
-              {item.note && (
-                <Text style={[styles.cardNote, { color: theme.colors.textSecondary }]}>{item.note}</Text>
-              )}
-              <View style={styles.cardFooter}>
-                <Text style={[styles.cardDate, { color: theme.colors.textLight }]}>
-                  {item.timestamp.toLocaleDateString('nl-NL', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                  })}
+            {categories.map((category) => (
+              <TouchableOpacity
+                key={category}
+                style={[
+                  styles.categoryChip,
+                  {
+                    backgroundColor: theme.colors.card,
+                    borderColor: theme.colors.border + '4D',
+                  },
+                  selectedCategory === category && {
+                    backgroundColor: theme.isDark
+                      ? theme.colors.accent
+                      : theme.colors.peaceful.primary[2],
+                    borderColor: theme.isDark
+                      ? theme.colors.accent
+                      : theme.colors.peaceful.accent[0],
+                  },
+                ]}
+                onPress={() =>
+                  setSelectedCategory(selectedCategory === category ? null : category || null)
+                }
+              >
+                <Text
+                  style={[
+                    styles.categoryText,
+                    { color: theme.colors.textSecondary },
+                    selectedCategory === category && styles.categoryTextActive,
+                  ]}
+                >
+                  {category}
                 </Text>
-                {item.category && (
-                  <View style={[styles.cardCategory, {
-                    backgroundColor: theme.isDark ? theme.colors.accent + '1A' : theme.colors.peaceful.primary[1],
-                  }]}>
-                    <Text style={[styles.cardCategoryText, { color: theme.colors.textSecondary }]}>{item.category}</Text>
-                  </View>
-                )}
-              </View>
-            </TouchableOpacity>
-          ))
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         )}
-      </ScrollView>
+
+        <ScrollView ref={scrollViewRef} style={styles.content} showsVerticalScrollIndicator={false}>
+          {filteredItems.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Ionicons name="book-outline" size={64} color={theme.colors.peaceful.primary[2]} />
+              <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>
+                {searchQuery ? 'Geen inzichten gevonden' : 'Je bibliotheek is nog leeg'}
+              </Text>
+              <Text style={[styles.emptySubtitle, { color: theme.colors.textSecondary }]}>
+                {searchQuery
+                  ? 'Probeer een andere zoekterm'
+                  : 'Bewaar belangrijke momenten uit je gesprekken'}
+              </Text>
+            </View>
+          ) : (
+            filteredItems.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={[
+                  styles.libraryCard,
+                  {
+                    backgroundColor: theme.colors.card,
+                    shadowColor: theme.isDark ? theme.colors.primary : '#000',
+                    shadowOpacity: theme.isDark ? 0.2 : 0.05,
+                  },
+                ]}
+                onPress={() =>
+                  navigation.navigate('ConversationDetailScreen', {
+                    conversationId: item.conversationId,
+                  })
+                }
+              >
+                <Text style={[styles.cardText, { color: theme.colors.text }]}>{item.text}</Text>
+                {item.note && (
+                  <Text style={[styles.cardNote, { color: theme.colors.textSecondary }]}>
+                    {item.note}
+                  </Text>
+                )}
+                <View style={styles.cardFooter}>
+                  <Text style={[styles.cardDate, { color: theme.colors.textLight }]}>
+                    {item.timestamp.toLocaleDateString('nl-NL', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </Text>
+                  {item.category && (
+                    <View
+                      style={[
+                        styles.cardCategory,
+                        {
+                          backgroundColor: theme.isDark
+                            ? theme.colors.accent + '1A'
+                            : theme.colors.peaceful.primary[1],
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.cardCategoryText, { color: theme.colors.textSecondary }]}
+                      >
+                        {item.category}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
+        </ScrollView>
       </View>
     </UniversalBackground>
   );

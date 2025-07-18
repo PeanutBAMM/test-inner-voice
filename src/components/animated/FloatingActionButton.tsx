@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -48,24 +43,11 @@ function ActionButton({ action, index, animation }: ActionButtonProps) {
       [0, -(index + 1) * 70],
       Extrapolate.CLAMP
     );
-    const opacity = interpolate(
-      animation.value,
-      [0, 0.5, 1],
-      [0, 0, 1],
-      Extrapolate.CLAMP
-    );
-    const scale = interpolate(
-      animation.value,
-      [0, 1],
-      [0.5, 1],
-      Extrapolate.CLAMP
-    );
+    const opacity = interpolate(animation.value, [0, 0.5, 1], [0, 0, 1], Extrapolate.CLAMP);
+    const scale = interpolate(animation.value, [0, 1], [0.5, 1], Extrapolate.CLAMP);
 
     return {
-      transform: [
-        { translateY },
-        { scale },
-      ],
+      transform: [{ translateY }, { scale }],
       opacity,
     };
   });
@@ -73,7 +55,10 @@ function ActionButton({ action, index, animation }: ActionButtonProps) {
   return (
     <Animated.View style={[styles.actionButton, actionStyle]}>
       <TouchableOpacity
-        style={[styles.actionButtonInner, { backgroundColor: action.color || theme.colors.secondary }]}
+        style={[
+          styles.actionButtonInner,
+          { backgroundColor: action.color || theme.colors.secondary },
+        ]}
         onPress={action.onPress}
       >
         <Ionicons name={action.icon} size={24} color="white" />
@@ -102,24 +87,11 @@ export function FloatingActionButton({
   };
 
   const mainButtonStyle = useAnimatedStyle(() => {
-    const scale = interpolate(
-      animation.value,
-      [0, 1],
-      [1, 1.1],
-      Extrapolate.CLAMP
-    );
-    const rotate = interpolate(
-      rotation.value,
-      [0, 1],
-      [0, 45],
-      Extrapolate.CLAMP
-    );
+    const scale = interpolate(animation.value, [0, 1], [1, 1.1], Extrapolate.CLAMP);
+    const rotate = interpolate(rotation.value, [0, 1], [0, 45], Extrapolate.CLAMP);
 
     return {
-      transform: [
-        { scale },
-        { rotate: `${rotate}deg` },
-      ],
+      transform: [{ scale }, { rotate: `${rotate}deg` }],
     };
   });
 
@@ -132,12 +104,12 @@ export function FloatingActionButton({
 
   return (
     <View style={[styles.container, style]}>
-      <Animated.View 
+      <Animated.View
         style={[StyleSheet.absoluteFillObject, styles.backdrop, backdropStyle]}
         pointerEvents={isOpen ? 'auto' : 'none'}
       >
-        <TouchableOpacity 
-          style={StyleSheet.absoluteFillObject} 
+        <TouchableOpacity
+          style={StyleSheet.absoluteFillObject}
           onPress={toggleMenu}
           activeOpacity={1}
         />
@@ -151,30 +123,18 @@ export function FloatingActionButton({
             onPress: () => {
               action.onPress();
               toggleMenu();
-            }
+            },
           }}
           index={index}
           animation={animation}
         />
       ))}
 
-      <AnimatedTouchable
-        style={[styles.mainButton]}
-        onPress={toggleMenu}
-        activeOpacity={0.8}
-      >
-        <Animated.View 
-          style={[
-            styles.mainButtonInner,
-            { backgroundColor: mainColor },
-            mainButtonStyle,
-          ]}
+      <AnimatedTouchable style={[styles.mainButton]} onPress={toggleMenu} activeOpacity={0.8}>
+        <Animated.View
+          style={[styles.mainButtonInner, { backgroundColor: mainColor }, mainButtonStyle]}
         >
-          <Ionicons
-            name={mainIcon}
-            size={28}
-            color={theme.colors.white}
-          />
+          <Ionicons name={mainIcon} size={28} color={theme.colors.white} />
         </Animated.View>
       </AnimatedTouchable>
     </View>

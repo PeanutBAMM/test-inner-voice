@@ -1,14 +1,10 @@
 import React, { useState, useRef } from 'react';
-import {
-  Text,
-  StyleSheet,
-  Animated,
-  TouchableOpacity,
-  Platform,
-} from 'react-native';
+import { Text, StyleSheet, Animated, TouchableOpacity, Platform, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Message } from '../../../types/chat';
 import { useTheme } from '../../../contexts/ThemeContext';
+import { useBackground } from '../../../contexts/BackgroundContext';
+import { getMoodPalette } from '../../../constants/moodPalettes';
 
 interface SelectableMessageBubbleProps {
   message: Message;
@@ -24,6 +20,8 @@ export const SelectableMessageBubble: React.FC<SelectableMessageBubbleProps> = (
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const [isSelected, setIsSelected] = useState(false);
   const { theme } = useTheme();
+  const { currentMood } = useBackground();
+  const moodPalette = getMoodPalette(currentMood, theme.isDark);
 
   React.useEffect(() => {
     const animation = Animated.parallel([
@@ -38,9 +36,9 @@ export const SelectableMessageBubble: React.FC<SelectableMessageBubbleProps> = (
         useNativeDriver: true,
       }),
     ]);
-    
+
     animation.start();
-    
+
     // Cleanup animation on unmount
     return () => {
       animation.stop();
@@ -48,7 +46,6 @@ export const SelectableMessageBubble: React.FC<SelectableMessageBubbleProps> = (
       slideAnim.removeAllListeners();
     };
   }, [fadeAnim, slideAnim]);
-
 
   const handleLongPress = () => {
     // Animate scale on long press
@@ -64,7 +61,7 @@ export const SelectableMessageBubble: React.FC<SelectableMessageBubbleProps> = (
         useNativeDriver: true,
       }),
     ]).start();
-    
+
     setIsSelected(true);
   };
 
@@ -81,14 +78,62 @@ export const SelectableMessageBubble: React.FC<SelectableMessageBubbleProps> = (
     }
   };
 
-
   const isUser = message.sender === 'user';
 
+  // Assistant messages zonder bubble
+  if (!isUser) {
+    return (
+      <Animated.View
+        style={[
+          styles.container,
+          styles.assistantContainer,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
+      >
+        <TouchableOpacity
+          onLongPress={handleLongPress}
+          delayLongPress={500}
+          activeOpacity={0.8}
+          style={styles.assistantTouchable}
+        >
+          <Text style={[styles.text, styles.assistantText]}>{message.text}</Text>
+        </TouchableOpacity>
+
+        {/* Save Button voor assistant messages */}
+        {isSelected && (
+          <Animated.View
+            style={[
+              styles.saveButtonContainerAssistant,
+              {
+                opacity: fadeAnim,
+              },
+            ]}
+          >
+            <TouchableOpacity
+              style={[styles.saveButton, {
+                backgroundColor: moodPalette.accent[1],
+                shadowColor: moodPalette.accent[1],
+              }]}
+              onPress={handleSaveToLibrary}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="add" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          </Animated.View>
+        )}
+      </Animated.View>
+    );
+  }
+
+  // User messages met bubble
   return (
     <Animated.View
       style={[
         styles.container,
-        isUser ? styles.userContainer : styles.assistantContainer,
+        styles.userContainer,
         {
           opacity: fadeAnim,
           transform: [{ translateY: slideAnim }],
@@ -105,21 +150,19 @@ export const SelectableMessageBubble: React.FC<SelectableMessageBubbleProps> = (
         <TouchableOpacity
           style={[
             styles.bubble,
-            isUser ? styles.userBubble : styles.assistantBubble,
+            styles.userBubble,
             isSelected && styles.selectedBubble,
             {
+              backgroundColor: theme.isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
               shadowColor: theme.isDark ? 'rgba(255, 255, 255, 0.1)' : '#000',
-              shadowOpacity: theme.isDark ? 0.3 : 0.15,
-            }
+              shadowOpacity: theme.isDark ? 0.3 : 0.1,
+            },
           ]}
           onLongPress={handleLongPress}
           delayLongPress={500}
           activeOpacity={0.8}
         >
-          <Text
-            style={[styles.text, isUser ? styles.userText : styles.assistantText]}
-            selectable={Platform.OS === 'ios'}
-          >
+          <Text style={[styles.text, styles.userText]} selectable={Platform.OS === 'ios'}>
             {message.text}
           </Text>
         </TouchableOpacity>
@@ -137,12 +180,14 @@ export const SelectableMessageBubble: React.FC<SelectableMessageBubbleProps> = (
           ]}
         >
           <TouchableOpacity
-            style={styles.saveButton}
+            style={[styles.saveButton, {
+              backgroundColor: moodPalette.accent[1],
+              shadowColor: moodPalette.accent[1],
+            }]}
             onPress={handleSaveToLibrary}
             activeOpacity={0.8}
           >
-            <Ionicons name="bookmark" size={24} color="#FFFFFF" />
-            <Text style={styles.saveButtonText}>Opslaan in bibliotheek</Text>
+            <Ionicons name="add" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </Animated.View>
       )}
@@ -159,6 +204,7 @@ const styles = StyleSheet.create({
   },
   assistantContainer: {
     alignItems: 'flex-start',
+    paddingRight: 32,
   },
   bubble: {
     maxWidth: '80%',
@@ -167,14 +213,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   userBubble: {
-    backgroundColor: '#E8DFFD',
     borderBottomRightRadius: 4,
     // Schaduw aan rechterkant voor user messages
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 2,
+    elevation: 2,
   },
   assistantBubble: {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -194,26 +237,36 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   text: {
-    fontSize: 16,
-    lineHeight: 22,
+    fontSize: 17,
+    lineHeight: 26,
   },
   userText: {
     color: '#4A4458',
+    fontFamily: 'Inter_400Regular',
   },
   assistantText: {
-    color: '#6B6478',
+    color: '#2C2C2E',
+    fontFamily: 'Inter_400Regular',
+    fontWeight: '400',
+    letterSpacing: -0.2,
+  },
+  assistantTouchable: {
+    maxWidth: '100%',
+  },
+  saveButtonContainerAssistant: {
+    marginTop: 8,
+    alignSelf: 'flex-start',
   },
   saveButtonContainer: {
     marginTop: 8,
   },
   saveButton: {
-    flexDirection: 'row',
+    width: 44,
+    height: 44,
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#FFB6C1',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    gap: 8,
+    borderRadius: 22,
     elevation: 4,
     shadowColor: '#FFB6C1',
     shadowOffset: { width: 0, height: 2 },
@@ -224,5 +277,10 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
+  },
+  bubbleTail: {
+    position: 'absolute',
+    right: -8,
+    bottom: 0,
   },
 });

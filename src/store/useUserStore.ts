@@ -22,14 +22,14 @@ interface UserState {
   user: UserProfile | null;
   isAuthenticated: boolean;
   userProfile: any; // For app-specific profile data (e.g., InnerVoice)
-  
+
   // User preferences
   preferences: UserPreferences;
-  
+
   // User data
   favoriteItems: string[];
   recentSearches: string[];
-  
+
   // Actions
   setUser: (user: UserProfile | null) => void;
   setUserProfile: (profile: any) => void;
@@ -57,49 +57,51 @@ const useUserStore = create<UserState>()(
       },
       favoriteItems: [],
       recentSearches: [],
-      
+
       // Actions
       setUser: (user) => set({ user, isAuthenticated: !!user }),
-      
+
       setUserProfile: (profile) => set({ userProfile: profile }),
-      
+
       loadUserProfile: (profile) => set({ userProfile: profile }),
-      
-      updateUserProfile: (updates) => set((state) => ({
-        userProfile: { ...state.userProfile, ...updates }
-      })),
-      
-      logout: () => set({ 
-        user: null, 
-        isAuthenticated: false, 
-        userProfile: null,
-        favoriteItems: [],
-        recentSearches: []
-      }),
-      
+
+      updateUserProfile: (updates) =>
+        set((state) => ({
+          userProfile: { ...state.userProfile, ...updates },
+        })),
+
+      logout: () =>
+        set({
+          user: null,
+          isAuthenticated: false,
+          userProfile: null,
+          favoriteItems: [],
+          recentSearches: [],
+        }),
+
       updatePreferences: (preferences) =>
         set((state) => ({
           preferences: { ...state.preferences, ...preferences },
         })),
-      
+
       addFavoriteItem: (itemId) =>
         set((state) => ({
           favoriteItems: [...new Set([...state.favoriteItems, itemId])],
         })),
-      
+
       removeFavoriteItem: (itemId) =>
         set((state) => ({
           favoriteItems: state.favoriteItems.filter((id) => id !== itemId),
         })),
-      
+
       addRecentSearch: (search) =>
         set((state) => ({
-          recentSearches: [
-            search,
-            ...state.recentSearches.filter((s) => s !== search),
-          ].slice(0, 10), // Keep only last 10 searches
+          recentSearches: [search, ...state.recentSearches.filter((s) => s !== search)].slice(
+            0,
+            10
+          ), // Keep only last 10 searches
         })),
-      
+
       clearRecentSearches: () => set({ recentSearches: [] }),
     }),
     {

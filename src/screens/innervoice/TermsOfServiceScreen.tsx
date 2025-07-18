@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,27 +12,33 @@ export default function TermsOfServiceScreen() {
   const sections = [
     {
       title: '1. Acceptatie van voorwaarden',
-      content: 'Door InnerVoice te gebruiken, ga je akkoord met deze servicevoorwaarden. Als je niet akkoord gaat, gebruik de app dan niet.',
+      content:
+        'Door InnerVoice te gebruiken, ga je akkoord met deze servicevoorwaarden. Als je niet akkoord gaat, gebruik de app dan niet.',
     },
     {
       title: '2. Gebruik van de dienst',
-      content: 'InnerVoice is bedoeld voor persoonlijke reflectie en zelfontdekking. De app vervangt geen professionele medische of psychologische hulp.',
+      content:
+        'InnerVoice is bedoeld voor persoonlijke reflectie en zelfontdekking. De app vervangt geen professionele medische of psychologische hulp.',
     },
     {
       title: '3. Gebruikersverantwoordelijkheden',
-      content: 'Je bent verantwoordelijk voor het veilig bewaren van je inloggegevens en voor alle activiteiten onder je account.',
+      content:
+        'Je bent verantwoordelijk voor het veilig bewaren van je inloggegevens en voor alle activiteiten onder je account.',
     },
     {
       title: '4. Intellectueel eigendom',
-      content: 'Alle content, functies en functionaliteit van InnerVoice zijn eigendom van InnerVoice en worden beschermd door auteursrecht.',
+      content:
+        'Alle content, functies en functionaliteit van InnerVoice zijn eigendom van InnerVoice en worden beschermd door auteursrecht.',
     },
     {
       title: '5. Beperking van aansprakelijkheid',
-      content: 'InnerVoice is niet aansprakelijk voor enige indirecte, incidentele of gevolgschade die voortvloeit uit het gebruik van de app.',
+      content:
+        'InnerVoice is niet aansprakelijk voor enige indirecte, incidentele of gevolgschade die voortvloeit uit het gebruik van de app.',
     },
     {
       title: '6. Wijzigingen',
-      content: 'We behouden ons het recht voor om deze voorwaarden op elk moment te wijzigen. Belangrijke wijzigingen worden aan je gecommuniceerd.',
+      content:
+        'We behouden ons het recht voor om deze voorwaarden op elk moment te wijzigen. Belangrijke wijzigingen worden aan je gecommuniceerd.',
     },
   ];
 
@@ -48,12 +48,9 @@ export default function TermsOfServiceScreen() {
         colors={['rgba(232, 223, 253, 0.3)', 'rgba(255, 255, 255, 0)']}
         style={styles.gradient}
       />
-      
+
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#8B7BA7" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Servicevoorwaarden</Text>
@@ -63,7 +60,8 @@ export default function TermsOfServiceScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.introContainer}>
           <Text style={styles.introText}>
-            Welkom bij InnerVoice. Deze servicevoorwaarden regelen je gebruik van onze app en diensten.
+            Welkom bij InnerVoice. Deze servicevoorwaarden regelen je gebruik van onze app en
+            diensten.
           </Text>
           <Text style={styles.lastUpdated}>Ingangsdatum: Januari 2025</Text>
         </View>
@@ -78,7 +76,8 @@ export default function TermsOfServiceScreen() {
         <View style={styles.agreementSection}>
           <Ionicons name="information-circle-outline" size={20} color="#8B7BA7" />
           <Text style={styles.agreementText}>
-            Door InnerVoice te gebruiken, bevestig je dat je deze voorwaarden hebt gelezen, begrepen en ermee akkoord gaat.
+            Door InnerVoice te gebruiken, bevestig je dat je deze voorwaarden hebt gelezen, begrepen
+            en ermee akkoord gaat.
           </Text>
         </View>
 

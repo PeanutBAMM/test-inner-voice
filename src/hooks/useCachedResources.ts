@@ -12,7 +12,6 @@ export default function useCachedResources() {
   useEffect(() => {
     async function loadResourcesAndDataAsync() {
       try {
-
         // Load fonts
         await Font.loadAsync({
           ...Ionicons.font,

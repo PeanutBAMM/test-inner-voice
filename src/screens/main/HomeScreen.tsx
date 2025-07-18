@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackScreenProps } from '../../types/navigation';
@@ -27,8 +22,8 @@ export default function ChatScreen() {
     // Check if user can ask question (free tier limit)
     const permission = await canAskQuestion();
     if (!permission.allowed) {
-        // Show upgrade prompt
-      navigation.navigate('UpgradeModal', { 
+      // Show upgrade prompt
+      navigation.navigate('UpgradeModal', {
         reason: permission.message || '',
         resetTime: permission.resetTime?.toISOString(),
       });
@@ -49,14 +44,14 @@ export default function ChatScreen() {
     setTyping(true);
 
     // Get coach response - convert messages to expected format
-    const history = messages.map(msg => ({
+    const history = messages.map((msg) => ({
       role: msg.sender === 'user' ? 'user' : 'assistant',
-      content: msg.text
+      content: msg.text,
     }));
     const response = await getCoachResponse(text, history);
-    
+
     setTyping(false);
-    
+
     // Add coach message
     const coachMessage = {
       id: (Date.now() + 1).toString(),
@@ -65,7 +60,6 @@ export default function ChatScreen() {
       timestamp: new Date(),
     };
     addMessage(coachMessage);
-
   };
 
   return (
@@ -77,30 +71,30 @@ export default function ChatScreen() {
         enableEffects={true}
       >
         <GlassOverlay intensity={25}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('MainTabs', { screen: 'Library' })}
-            style={styles.headerButton}
-          >
-            <Ionicons name="book-outline" size={24} color={theme.colors.textSecondary} />
-          </TouchableOpacity>
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('MainTabs', { screen: 'Library' })}
+              style={styles.headerButton}
+            >
+              <Ionicons name="book-outline" size={24} color={theme.colors.textSecondary} />
+            </TouchableOpacity>
 
-          <Text style={styles.headerTitle}>InnerVoice</Text>
+            <Text style={styles.headerTitle}>InnerVoice</Text>
 
-          <TouchableOpacity
-            onPress={() => navigation.navigate('MainTabs', { screen: 'Profile' })}
-            style={styles.headerButton}
-          >
-            <Ionicons name="person-circle-outline" size={28} color={theme.colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('MainTabs', { screen: 'Profile' })}
+              style={styles.headerButton}
+            >
+              <Ionicons name="person-circle-outline" size={28} color={theme.colors.textSecondary} />
+            </TouchableOpacity>
+          </View>
 
-        <ChatContainer
-          messages={messages}
-          onSendMessage={handleSendMessage}
-          isTyping={isTyping}
-          placeholder='Deel je gedachten...'
-        />
+          <ChatContainer
+            messages={messages}
+            onSendMessage={handleSendMessage}
+            isTyping={isTyping}
+            placeholder="Deel je gedachten..."
+          />
         </GlassOverlay>
       </UniversalBackground>
     </View>

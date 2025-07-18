@@ -56,13 +56,11 @@ export default function OnboardingScreen() {
   const { completeAppOnboarding } = useAppStore();
   const { theme } = useTheme();
 
-  const handleViewableItemsChanged = useRef(
-    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
-      if (viewableItems.length > 0) {
-        setCurrentIndex(viewableItems[0].index || 0);
-      }
+  const handleViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+    if (viewableItems.length > 0) {
+      setCurrentIndex(viewableItems[0].index || 0);
     }
-  ).current;
+  }).current;
 
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 50,
@@ -102,71 +100,73 @@ export default function OnboardingScreen() {
       </View>
       <View style={styles.textContainer}>
         <Text style={[styles.title, { color: theme.colors.text }]}>{item.title}</Text>
-        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>{item.subtitle}</Text>
+        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+          {item.subtitle}
+        </Text>
       </View>
     </View>
   );
 
   return (
-    <UniversalBackground 
-      variant="minimal" 
-      mood="joyful" 
-      timeOfDay="morning"
+    <UniversalBackground
+      variant="modern"
+      mood="peaceful"
+      timeOfDay="afternoon"
       enableEffects={false}
     >
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      
-      <TouchableOpacity 
-        style={[
-          styles.skipButton, 
-          {
-            backgroundColor: theme.isDark 
-              ? 'rgba(46, 89, 132, 0.15)' 
-              : 'rgba(255, 182, 193, 0.15)',
-            borderRadius: 20,
-            borderWidth: 1,
-            borderColor: theme.isDark 
-              ? 'rgba(255, 255, 255, 0.1)' 
-              : 'rgba(255, 182, 193, 0.2)',
-          }
-        ]} 
-        onPress={handleSkip}
-      >
-        <Text style={[styles.skipText, { color: theme.colors.textSecondary }]}>Skip</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.skipButton,
+            {
+              backgroundColor: theme.isDark
+                ? 'rgba(46, 89, 132, 0.15)'
+                : 'rgba(255, 182, 193, 0.15)',
+              borderRadius: 20,
+              borderWidth: 1,
+              borderColor: theme.isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 182, 193, 0.2)',
+            },
+          ]}
+          onPress={handleSkip}
+        >
+          <Text style={[styles.skipText, { color: theme.colors.textSecondary }]}>Skip</Text>
+        </TouchableOpacity>
 
-      <FlatList
-        ref={flatListRef}
-        data={onboardingData}
-        renderItem={renderItem}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onViewableItemsChanged={handleViewableItemsChanged}
-        viewabilityConfig={viewabilityConfig}
-        keyExtractor={(item) => item.id}
-      />
-
-      <View style={styles.footer}>
-        <View style={styles.pagination}>
-          {onboardingData.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.paginationDot,
-                { backgroundColor: theme.colors.border },
-                currentIndex === index && [styles.paginationDotActive, { backgroundColor: theme.colors.primary }],
-              ]}
-            />
-          ))}
-        </View>
-
-        <PrimaryButton
-          title={currentIndex === onboardingData.length - 1 ? 'Aan de slag' : 'Volgende'}
-          onPress={handleNext}
-          style={styles.nextButton}
+        <FlatList
+          ref={flatListRef}
+          data={onboardingData}
+          renderItem={renderItem}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onViewableItemsChanged={handleViewableItemsChanged}
+          viewabilityConfig={viewabilityConfig}
+          keyExtractor={(item) => item.id}
         />
-      </View>
+
+        <View style={styles.footer}>
+          <View style={styles.pagination}>
+            {onboardingData.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.paginationDot,
+                  { backgroundColor: theme.colors.border },
+                  currentIndex === index && [
+                    styles.paginationDotActive,
+                    { backgroundColor: theme.colors.primary },
+                  ],
+                ]}
+              />
+            ))}
+          </View>
+
+          <PrimaryButton
+            title={currentIndex === onboardingData.length - 1 ? 'Aan de slag' : 'Volgende'}
+            onPress={handleNext}
+            style={styles.nextButton}
+          />
+        </View>
       </SafeAreaView>
     </UniversalBackground>
   );

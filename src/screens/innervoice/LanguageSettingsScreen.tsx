@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,18 +27,15 @@ export default function LanguageSettingsScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <UniversalBackground 
+      <UniversalBackground
         variant="gradient"
         mood="peaceful"
         timeOfDay="afternoon"
         enableEffects={false}
       />
-      
+
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#8B7BA7" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Taalinstellingen</Text>
@@ -68,10 +60,12 @@ export default function LanguageSettingsScreen() {
             >
               <View style={styles.languageInfo}>
                 <Text style={styles.languageFlag}>{language.flag}</Text>
-                <Text style={[
-                  styles.languageLabel,
-                  selectedLanguage === language.code && styles.languageLabelSelected,
-                ]}>
+                <Text
+                  style={[
+                    styles.languageLabel,
+                    selectedLanguage === language.code && styles.languageLabelSelected,
+                  ]}
+                >
                   {language.label}
                 </Text>
               </View>

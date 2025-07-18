@@ -30,7 +30,7 @@ export default function AuthScreen({ navigation }: any) {
   const [phoneError, setPhoneError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [countryCode, setCountryCode] = useState('+31');
-  
+
   const { resetOnboarding } = useAppStore();
   const { theme } = useTheme();
   const isDev = __DEV__;
@@ -41,12 +41,12 @@ export default function AuthScreen({ navigation }: any) {
       'Weet je zeker dat je terug wilt naar het onboarding proces?',
       [
         { text: 'Annuleren', style: 'cancel' },
-        { 
-          text: 'Ja, ga terug', 
+        {
+          text: 'Ja, ga terug',
           onPress: () => {
             resetOnboarding();
-          }
-        }
+          },
+        },
       ]
     );
   };
@@ -71,11 +71,11 @@ export default function AuthScreen({ navigation }: any) {
     try {
       const fullPhoneNumber = `${countryCode}${phoneNumber}`;
       const result = await mockAuthService.loginWithPhone(fullPhoneNumber);
-      
+
       if (result.requiresOTP) {
         // Navigate to OTP screen (not implemented in mock)
-        navigation.navigate('OTPVerification', { 
-          phoneNumber: fullPhoneNumber 
+        navigation.navigate('OTPVerification', {
+          phoneNumber: fullPhoneNumber,
         });
       } else {
         // Direct login successful - navigation will happen automatically
@@ -92,7 +92,7 @@ export default function AuthScreen({ navigation }: any) {
     setIsLoading(true);
     try {
       const user = await mockAuthService.loginWithProvider(provider);
-      
+
       // Successful login - navigation will happen automatically
       // when RootNavigator detects authentication status change
     } catch (error) {
@@ -103,177 +103,203 @@ export default function AuthScreen({ navigation }: any) {
   };
 
   return (
-    <UniversalBackground 
-      variant="minimal" 
-      mood="neutral" 
+    <UniversalBackground
+      variant="modern"
+      mood="peaceful"
       timeOfDay="afternoon"
       enableEffects={false}
     >
       <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}
         >
-          {/* Illustration */}
-          <View style={styles.illustrationContainer}>
-            <AuthIllustration size={180} />
-          </View>
-
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-              Log in or create an account to continue to InnerVoice
-            </Text>
-          </View>
-
-          {/* Social Login Section */}
-          <View style={styles.socialSection}>
-            <SocialLoginButton
-              provider="google"
-              onPress={() => handleSocialLogin('google')}
-              style={styles.socialButton}
-            />
-            <SocialLoginButton
-              provider="apple"
-              onPress={() => handleSocialLogin('apple')}
-              style={styles.socialButton}
-            />
-            <SocialLoginButton
-              provider="facebook"
-              onPress={() => handleSocialLogin('facebook')}
-              style={styles.socialButton}
-            />
-            <SocialLoginButton
-              provider="email"
-              onPress={() => navigation.navigate('Login')}
-              style={styles.socialButton}
-            />
-          </View>
-
-          {/* Divider */}
-          <View style={styles.divider}>
-            <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
-            <Text style={[styles.dividerText, { color: theme.colors.textSecondary }]}>OR</Text>
-            <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
-          </View>
-
-          {/* Phone Input Section */}
-          <View style={styles.phoneSection}>
-            <Text style={[styles.inputLabel, { color: theme.colors.text }]}>Phone Number</Text>
-            <PhoneInput
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              onChangeCountry={(country: any) => setCountryCode(country.dial_code)}
-              error={phoneError}
-              placeholder="Enter your phone number"
-            />
-
-            <PrimaryButton
-              title="Continue"
-              onPress={handleContinue}
-              loading={isLoading}
-              style={styles.continueButton}
-            />
-          </View>
-
-          {/* Terms */}
-          <View style={styles.termsContainer}>
-            <Text style={[styles.termsText, { color: theme.colors.textSecondary }]}>
-              By continuing, you agree to our{' '}
-              <Text style={[styles.termsLink, { color: theme.colors.primary }]}>Terms of Service</Text>
-              {' '}and{' '}
-              <Text style={[styles.termsLink, { color: theme.colors.primary }]}>Privacy Policy</Text>
-            </Text>
-          </View>
-
-          {/* Skip for now */}
-          <TouchableOpacity 
-            style={styles.skipButton}
-            onPress={async () => {
-              setIsLoading(true);
-              try {
-                await mockAuthService.loginAsGuest();
-                // Navigation will happen automatically via RootNavigator
-              } catch (error) {
-                Alert.alert('Error', 'Something went wrong. Please try again.');
-              } finally {
-                setIsLoading(false);
-              }
-            }}
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           >
-            <Text style={[styles.skipText, { color: theme.colors.primary }]}>Skip for now</Text>
-          </TouchableOpacity>
+            {/* Illustration */}
+            <View style={styles.illustrationContainer}>
+              <AuthIllustration size={180} />
+            </View>
 
-          {/* Development Quick Login (dev only) */}
-          {isDev && (
-            <View style={[styles.devSection, { 
-              backgroundColor: theme.colors.warning + '10',
-              borderColor: theme.colors.warning + '30'
-            }]}>
-              <Text style={[styles.devSectionTitle, { color: theme.colors.warning }]}>🚀 Development Quick Login</Text>
-              <View style={styles.devButtonRow}>
-                <TouchableOpacity 
-                  style={[styles.devButton, { 
-                    backgroundColor: theme.colors.primary + '20',
-                    borderColor: theme.colors.primary + '40'
-                  }]}
-                  onPress={async () => {
-                    setIsLoading(true);
-                    try {
-                      await mockAuthService.quickLogin('user');
-                      // Clear onboarding for this test user
-                      await AsyncStorage.removeItem('onboardingCompleted');
-                      // Trigger RootNavigator to re-check status
-                      await AsyncStorage.setItem('triggerReload', Date.now().toString());
-                      // Navigation will happen automatically via RootNavigator
-                    } catch (error) {
-                      Alert.alert('Error', 'Quick login failed');
-                    } finally {
-                      setIsLoading(false);
-                    }
-                  }}
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
+                Log in or create an account to continue to InnerVoice
+              </Text>
+            </View>
+
+            {/* Social Login Section */}
+            <View style={styles.socialSection}>
+              <SocialLoginButton
+                provider="google"
+                onPress={() => handleSocialLogin('google')}
+                style={styles.socialButton}
+              />
+              <SocialLoginButton
+                provider="apple"
+                onPress={() => handleSocialLogin('apple')}
+                style={styles.socialButton}
+              />
+              <SocialLoginButton
+                provider="facebook"
+                onPress={() => handleSocialLogin('facebook')}
+                style={styles.socialButton}
+              />
+              <SocialLoginButton
+                provider="email"
+                onPress={() => navigation.navigate('Login')}
+                style={styles.socialButton}
+              />
+            </View>
+
+            {/* Divider */}
+            <View style={styles.divider}>
+              <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
+              <Text style={[styles.dividerText, { color: theme.colors.textSecondary }]}>OR</Text>
+              <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
+            </View>
+
+            {/* Phone Input Section */}
+            <View style={styles.phoneSection}>
+              <Text style={[styles.inputLabel, { color: theme.colors.text }]}>Phone Number</Text>
+              <PhoneInput
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                onChangeCountry={(country: any) => setCountryCode(country.dial_code)}
+                error={phoneError}
+                placeholder="Enter your phone number"
+              />
+
+              <PrimaryButton
+                title="Continue"
+                onPress={handleContinue}
+                loading={isLoading}
+                style={styles.continueButton}
+              />
+            </View>
+
+            {/* Terms */}
+            <View style={styles.termsContainer}>
+              <Text style={[styles.termsText, { color: theme.colors.textSecondary }]}>
+                By continuing, you agree to our{' '}
+                <Text style={[styles.termsLink, { color: theme.colors.primary }]}>
+                  Terms of Service
+                </Text>{' '}
+                and{' '}
+                <Text style={[styles.termsLink, { color: theme.colors.primary }]}>
+                  Privacy Policy
+                </Text>
+              </Text>
+            </View>
+
+            {/* Skip for now */}
+            <TouchableOpacity
+              style={styles.skipButton}
+              onPress={async () => {
+                setIsLoading(true);
+                try {
+                  await mockAuthService.loginAsGuest();
+                  // Navigation will happen automatically via RootNavigator
+                } catch (error) {
+                  Alert.alert('Error', 'Something went wrong. Please try again.');
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+            >
+              <Text style={[styles.skipText, { color: theme.colors.primary }]}>Skip for now</Text>
+            </TouchableOpacity>
+
+            {/* Development Quick Login (dev only) */}
+            {isDev && (
+              <View
+                style={[
+                  styles.devSection,
+                  {
+                    backgroundColor: theme.colors.warning + '10',
+                    borderColor: theme.colors.warning + '30',
+                  },
+                ]}
+              >
+                <Text style={[styles.devSectionTitle, { color: theme.colors.warning }]}>
+                  🚀 Development Quick Login
+                </Text>
+                <View style={styles.devButtonRow}>
+                  <TouchableOpacity
+                    style={[
+                      styles.devButton,
+                      {
+                        backgroundColor: theme.colors.primary + '20',
+                        borderColor: theme.colors.primary + '40',
+                      },
+                    ]}
+                    onPress={async () => {
+                      setIsLoading(true);
+                      try {
+                        await mockAuthService.quickLogin('user');
+                        // Clear onboarding for this test user
+                        await AsyncStorage.removeItem('onboardingCompleted');
+                        // Trigger RootNavigator to re-check status
+                        await AsyncStorage.setItem('triggerReload', Date.now().toString());
+                        // Navigation will happen automatically via RootNavigator
+                      } catch (error) {
+                        Alert.alert('Error', 'Quick login failed');
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
+                  >
+                    <Text style={[styles.devButtonText, { color: theme.colors.primary }]}>
+                      👤 Onboarding User
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.devButton,
+                      {
+                        backgroundColor: theme.colors.primary + '20',
+                        borderColor: theme.colors.primary + '40',
+                      },
+                    ]}
+                    onPress={async () => {
+                      setIsLoading(true);
+                      try {
+                        await mockAuthService.quickLogin('admin');
+                        // Navigation will happen automatically via RootNavigator
+                      } catch (error) {
+                        Alert.alert('Error', 'Quick login failed');
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
+                  >
+                    <Text style={[styles.devButtonText, { color: theme.colors.primary }]}>
+                      ⚡ Admin
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity
+                  style={[
+                    styles.backToOnboardingButton,
+                    {
+                      backgroundColor: theme.colors.warning + '20',
+                    },
+                  ]}
+                  onPress={handleBackToOnboarding}
                 >
-                  <Text style={[styles.devButtonText, { color: theme.colors.primary }]}>👤 Onboarding User</Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.devButton, { 
-                    backgroundColor: theme.colors.primary + '20',
-                    borderColor: theme.colors.primary + '40'
-                  }]}
-                  onPress={async () => {
-                    setIsLoading(true);
-                    try {
-                      await mockAuthService.quickLogin('admin');
-                      // Navigation will happen automatically via RootNavigator
-                    } catch (error) {
-                      Alert.alert('Error', 'Quick login failed');
-                    } finally {
-                      setIsLoading(false);
-                    }
-                  }}
-                >
-                  <Text style={[styles.devButtonText, { color: theme.colors.primary }]}>⚡ Admin</Text>
+                  <Text style={[styles.backToOnboardingText, { color: theme.colors.warning }]}>
+                    🔙 Terug naar onboarding
+                  </Text>
                 </TouchableOpacity>
               </View>
-              
-              <TouchableOpacity 
-                style={[styles.backToOnboardingButton, { 
-                  backgroundColor: theme.colors.warning + '20'
-                }]}
-                onPress={handleBackToOnboarding}
-              >
-                <Text style={[styles.backToOnboardingText, { color: theme.colors.warning }]}>🔙 Terug naar onboarding</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </ScrollView>
-      </KeyboardAvoidingView>
+            )}
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </UniversalBackground>
   );

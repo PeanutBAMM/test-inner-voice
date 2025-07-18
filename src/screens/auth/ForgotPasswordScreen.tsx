@@ -47,10 +47,7 @@ export default function ForgotPasswordScreen({ navigation }: Props) {
       await api.post('/auth/forgot-password', { email });
       setIsSuccess(true);
     } catch (error) {
-      Alert.alert(
-        'Fout',
-        'Er is iets misgegaan. Controleer je email adres en probeer opnieuw.'
-      );
+      Alert.alert('Fout', 'Er is iets misgegaan. Controleer je email adres en probeer opnieuw.');
     } finally {
       setIsLoading(false);
     }
@@ -67,16 +64,16 @@ export default function ForgotPasswordScreen({ navigation }: Props) {
           <View style={styles.successIcon}>
             <Ionicons name="checkmark-circle" size={80} color={theme.colors.success} />
           </View>
-          
+
           <Text style={styles.successTitle}>Check je email!</Text>
           <Text style={styles.successText}>
             We hebben een link gestuurd naar{'\n'}
             <Text style={styles.emailText}>{email}</Text>
           </Text>
-          
+
           <Text style={styles.successSubtext}>
-            Klik op de link in de email om je wachtwoord te resetten.
-            Vergeet niet je spam folder te checken!
+            Klik op de link in de email om je wachtwoord te resetten. Vergeet niet je spam folder te
+            checken!
           </Text>
 
           <PrimaryButton
@@ -110,10 +107,7 @@ export default function ForgotPasswordScreen({ navigation }: Props) {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={handleBackToLogin}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={handleBackToLogin}>
             <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
           </TouchableOpacity>
 

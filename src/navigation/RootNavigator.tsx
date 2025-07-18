@@ -36,6 +36,7 @@ function MainTabs() {
       tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: true,
       }}
     >
       <Tab.Screen name="Chat" component={ChatScreen} options={{ title: 'Gesprek' }} />
@@ -56,12 +57,12 @@ export default function RootNavigator() {
 
   useEffect(() => {
     checkOnboardingStatus();
-    
+
     // Poll for auth status changes and reload triggers
     const statusCheckInterval = setInterval(async () => {
       const authStatus = await mockAuthService.isAuthenticated();
       const triggerReload = await AsyncStorage.getItem('triggerReload');
-      
+
       if (authStatus !== isAuthenticated || triggerReload) {
         if (triggerReload) {
           await AsyncStorage.removeItem('triggerReload');
@@ -69,7 +70,7 @@ export default function RootNavigator() {
         checkOnboardingStatus();
       }
     }, 1000);
-    
+
     return () => clearInterval(statusCheckInterval);
   }, [isAuthenticated]);
 
@@ -77,14 +78,14 @@ export default function RootNavigator() {
     try {
       // Initialize app store from AsyncStorage
       await initializeFromStorage();
-      
+
       const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
       const userProfile = await AsyncStorage.getItem('userProfile');
-      
+
       // Check authentication status
       const authStatus = await mockAuthService.isAuthenticated();
       setIsAuthenticated(authStatus);
-      
+
       if (onboardingCompleted === 'true' && userProfile) {
         setHasCompletedOnboarding(true);
         const profile = JSON.parse(userProfile);
@@ -110,53 +111,29 @@ export default function RootNavigator() {
         animation: 'fade',
       }}
     >
-        {!isAppOnboarded ? (
-          <Stack.Screen 
-            name="Onboarding" 
-            component={OnboardingScreen} 
+      {!isAppOnboarded ? (
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+      ) : !isAuthenticated ? (
+        <Stack.Screen name="Auth" component={AuthScreen} />
+      ) : !hasCompletedOnboarding ? (
+        <Stack.Screen name="OnboardingChat" component={OnboardingChatScreen} />
+      ) : (
+        <>
+          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen name="ConversationDetailScreen" component={ConversationDetailScreen} />
+          <Stack.Screen name="LanguageSettingsScreen" component={LanguageSettingsScreen} />
+          <Stack.Screen name="PrivacyPolicyScreen" component={PrivacyPolicyScreen} />
+          <Stack.Screen name="TermsOfServiceScreen" component={TermsOfServiceScreen} />
+          <Stack.Screen
+            name="UpgradeModal"
+            component={UpgradeModal}
+            options={{
+              presentation: 'modal',
+              animation: 'slide_from_bottom',
+            }}
           />
-        ) : !isAuthenticated ? (
-          <Stack.Screen 
-            name="Auth" 
-            component={AuthScreen} 
-          />
-        ) : !hasCompletedOnboarding ? (
-          <Stack.Screen 
-            name="OnboardingChat" 
-            component={OnboardingChatScreen} 
-          />
-        ) : (
-          <>
-            <Stack.Screen 
-              name="MainTabs" 
-              component={MainTabs} 
-            />
-            <Stack.Screen 
-              name="ConversationDetailScreen" 
-              component={ConversationDetailScreen} 
-            />
-            <Stack.Screen 
-              name="LanguageSettingsScreen" 
-              component={LanguageSettingsScreen} 
-            />
-            <Stack.Screen 
-              name="PrivacyPolicyScreen" 
-              component={PrivacyPolicyScreen} 
-            />
-            <Stack.Screen 
-              name="TermsOfServiceScreen" 
-              component={TermsOfServiceScreen} 
-            />
-            <Stack.Screen 
-              name="UpgradeModal" 
-              component={UpgradeModal}
-              options={{
-                presentation: 'modal',
-                animation: 'slide_from_bottom',
-              }} 
-            />
-          </>
-        )}
+        </>
+      )}
     </Stack.Navigator>
   );
 }

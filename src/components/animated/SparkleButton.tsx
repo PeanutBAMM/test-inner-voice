@@ -1,11 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  View,
-  ViewStyle,
-} from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, View, ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -39,12 +33,9 @@ const Sparkle = ({ index, color }: SparkleProps) => {
 
   useEffect(() => {
     const delay = index * 200;
-    
+
     scale.value = withRepeat(
-      withSequence(
-        withSpring(1, { damping: 5 }),
-        withTiming(0, { duration: 500 })
-      ),
+      withSequence(withSpring(1, { damping: 5 }), withTiming(0, { duration: 500 })),
       -1,
       false
     );
@@ -59,26 +50,15 @@ const Sparkle = ({ index, color }: SparkleProps) => {
     );
 
     opacity.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 300 }),
-        withTiming(0, { duration: 700 })
-      ),
+      withSequence(withTiming(1, { duration: 300 }), withTiming(0, { duration: 700 })),
       -1,
       false
     );
   }, [index, opacity, rotate, scale]);
 
   const animatedStyle = useAnimatedStyle(() => {
-    const translateX = interpolate(
-      scale.value,
-      [0, 1],
-      [0, (index % 2 === 0 ? 1 : -1) * 30]
-    );
-    const translateY = interpolate(
-      scale.value,
-      [0, 1],
-      [0, -30]
-    );
+    const translateX = interpolate(scale.value, [0, 1], [0, (index % 2 === 0 ? 1 : -1) * 30]);
+    const translateY = interpolate(scale.value, [0, 1], [0, -30]);
 
     return {
       transform: [
@@ -97,7 +77,6 @@ const Sparkle = ({ index, color }: SparkleProps) => {
     </Animated.View>
   );
 };
-
 
 export function SparkleButton({
   title,
@@ -139,7 +118,7 @@ export function SparkleButton({
             <Sparkle key={index} index={index} color={sparkleColor} />
           ))}
         </View>
-        
+
         <Text style={styles.title}>{title}</Text>
       </Animated.View>
     </TouchableOpacity>

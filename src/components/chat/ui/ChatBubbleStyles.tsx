@@ -19,10 +19,7 @@ export const ChatBubbleStyles: React.FC<ChatBubbleStylesProps> = ({
         {styles.map((style) => (
           <TouchableOpacity
             key={style}
-            style={[
-              componentStyles.option,
-              selectedStyle === style && componentStyles.selected,
-            ]}
+            style={[componentStyles.option, selectedStyle === style && componentStyles.selected]}
             onPress={() => onStyleChange?.(style)}
           >
             <Text style={componentStyles.optionText}>

@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getConnectionStatus, validateApiKey } from '../../../services/innervoice/llmService';
 
@@ -74,15 +68,13 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ style }) => 
         onPress={() => setIsExpanded(!isExpanded)}
         activeOpacity={0.7}
       >
-        <Ionicons 
-          name={getStatusIcon()} 
-          size={14} 
-          color={getStatusColor()} 
+        <Ionicons
+          name={getStatusIcon()}
+          size={14}
+          color={getStatusColor()}
           style={isValidating ? styles.rotating : undefined}
         />
-        <Text style={[styles.statusText, { color: getStatusColor() }]}>
-          {getStatusText()}
-        </Text>
+        <Text style={[styles.statusText, { color: getStatusColor() }]}>{getStatusText()}</Text>
       </TouchableOpacity>
 
       {isExpanded && (
@@ -93,12 +85,8 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ style }) => 
           <Text style={styles.detailText}>
             Mode: {status.mockMode ? '🎭 Mock Responses' : '🤖 AI Responses'}
           </Text>
-          {status.error && (
-            <Text style={styles.errorText}>
-              Error: {status.error}
-            </Text>
-          )}
-          
+          {status.error && <Text style={styles.errorText}>Error: {status.error}</Text>}
+
           <TouchableOpacity
             style={styles.validateButton}
             onPress={handleValidateConnection}

@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  ViewStyle,
-} from 'react-native';
+import { View, StyleSheet, ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -44,10 +40,7 @@ export function GlowingBorder({
     );
 
     scale.value = withRepeat(
-      withSequence(
-        withTiming(1.05, { duration: 1500 }),
-        withTiming(1, { duration: 1500 })
-      ),
+      withSequence(withTiming(1.05, { duration: 1500 }), withTiming(1, { duration: 1500 })),
       -1,
       true
     );
@@ -55,10 +48,7 @@ export function GlowingBorder({
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [
-        { rotate: `${rotation.value}deg` },
-        { scale: scale.value },
-      ],
+      transform: [{ rotate: `${rotation.value}deg` }, { scale: scale.value }],
     };
   });
 
@@ -78,14 +68,14 @@ export function GlowingBorder({
           ]}
         />
       </Animated.View>
-      
+
       <View
         style={[
           styles.content,
           {
             margin: borderWidth,
-            borderRadius: style?.borderRadius 
-              ? (style.borderRadius as number) - borderWidth 
+            borderRadius: style?.borderRadius
+              ? (style.borderRadius as number) - borderWidth
               : theme.borderRadius.lg - borderWidth,
           },
         ]}

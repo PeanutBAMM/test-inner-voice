@@ -14,9 +14,7 @@ export const SpeechRecognition: React.FC<SpeechRecognitionProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.status}>
-        {isListening ? 'Listening...' : 'Ready to listen'}
-      </Text>
+      <Text style={styles.status}>{isListening ? 'Listening...' : 'Ready to listen'}</Text>
       {/* TODO: Implement actual speech recognition using expo-speech */}
     </View>
   );

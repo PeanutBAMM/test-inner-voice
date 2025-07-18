@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -134,7 +128,7 @@ export default function OnboardingChatScreen() {
 
   // Optimized: only store locally during onboarding
   const addMessage = (message: any) => {
-    setMessages(prev => [...prev, message]);
+    setMessages((prev) => [...prev, message]);
     // Skip conversation store during onboarding for performance
   };
 
@@ -174,34 +168,39 @@ export default function OnboardingChatScreen() {
 
   const processAnswer = async (answer: string | string[]) => {
     const question = ONBOARDING_QUESTIONS[currentQuestion];
-    
+
     // Add user message
-    setMessages(prev => [...prev, {
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      text: Array.isArray(answer) ? answer.join(', ') : answer,
-      sender: 'user',
-      timestamp: new Date(),
-    }]);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        text: Array.isArray(answer) ? answer.join(', ') : answer,
+        sender: 'user',
+        timestamp: new Date(),
+      },
+    ]);
 
     // Store answer
     const newProfile = { ...userProfile, [question.storeAs]: answer };
     setUserProfile(newProfile);
 
-
     // Move to next question or complete
     if (currentQuestion < ONBOARDING_QUESTIONS.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      
+
       // Add next question with optimized delay
       setIsTransitioning(true);
       setTimeout(() => {
         const nextQ = ONBOARDING_QUESTIONS[currentQuestion + 1];
-        setMessages(prev => [...prev, {
-          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          text: interpolateUserData(nextQ.coach, newProfile),
-          sender: 'assistant',
-          timestamp: new Date(),
-        }]);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            text: interpolateUserData(nextQ.coach, newProfile),
+            sender: 'assistant',
+            timestamp: new Date(),
+          },
+        ]);
         setIsTransitioning(false);
       }, 300);
     } else {
@@ -213,17 +212,21 @@ export default function OnboardingChatScreen() {
   const completeOnboarding = async (profile: Record<string, string | string[]>) => {
     // Convert profile to UserProfile type
     const userProfile = {
-      userName: profile.userName as string || '',
-      preferredLanguage: (profile.preferredLanguage === 'English' ? 'English' : 'Nederlands') as 'Nederlands' | 'English',
-      primaryIntention: profile.primaryIntention as string || '',
-      emotionalStyle: profile.emotionalStyle as string || '',
+      userName: (profile.userName as string) || '',
+      preferredLanguage: (profile.preferredLanguage === 'English' ? 'English' : 'Nederlands') as
+        | 'Nederlands'
+        | 'English',
+      primaryIntention: (profile.primaryIntention as string) || '',
+      emotionalStyle: (profile.emotionalStyle as string) || '',
       spiritualExperience: profile.spiritualExperience as string,
       currentFocus: profile.currentFocus as string,
-      allowNotifications: profile.notificationPreference !== 'Nee, ik kom wel als ik er behoefte aan heb',
+      allowNotifications:
+        profile.notificationPreference !== 'Nee, ik kom wel als ik er behoefte aan heb',
       biometricEnabled: false,
-      notificationPreference: profile.notificationPreference as string || 'Af en toe, niet te vaak',
+      notificationPreference:
+        (profile.notificationPreference as string) || 'Af en toe, niet te vaak',
     };
-    
+
     // Save profile
     saveUserProfile(userProfile);
     await AsyncStorage.setItem('onboardingCompleted', 'true');
@@ -231,12 +234,15 @@ export default function OnboardingChatScreen() {
 
     // Final message
     setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        text: `Dank je voor het delen, ${profile.userName}. Ik ben hier wanneer je me nodig hebt. Dit is jouw veilige ruimte om thuis te komen in jezelf.`,
-        sender: 'assistant',
-        timestamp: new Date(),
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          text: `Dank je voor het delen, ${profile.userName}. Ik ben hier wanneer je me nodig hebt. Dit is jouw veilige ruimte om thuis te komen in jezelf.`,
+          sender: 'assistant',
+          timestamp: new Date(),
+        },
+      ]);
     }, 300);
 
     // Trigger app reload to show MainTabs after delay
@@ -262,12 +268,12 @@ export default function OnboardingChatScreen() {
         biometricEnabled: false,
         notificationPreference: 'Af en toe, niet te vaak',
       };
-      
+
       // Save met useUserStore
       saveUserProfile(defaultProfile);
       await AsyncStorage.setItem('onboardingCompleted', 'true');
       await AsyncStorage.setItem('userProfile', JSON.stringify(defaultProfile));
-      
+
       // Trigger reload voor navigatie
       await AsyncStorage.setItem('triggerReload', Date.now().toString());
     } catch (error) {
@@ -279,12 +285,15 @@ export default function OnboardingChatScreen() {
     if (currentQuestion < ONBOARDING_QUESTIONS.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       const nextQ = ONBOARDING_QUESTIONS[currentQuestion + 1];
-      setMessages(prev => [...prev, {
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        text: interpolateUserData(nextQ.coach, userProfile),
-        sender: 'assistant',
-        timestamp: new Date(),
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          text: interpolateUserData(nextQ.coach, userProfile),
+          sender: 'assistant',
+          timestamp: new Date(),
+        },
+      ]);
     }
   };
 
@@ -292,7 +301,7 @@ export default function OnboardingChatScreen() {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
       // Remove last two messages (user answer + assistant question)
-      setMessages(prev => prev.slice(0, -2));
+      setMessages((prev) => prev.slice(0, -2));
     }
   };
 
@@ -309,10 +318,10 @@ export default function OnboardingChatScreen() {
   // Components verwijderd - nu direct in render
 
   return (
-    <UniversalBackground 
-      variant="spiritual"
+    <UniversalBackground
+      variant="transparent"
       mood="peaceful"
-      timeOfDay="morning" // Onboarding is like a new dawn
+      timeOfDay="afternoon"
       enableEffects={false} // Disabled for better performance
     >
       <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -320,58 +329,66 @@ export default function OnboardingChatScreen() {
           messages={messages}
           onSendMessage={handleTextSubmit}
           inputComponent={
-            isTransitioning ? 
-              () => <View style={styles.loadingContainer}><Text style={styles.loadingText}>...</Text></View> :
-            currentQ.inputType === 'choice' ? 
-              () => <ChoiceInput 
-                choices={currentQ.choices!} 
-                onSelect={handleChoiceSelect}
-                onPrevious={goToPreviousQuestion}
-                onSkip={skipCurrentQuestion}
-                canGoPrevious={currentQuestion > 0}
-                currentQuestion={currentQuestion}
-                totalQuestions={ONBOARDING_QUESTIONS.length}
-              /> :
-            currentQ.inputType === 'multiChoice' ?
-              () => <MultiChoiceInput 
-                choices={currentQ.choices!} 
-                selected={selectedChoices}
-                onToggle={(choice) => {
-                  setSelectedChoices(prev =>
-                    prev.includes(choice) 
-                      ? prev.filter(c => c !== choice)
-                      : [...prev, choice]
-                  );
-                }}
-                onSubmit={handleMultiChoiceSubmit}
-                onPrevious={goToPreviousQuestion}
-                onSkip={skipCurrentQuestion}
-                canGoPrevious={currentQuestion > 0}
-                currentQuestion={currentQuestion}
-                totalQuestions={ONBOARDING_QUESTIONS.length}
-              /> :
-              undefined
+            isTransitioning
+              ? () => (
+                  <View style={styles.loadingContainer}>
+                    <Text style={styles.loadingText}>...</Text>
+                  </View>
+                )
+              : currentQ.inputType === 'choice'
+                ? () => (
+                    <ChoiceInput
+                      choices={currentQ.choices!}
+                      onSelect={handleChoiceSelect}
+                      onPrevious={goToPreviousQuestion}
+                      onSkip={skipCurrentQuestion}
+                      canGoPrevious={currentQuestion > 0}
+                      currentQuestion={currentQuestion}
+                      totalQuestions={ONBOARDING_QUESTIONS.length}
+                    />
+                  )
+                : currentQ.inputType === 'multiChoice'
+                  ? () => (
+                      <MultiChoiceInput
+                        choices={currentQ.choices!}
+                        selected={selectedChoices}
+                        onToggle={(choice) => {
+                          setSelectedChoices((prev) =>
+                            prev.includes(choice)
+                              ? prev.filter((c) => c !== choice)
+                              : [...prev, choice]
+                          );
+                        }}
+                        onSubmit={handleMultiChoiceSubmit}
+                        onPrevious={goToPreviousQuestion}
+                        onSkip={skipCurrentQuestion}
+                        canGoPrevious={currentQuestion > 0}
+                        currentQuestion={currentQuestion}
+                        totalQuestions={ONBOARDING_QUESTIONS.length}
+                      />
+                    )
+                  : undefined
           }
           placeholder={currentQ.optional ? 'Dit mag je overslaan...' : 'Type je antwoord...'}
           bottomPadding={0}
           keyboardVerticalOffset={60}
         />
-        
+
         {/* Progress Bar */}
         <View style={[styles.progressContainer, { top: insets.top + 16 }]}>
           <View style={styles.progressBar}>
-            <View 
+            <View
               style={[
-                styles.progressFill, 
-                { width: `${((currentQuestion + 1) / ONBOARDING_QUESTIONS.length) * 100}%` }
-              ]} 
+                styles.progressFill,
+                { width: `${((currentQuestion + 1) / ONBOARDING_QUESTIONS.length) * 100}%` },
+              ]}
             />
           </View>
         </View>
-        
+
         {/* Skip Button */}
-        <TouchableOpacity 
-          onPress={skipOnboarding} 
+        <TouchableOpacity
+          onPress={skipOnboarding}
           style={[styles.skipButton, { top: insets.top + 16 }]}
         >
           <Text style={styles.skipText}>Overslaan</Text>
@@ -382,21 +399,29 @@ export default function OnboardingChatScreen() {
 }
 
 // Choice Input Component
-const ChoiceInput: React.FC<{ 
-  choices: string[], 
-  onSelect: (choice: string) => void,
-  onPrevious: () => void,
-  onSkip: () => void,
-  canGoPrevious: boolean,
-  currentQuestion: number,
-  totalQuestions: number
-}> = ({ choices, onSelect, onPrevious, onSkip, canGoPrevious, currentQuestion, totalQuestions }) => {
+const ChoiceInput: React.FC<{
+  choices: string[];
+  onSelect: (choice: string) => void;
+  onPrevious: () => void;
+  onSkip: () => void;
+  canGoPrevious: boolean;
+  currentQuestion: number;
+  totalQuestions: number;
+}> = ({
+  choices,
+  onSelect,
+  onPrevious,
+  onSkip,
+  canGoPrevious,
+  currentQuestion,
+  totalQuestions,
+}) => {
   const showScrollIndicator = choices.length > 4;
-  
+
   return (
     <View style={styles.choiceWrapper}>
-      <ScrollView 
-        style={styles.choiceContainer} 
+      <ScrollView
+        style={styles.choiceContainer}
         showsVerticalScrollIndicator={showScrollIndicator}
         contentContainerStyle={styles.choiceContentContainer}
       >
@@ -417,7 +442,7 @@ const ChoiceInput: React.FC<{
           pointerEvents="none"
         />
       )}
-      
+
       {/* Navigation buttons */}
       <View style={styles.navigationContainer}>
         <TouchableOpacity
@@ -425,26 +450,15 @@ const ChoiceInput: React.FC<{
           onPress={onPrevious}
           disabled={!canGoPrevious}
         >
-          <Ionicons 
-            name="arrow-back" 
-            size={24} 
-            color={canGoPrevious ? '#8B7BA7' : '#C5B8E3'} 
-          />
+          <Ionicons name="arrow-back" size={24} color={canGoPrevious ? '#8B7BA7' : '#C5B8E3'} />
         </TouchableOpacity>
-        
+
         <Text style={styles.questionCounter}>
           {currentQuestion + 1} / {totalQuestions}
         </Text>
-        
-        <TouchableOpacity
-          style={styles.navIconButton}
-          onPress={onSkip}
-        >
-          <Ionicons 
-            name="arrow-forward" 
-            size={24} 
-            color="#8B7BA7" 
-          />
+
+        <TouchableOpacity style={styles.navIconButton} onPress={onSkip}>
+          <Ionicons name="arrow-forward" size={24} color="#8B7BA7" />
         </TouchableOpacity>
       </View>
     </View>
@@ -453,22 +467,32 @@ const ChoiceInput: React.FC<{
 
 // Multi Choice Input Component
 const MultiChoiceInput: React.FC<{
-  choices: string[],
-  selected: string[],
-  onToggle: (choice: string) => void,
-  onSubmit: () => void,
-  onPrevious: () => void,
-  onSkip: () => void,
-  canGoPrevious: boolean,
-  currentQuestion: number,
-  totalQuestions: number
-}> = ({ choices, selected, onToggle, onSubmit, onPrevious, onSkip, canGoPrevious, currentQuestion, totalQuestions }) => {
+  choices: string[];
+  selected: string[];
+  onToggle: (choice: string) => void;
+  onSubmit: () => void;
+  onPrevious: () => void;
+  onSkip: () => void;
+  canGoPrevious: boolean;
+  currentQuestion: number;
+  totalQuestions: number;
+}> = ({
+  choices,
+  selected,
+  onToggle,
+  onSubmit,
+  onPrevious,
+  onSkip,
+  canGoPrevious,
+  currentQuestion,
+  totalQuestions,
+}) => {
   const showScrollIndicator = choices.length > 5;
-  
+
   return (
     <View style={styles.multiChoiceWrapper}>
       <View style={styles.multiChoiceContainer}>
-        <ScrollView 
+        <ScrollView
           showsVerticalScrollIndicator={showScrollIndicator}
           contentContainerStyle={styles.multiChoiceContentContainer}
         >
@@ -477,14 +501,15 @@ const MultiChoiceInput: React.FC<{
               key={index}
               style={[
                 styles.multiChoiceButton,
-                selected.includes(choice) && styles.multiChoiceButtonSelected
+                selected.includes(choice) && styles.multiChoiceButtonSelected,
               ]}
               onPress={() => onToggle(choice)}
             >
-              <Text style={[
-                styles.choiceText,
-                selected.includes(choice) && styles.choiceTextSelected
-              ]}>{choice}</Text>
+              <Text
+                style={[styles.choiceText, selected.includes(choice) && styles.choiceTextSelected]}
+              >
+                {choice}
+              </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -496,7 +521,7 @@ const MultiChoiceInput: React.FC<{
           />
         )}
       </View>
-      
+
       {/* Submit button */}
       <TouchableOpacity
         style={[styles.submitButton, selected.length === 0 && styles.submitButtonDisabled]}
@@ -505,7 +530,7 @@ const MultiChoiceInput: React.FC<{
       >
         <Text style={styles.submitButtonText}>Verder</Text>
       </TouchableOpacity>
-      
+
       {/* Navigation buttons */}
       <View style={styles.navigationContainer}>
         <TouchableOpacity
@@ -513,26 +538,15 @@ const MultiChoiceInput: React.FC<{
           onPress={onPrevious}
           disabled={!canGoPrevious}
         >
-          <Ionicons 
-            name="arrow-back" 
-            size={24} 
-            color={canGoPrevious ? '#8B7BA7' : '#C5B8E3'} 
-          />
+          <Ionicons name="arrow-back" size={24} color={canGoPrevious ? '#8B7BA7' : '#C5B8E3'} />
         </TouchableOpacity>
-        
+
         <Text style={styles.questionCounter}>
           {currentQuestion + 1} / {totalQuestions}
         </Text>
-        
-        <TouchableOpacity
-          style={styles.navIconButton}
-          onPress={onSkip}
-        >
-          <Ionicons 
-            name="arrow-forward" 
-            size={24} 
-            color="#8B7BA7" 
-          />
+
+        <TouchableOpacity style={styles.navIconButton} onPress={onSkip}>
+          <Ionicons name="arrow-forward" size={24} color="#8B7BA7" />
         </TouchableOpacity>
       </View>
     </View>

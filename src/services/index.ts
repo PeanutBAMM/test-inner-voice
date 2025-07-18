@@ -21,4 +21,8 @@ export const databaseService: IDatabaseService = new MockDatabaseService();
 // Export interfaces for type safety
 export type { IAuthService, User, AuthSession } from './interfaces/IAuthService';
 export type { IStorageService, UploadOptions, StorageFile } from './interfaces/IStorageService';
-export type { IDatabaseService, QueryOptions, RealtimeSubscription } from './interfaces/IDatabaseService';
+export type {
+  IDatabaseService,
+  QueryOptions,
+  RealtimeSubscription,
+} from './interfaces/IDatabaseService';

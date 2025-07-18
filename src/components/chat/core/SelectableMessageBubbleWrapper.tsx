@@ -8,17 +8,12 @@ interface SelectableMessageBubbleWrapperProps {
   onSaveToLibrary?: (text: string, type: 'sentence' | 'paragraph') => void;
 }
 
-export const SelectableMessageBubbleWrapper: React.FC<SelectableMessageBubbleWrapperProps> = ({ 
-  message, 
-  onSaveToLibrary 
+export const SelectableMessageBubbleWrapper: React.FC<SelectableMessageBubbleWrapperProps> = ({
+  message,
+  onSaveToLibrary,
 }) => {
   try {
-    return (
-      <SelectableMessageBubble
-        message={message}
-        onSaveToLibrary={onSaveToLibrary}
-      />
-    );
+    return <SelectableMessageBubble message={message} onSaveToLibrary={onSaveToLibrary} />;
   } catch (error) {
     console.warn('SelectableMessageBubble crashed, falling back to MessageBubble:', error);
     // Fallback to normal MessageBubble if SelectableMessageBubble crashes

@@ -17,7 +17,7 @@ interface ConversationStore {
   conversations: Conversation[];
   messages: Message[];
   isTyping: boolean;
-  
+
   startNewConversation: () => void;
   addMessage: (message: Message) => void;
   setTyping: (isTyping: boolean) => void;
@@ -29,12 +29,14 @@ interface ConversationStore {
 
 // Initial welcome message for new users
 const getInitialMessages = (): Message[] => {
-  return [{
-    id: 'welcome',
-    text: 'Welkom! Ik ben hier om je te helpen in je innerlijke reis. Waar wil je vandaag over praten?',
-    sender: 'assistant',
-    timestamp: new Date(),
-  }];
+  return [
+    {
+      id: 'welcome',
+      text: 'Welkom! Ik ben hier om je te helpen in je innerlijke reis. Waar wil je vandaag over praten?',
+      sender: 'assistant',
+      timestamp: new Date(),
+    },
+  ];
 };
 
 export const useConversationStore = create<ConversationStore>((set, get) => ({
@@ -50,7 +52,7 @@ export const useConversationStore = create<ConversationStore>((set, get) => ({
       startedAt: new Date(),
       lastMessageAt: new Date(),
     };
-    
+
     set({
       currentConversation: newConversation,
       messages: [],
@@ -60,12 +62,12 @@ export const useConversationStore = create<ConversationStore>((set, get) => ({
   addMessage: (message) => {
     set((state) => {
       const updatedMessages = [...state.messages, message];
-      
+
       if (state.currentConversation) {
         state.currentConversation.messages = updatedMessages;
         state.currentConversation.lastMessageAt = new Date();
       }
-      
+
       return {
         messages: updatedMessages,
         currentConversation: state.currentConversation,
@@ -77,7 +79,7 @@ export const useConversationStore = create<ConversationStore>((set, get) => ({
 
   saveConversation: async () => {
     const { currentConversation, conversations } = get();
-    
+
     if (!currentConversation || currentConversation.messages.length === 0) {
       return;
     }
@@ -87,10 +89,10 @@ export const useConversationStore = create<ConversationStore>((set, get) => ({
       const subscriptionData = await AsyncStorage.getItem('subscription');
       const subscription = subscriptionData ? JSON.parse(subscriptionData) : { tier: 'free' };
       const limit = subscription.tier === 'premium' ? 100 : 5;
-      
+
       // Add current conversation to list
       let updatedConversations = [currentConversation, ...conversations];
-      
+
       // Apply tier limits
       if (subscription.tier === 'free') {
         // Free: Keep only latest 5
@@ -99,20 +101,16 @@ export const useConversationStore = create<ConversationStore>((set, get) => ({
         // Premium: Remove older than 18 months
         const cutoffDate = new Date();
         cutoffDate.setMonth(cutoffDate.getMonth() - 18);
-        
+
         updatedConversations = updatedConversations
-          .filter(conv => new Date(conv.startedAt) > cutoffDate)
+          .filter((conv) => new Date(conv.startedAt) > cutoffDate)
           .slice(0, limit);
       }
-      
+
       // Save to secure storage
-      await SecureStore.setItemAsync(
-        'conversations',
-        JSON.stringify(updatedConversations)
-      );
-      
+      await SecureStore.setItemAsync('conversations', JSON.stringify(updatedConversations));
+
       set({ conversations: updatedConversations });
-      
     } catch (error) {
       // Error saving conversation
     }
@@ -121,7 +119,7 @@ export const useConversationStore = create<ConversationStore>((set, get) => ({
   loadConversations: async () => {
     try {
       const stored = await SecureStore.getItemAsync('conversations');
-      
+
       if (stored) {
         const conversations = JSON.parse(stored).map((conv: Conversation) => ({
           ...conv,
@@ -132,7 +130,7 @@ export const useConversationStore = create<ConversationStore>((set, get) => ({
             timestamp: new Date(msg.timestamp),
           })),
         }));
-        
+
         set({ conversations });
       }
     } catch (error) {
@@ -142,13 +140,10 @@ export const useConversationStore = create<ConversationStore>((set, get) => ({
 
   deleteConversation: async (id) => {
     const { conversations } = get();
-    const updatedConversations = conversations.filter(conv => conv.id !== id);
-    
+    const updatedConversations = conversations.filter((conv) => conv.id !== id);
+
     try {
-      await SecureStore.setItemAsync(
-        'conversations',
-        JSON.stringify(updatedConversations)
-      );
+      await SecureStore.setItemAsync('conversations', JSON.stringify(updatedConversations));
       set({ conversations: updatedConversations });
     } catch (error) {
       // Error deleting conversation
@@ -157,16 +152,16 @@ export const useConversationStore = create<ConversationStore>((set, get) => ({
 
   addToLibrary: async (messageId, note) => {
     const { currentConversation } = get();
-    
+
     if (!currentConversation) return;
-    
-    const message = currentConversation.messages.find(m => m.id === messageId);
+
+    const message = currentConversation.messages.find((m) => m.id === messageId);
     if (!message) return;
-    
+
     try {
       const libraryData = await SecureStore.getItemAsync('personal_library');
       const library = libraryData ? JSON.parse(libraryData) : [];
-      
+
       const libraryItem = {
         id: Date.now().toString(),
         text: message.text,
@@ -174,14 +169,10 @@ export const useConversationStore = create<ConversationStore>((set, get) => ({
         timestamp: new Date(),
         note,
       };
-      
+
       library.unshift(libraryItem);
-      
-      await SecureStore.setItemAsync(
-        'personal_library',
-        JSON.stringify(library)
-      );
-      
+
+      await SecureStore.setItemAsync('personal_library', JSON.stringify(library));
     } catch (error) {
       // Error adding to library
     }

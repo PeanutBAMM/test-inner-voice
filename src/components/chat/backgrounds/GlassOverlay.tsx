@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-} from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 interface GlassOverlayProps {
@@ -18,7 +15,7 @@ export const GlassOverlay: React.FC<GlassOverlayProps> = ({
 }) => {
   // Create background opacity based on intensity (0-100 scale)
   const backgroundOpacity = Math.min(intensity / 100, 0.9);
-  
+
   // Create background color based on tint
   const getBackgroundColor = () => {
     switch (tint) {
@@ -33,12 +30,7 @@ export const GlassOverlay: React.FC<GlassOverlayProps> = ({
 
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          StyleSheet.absoluteFillObject,
-          { backgroundColor: getBackgroundColor() }
-        ]}
-      />
+      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: getBackgroundColor() }]} />
       <LinearGradient
         colors={['rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0.05)']}
         style={StyleSheet.absoluteFillObject}

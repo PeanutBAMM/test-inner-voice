@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  View,
-  ViewStyle,
-} from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, View, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../constants/theme';
 
@@ -63,15 +57,8 @@ export function SocialLoginButton({ provider, onPress, style }: SocialLoginButto
       activeOpacity={0.8}
     >
       <View style={styles.content}>
-        <Ionicons
-          name={config.icon}
-          size={20}
-          color={config.iconColor}
-          style={styles.icon}
-        />
-        <Text style={[styles.text, { color: config.textColor }]}>
-          {config.text}
-        </Text>
+        <Ionicons name={config.icon} size={20} color={config.iconColor} style={styles.icon} />
+        <Text style={[styles.text, { color: config.textColor }]}>{config.text}</Text>
       </View>
     </TouchableOpacity>
   );

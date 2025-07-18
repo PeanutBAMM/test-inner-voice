@@ -17,7 +17,7 @@ export interface UserProfile {
 interface UserStore {
   userProfile: UserProfile | null;
   isAuthenticated: boolean;
-  
+
   loadUserProfile: (profile: UserProfile) => void;
   updateUserProfile: (updates: Partial<UserProfile>) => void;
   clearUserData: () => Promise<void>;
@@ -40,16 +40,18 @@ export const useUserStore = create<UserStore>()(
       userProfile: null,
       isAuthenticated: false,
 
-      loadUserProfile: (profile) => set({ 
-        userProfile: profile,
-        isAuthenticated: true 
-      }),
+      loadUserProfile: (profile) =>
+        set({
+          userProfile: profile,
+          isAuthenticated: true,
+        }),
 
-      updateUserProfile: (updates) => set((state) => ({
-        userProfile: state.userProfile 
-          ? { ...state.userProfile, ...updates }
-          : { ...defaultProfile, ...updates }
-      })),
+      updateUserProfile: (updates) =>
+        set((state) => ({
+          userProfile: state.userProfile
+            ? { ...state.userProfile, ...updates }
+            : { ...defaultProfile, ...updates },
+        })),
 
       clearUserData: async () => {
         // Clear all stored data
@@ -59,12 +61,12 @@ export const useUserStore = create<UserStore>()(
           'conversation-store',
           'subscription-store',
           'onboardingCompleted',
-          'userProfile'
+          'userProfile',
         ]);
-        
-        set({ 
+
+        set({
           userProfile: null,
-          isAuthenticated: false 
+          isAuthenticated: false,
         });
       },
 

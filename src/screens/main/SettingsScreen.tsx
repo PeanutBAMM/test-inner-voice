@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Switch,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -38,7 +30,7 @@ export default function SettingsScreen() {
   const { userProfile, updateUserProfile } = useUserStore();
   const { tier, restorePurchases } = useSubscriptionStore();
   const { theme, toggleTheme } = useAppStore();
-  
+
   const [biometricEnabled, setBiometricEnabled] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     userProfile?.notificationPreference !== 'Nee, ik kom wel als ik er behoefte aan heb'
@@ -50,7 +42,7 @@ export default function SettingsScreen() {
     if (value) {
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      
+
       if (!hasHardware || !isEnrolled) {
         Alert.alert(
           'Biometrie niet beschikbaar',
@@ -59,7 +51,7 @@ export default function SettingsScreen() {
         return;
       }
     }
-    
+
     setBiometricEnabled(value);
     await AsyncStorage.setItem('biometricEnabled', value.toString());
   };
@@ -114,7 +106,9 @@ export default function SettingsScreen() {
       value: cloudBackupEnabled,
       onPress: () => {
         if (tier.type === 'free') {
-          navigation.navigate('UpgradeModal', { reason: 'Cloud backup is alleen voor Premium gebruikers' });
+          navigation.navigate('UpgradeModal', {
+            reason: 'Cloud backup is alleen voor Premium gebruikers',
+          });
         } else {
           setCloudBackupEnabled(!cloudBackupEnabled);
         }
@@ -150,7 +144,9 @@ export default function SettingsScreen() {
       value: voiceOutputEnabled,
       onPress: () => {
         if (tier.type === 'free') {
-          navigation.navigate('UpgradeModal', { reason: 'Spraak output is alleen voor Premium gebruikers' });
+          navigation.navigate('UpgradeModal', {
+            reason: 'Spraak output is alleen voor Premium gebruikers',
+          });
         } else {
           setVoiceOutputEnabled(!voiceOutputEnabled);
         }
@@ -172,7 +168,8 @@ export default function SettingsScreen() {
       title: 'Exporteer gesprekken',
       type: 'action',
       icon: 'download-outline',
-      onPress: () => Alert.alert('Binnenkort beschikbaar', 'Deze functie komt in een volgende update.'),
+      onPress: () =>
+        Alert.alert('Binnenkort beschikbaar', 'Deze functie komt in een volgende update.'),
     },
     {
       id: 'clearData',
@@ -220,12 +217,10 @@ export default function SettingsScreen() {
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.settingTitle}>{item.title}</Text>
-          {item.subtitle && (
-            <Text style={styles.settingSubtitle}>{item.subtitle}</Text>
-          )}
+          {item.subtitle && <Text style={styles.settingSubtitle}>{item.subtitle}</Text>}
         </View>
       </View>
-      
+
       {item.type === 'toggle' && (
         <Switch
           value={item.value}
@@ -234,20 +229,15 @@ export default function SettingsScreen() {
           thumbColor={item.value ? '#8B7BA7' : '#f4f3f4'}
         />
       )}
-      
-      {item.type === 'navigation' && (
-        <Ionicons name="chevron-forward" size={20} color="#C3B5E3" />
-      )}
+
+      {item.type === 'navigation' && <Ionicons name="chevron-forward" size={20} color="#C3B5E3" />}
     </TouchableOpacity>
   );
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <LinearGradient
-        colors={['#FAFAF8', '#F5F0FF']}
-        style={StyleSheet.absoluteFillObject}
-      />
-      
+      <LinearGradient colors={['#FAFAF8', '#F5F0FF']} style={StyleSheet.absoluteFillObject} />
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Instellingen</Text>

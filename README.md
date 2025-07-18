@@ -8,7 +8,7 @@ Built with InnerVoice App Generator 🧘
 **Voice Conversations**: Talk to your spiritual coach using natural speech  
 **Privacy First**: All conversations stored locally with biometric protection  
 **Coach Personalities**: Choose from Gentle Guide, Wise Mentor, or Grounded Helper  
-**Conversation Library**: Save and revisit meaningful insights  
+**Conversation Library**: Save and revisit meaningful insights
 
 ## Quick Start
 
@@ -60,7 +60,7 @@ src/
 ## Customization
 
 1. **Coach Personality**: Choose in onboarding or settings
-2. **Sphere Colors**: Adaptive or custom mood colors  
+2. **Sphere Colors**: Adaptive or custom mood colors
 3. **Voice Settings**: Adjust speech speed and voice
 4. **Theme**: Light, dark, or system theme
 

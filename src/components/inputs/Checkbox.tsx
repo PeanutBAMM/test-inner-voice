@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '@/constants/theme';
 
@@ -16,13 +11,7 @@ interface CheckboxProps {
   disabled?: boolean;
 }
 
-export function Checkbox({
-  value,
-  onValueChange,
-  label,
-  error,
-  disabled = false,
-}: CheckboxProps) {
+export function Checkbox({ value, onValueChange, label, error, disabled = false }: CheckboxProps) {
   const handlePress = () => {
     if (!disabled) {
       onValueChange(!value);
@@ -45,27 +34,12 @@ export function Checkbox({
             disabled && styles.checkboxDisabled,
           ]}
         >
-          {value && (
-            <Ionicons
-              name="checkmark"
-              size={16}
-              color={theme.colors.white}
-            />
-          )}
+          {value && <Ionicons name="checkmark" size={16} color={theme.colors.white} />}
         </View>
-        
-        {label && (
-          <Text
-            style={[
-              styles.label,
-              disabled && styles.labelDisabled,
-            ]}
-          >
-            {label}
-          </Text>
-        )}
+
+        {label && <Text style={[styles.label, disabled && styles.labelDisabled]}>{label}</Text>}
       </TouchableOpacity>
-      
+
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );

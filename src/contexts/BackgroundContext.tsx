@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export type MoodType = 'peaceful' | 'contemplative' | 'joyful' | 'grounded' | 'neutral';
 export type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night';
-export type BackgroundVariant = 'spiritual' | 'gradient' | 'minimal';
+export type BackgroundVariant = 'spiritual' | 'gradient' | 'minimal' | 'transparent' | 'modern';
 
 export interface BackgroundConfig {
   mood: MoodType;
@@ -61,11 +61,7 @@ export const BackgroundProvider: React.FC<BackgroundProviderProps> = ({ children
     getBackgroundConfig,
   };
 
-  return (
-    <BackgroundContext.Provider value={value}>
-      {children}
-    </BackgroundContext.Provider>
-  );
+  return <BackgroundContext.Provider value={value}>{children}</BackgroundContext.Provider>;
 };
 
 export const useBackground = () => {

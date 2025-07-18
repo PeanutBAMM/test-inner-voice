@@ -1,10 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-} from 'react-native';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { Message } from '../../../types/chat';
 import { useTheme } from '../../../contexts/ThemeContext';
 
@@ -34,11 +29,30 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
 
   const isUser = message.sender === 'user';
 
+  // Assistant messages zonder bubble, user messages met bubble
+  if (!isUser) {
+    return (
+      <Animated.View
+        style={[
+          styles.container,
+          styles.assistantContainer,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
+      >
+        <Text style={[styles.text, styles.assistantText]}>{message.text}</Text>
+      </Animated.View>
+    );
+  }
+
+  // User messages met bubble
   return (
     <Animated.View
       style={[
         styles.container,
-        isUser ? styles.userContainer : styles.assistantContainer,
+        styles.userContainer,
         {
           opacity: fadeAnim,
           transform: [{ translateY: slideAnim }],
@@ -48,16 +62,14 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
       <View
         style={[
           styles.bubble,
-          isUser ? styles.userBubble : styles.assistantBubble,
+          styles.userBubble,
           {
             shadowColor: theme.isDark ? 'rgba(255, 255, 255, 0.05)' : '#8B7BA7',
             shadowOpacity: theme.isDark ? 0.1 : 0.08,
-          }
+          },
         ]}
       >
-        <Text style={[styles.text, isUser ? styles.userText : styles.assistantText]}>
-          {message.text}
-        </Text>
+        <Text style={[styles.text, styles.userText]}>{message.text}</Text>
       </View>
     </Animated.View>
   );
@@ -72,12 +84,14 @@ const styles = StyleSheet.create({
   },
   assistantContainer: {
     alignItems: 'flex-start',
+    paddingRight: 32,
   },
   bubble: {
     maxWidth: '80%',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 20,
+    overflow: 'hidden',
   },
   userBubble: {
     backgroundColor: '#E8DFFD',
@@ -89,19 +103,9 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 1,
   },
-  assistantBubble: {
-    backgroundColor: '#FFFFFF',
-    borderBottomLeftRadius: 4,
-    // Zachte schaduw zonder border
-    shadowColor: '#8B7BA7',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 2,
-    elevation: 0,
-  },
   text: {
-    fontSize: 16,
-    lineHeight: 22,
+    fontSize: 17,
+    lineHeight: 24,
   },
   userText: {
     color: '#4A4458',

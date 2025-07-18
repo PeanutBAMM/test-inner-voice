@@ -30,35 +30,20 @@ export function PrimaryButton({
 
   return (
     <TouchableOpacity
-      style={[
-        styles.button,
-        styles[variant],
-        styles[size],
-        isDisabled && styles.disabled,
-        style,
-      ]}
+      style={[styles.button, styles[variant], styles[size], isDisabled && styles.disabled, style]}
       disabled={isDisabled}
       activeOpacity={0.7}
       {...props}
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === 'outline' || variant === 'ghost' 
-            ? theme.colors.primary 
-            : theme.colors.white
+          color={
+            variant === 'outline' || variant === 'ghost' ? theme.colors.primary : theme.colors.white
           }
           size="small"
         />
       ) : (
-        <Text
-          style={[
-            styles.text,
-            styles[`${variant}Text`],
-            styles[`${size}Text`],
-          ]}
-        >
-          {title}
-        </Text>
+        <Text style={[styles.text, styles[`${variant}Text`], styles[`${size}Text`]]}>{title}</Text>
       )}
     </TouchableOpacity>
   );

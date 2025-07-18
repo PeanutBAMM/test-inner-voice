@@ -7,13 +7,15 @@ let connectionStatus: 'unknown' | 'connected' | 'failed' = 'unknown';
 let lastError: string | null = null;
 
 // Initialize OpenAI client with enhanced configuration
-const openaiClient = config.openaiApiKey ? new OpenAI({
-  apiKey: config.openaiApiKey,
-  // React Native specific configuration
-  dangerouslyAllowBrowser: true,
-  timeout: 15000, // 15 second timeout
-  maxRetries: 2,
-}) : null;
+const openaiClient = config.openaiApiKey
+  ? new OpenAI({
+      apiKey: config.openaiApiKey,
+      // React Native specific configuration
+      dangerouslyAllowBrowser: true,
+      timeout: 15000, // 15 second timeout
+      maxRetries: 2,
+    })
+  : null;
 
 // Enhanced logging and validation
 if (!openaiClient) {
@@ -38,7 +40,7 @@ export const validateApiKey = async (): Promise<{ valid: boolean; error?: string
       messages: [{ role: 'user', content: 'test' }],
       max_tokens: 1,
     });
-    
+
     connectionStatus = 'connected';
     console.log('✅ OpenAI API key validation successful');
     return { valid: true };
@@ -83,7 +85,7 @@ export const getLLMResponse = async (
     const messages: ChatMessage[] = [
       { role: 'system', content: systemPrompt },
       ...history.slice(-10), // Keep last 10 messages for context
-      { role: 'user', content: message }
+      { role: 'user', content: message },
     ];
 
     if (config.debugMode) {
@@ -103,14 +105,14 @@ export const getLLMResponse = async (
     });
 
     const response = completion.choices[0]?.message?.content;
-    
+
     if (!response) {
       throw new Error('No response from LLM');
     }
 
     connectionStatus = 'connected';
     lastError = null;
-    
+
     if (config.debugMode) {
       console.log('✅ OpenAI API response received');
       console.log('📄 Response:', response.substring(0, 100) + '...');
@@ -121,13 +123,13 @@ export const getLLMResponse = async (
   } catch (error) {
     connectionStatus = 'failed';
     lastError = error instanceof Error ? error.message : 'Unknown error';
-    
+
     console.error('❌ OpenAI API Error:', lastError);
-    
+
     if (config.debugMode) {
       console.log('🎭 Falling back to mock response');
     }
-    
+
     // Fallback to mock response on error
     return getMockCoachResponse(message, coachType);
   }
@@ -152,9 +154,9 @@ export const calculateCost = (inputTokens: number, outputTokens: number): number
   // GPT-3.5-turbo pricing (as of late 2024)
   const inputCostPer1K = 0.0005; // $0.0005 per 1K input tokens
   const outputCostPer1K = 0.0015; // $0.0015 per 1K output tokens
-  
+
   const inputCost = (inputTokens / 1000) * inputCostPer1K;
   const outputCost = (outputTokens / 1000) * outputCostPer1K;
-  
+
   return inputCost + outputCost;
 };

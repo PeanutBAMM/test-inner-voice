@@ -17,16 +17,10 @@ export function AuthIllustration({ size = 200 }: AuthIllustrationProps) {
             <Stop offset="100%" stopColor={theme.colors.primaryLight} stopOpacity="0.6" />
           </LinearGradient>
         </Defs>
-        
+
         {/* Background circle */}
-        <Circle
-          cx="100"
-          cy="100"
-          r="90"
-          fill="url(#grad1)"
-          opacity="0.1"
-        />
-        
+        <Circle cx="100" cy="100" r="90" fill="url(#grad1)" opacity="0.1" />
+
         {/* Phone outline */}
         <G transform="translate(70, 40)">
           <Path
@@ -35,13 +29,10 @@ export function AuthIllustration({ size = 200 }: AuthIllustrationProps) {
             stroke={theme.colors.primary}
             strokeWidth="2"
           />
-          
+
           {/* Screen */}
-          <Path
-            d="M15 15 L45 15 L45 100 L15 100 Z"
-            fill={theme.colors.surface}
-          />
-          
+          <Path d="M15 15 L45 15 L45 100 L15 100 Z" fill={theme.colors.surface} />
+
           {/* Lock icon */}
           <G transform="translate(20, 45)">
             <Circle
@@ -59,16 +50,11 @@ export function AuthIllustration({ size = 200 }: AuthIllustrationProps) {
               strokeWidth="2"
             />
           </G>
-          
+
           {/* Home button */}
-          <Circle
-            cx="30"
-            cy="110"
-            r="4"
-            fill={theme.colors.border}
-          />
+          <Circle cx="30" cy="110" r="4" fill={theme.colors.border} />
         </G>
-        
+
         {/* Decorative elements */}
         <Circle cx="40" cy="30" r="3" fill={theme.colors.primaryLight} opacity="0.6" />
         <Circle cx="160" cy="50" r="4" fill={theme.colors.primary} opacity="0.4" />

@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,23 +12,28 @@ export default function PrivacyPolicyScreen() {
   const sections = [
     {
       title: 'Gegevensverzameling',
-      content: 'InnerVoice verzamelt alleen de gegevens die nodig zijn voor het functioneren van de app. Dit omvat je naam, taalvoorkeuren, en gespreksgeschiedenis.',
+      content:
+        'InnerVoice verzamelt alleen de gegevens die nodig zijn voor het functioneren van de app. Dit omvat je naam, taalvoorkeuren, en gespreksgeschiedenis.',
     },
     {
       title: 'Gegevensopslag',
-      content: 'Al je persoonlijke gegevens worden veilig opgeslagen op je apparaat. Gesprekken worden lokaal bewaard en zijn alleen voor jou toegankelijk.',
+      content:
+        'Al je persoonlijke gegevens worden veilig opgeslagen op je apparaat. Gesprekken worden lokaal bewaard en zijn alleen voor jou toegankelijk.',
     },
     {
       title: 'Gegevensbeveiliging',
-      content: 'We gebruiken geavanceerde encryptie om je gegevens te beschermen. Optionele biometrische beveiliging biedt extra bescherming.',
+      content:
+        'We gebruiken geavanceerde encryptie om je gegevens te beschermen. Optionele biometrische beveiliging biedt extra bescherming.',
     },
     {
       title: 'Delen van gegevens',
-      content: 'Je gegevens worden nooit gedeeld met derden zonder je expliciete toestemming. Je privacy staat bij ons voorop.',
+      content:
+        'Je gegevens worden nooit gedeeld met derden zonder je expliciete toestemming. Je privacy staat bij ons voorop.',
     },
     {
       title: 'Je rechten',
-      content: 'Je hebt altijd het recht om je gegevens in te zien, te wijzigen of te verwijderen. Dit kan via de instellingen in de app.',
+      content:
+        'Je hebt altijd het recht om je gegevens in te zien, te wijzigen of te verwijderen. Dit kan via de instellingen in de app.',
     },
   ];
 
@@ -44,12 +43,9 @@ export default function PrivacyPolicyScreen() {
         colors={['rgba(232, 223, 253, 0.3)', 'rgba(255, 255, 255, 0)']}
         style={styles.gradient}
       />
-      
+
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#8B7BA7" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Privacybeleid</Text>
@@ -59,7 +55,8 @@ export default function PrivacyPolicyScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.introContainer}>
           <Text style={styles.introText}>
-            Bij InnerVoice nemen we je privacy zeer serieus. Dit beleid beschrijft hoe we omgaan met je persoonlijke gegevens.
+            Bij InnerVoice nemen we je privacy zeer serieus. Dit beleid beschrijft hoe we omgaan met
+            je persoonlijke gegevens.
           </Text>
           <Text style={styles.lastUpdated}>Laatst bijgewerkt: Januari 2025</Text>
         </View>
@@ -67,10 +64,20 @@ export default function PrivacyPolicyScreen() {
         {sections.map((section, index) => (
           <View key={index} style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Ionicons 
-                name={index === 0 ? 'document-text' : index === 1 ? 'save' : index === 2 ? 'shield-checkmark' : index === 3 ? 'share-social' : 'person'}
-                size={20} 
-                color="#8B7BA7" 
+              <Ionicons
+                name={
+                  index === 0
+                    ? 'document-text'
+                    : index === 1
+                      ? 'save'
+                      : index === 2
+                        ? 'shield-checkmark'
+                        : index === 3
+                          ? 'share-social'
+                          : 'person'
+                }
+                size={20}
+                color="#8B7BA7"
               />
               <Text style={styles.sectionTitle}>{section.title}</Text>
             </View>

@@ -23,7 +23,7 @@ export default function OTPVerificationScreen({ route, navigation }: Props) {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef<TextInput[]>([]);
-  
+
   const { login } = useAuthStore();
 
   const handleOtpChange = (value: string, index: number) => {
@@ -37,7 +37,7 @@ export default function OTPVerificationScreen({ route, navigation }: Props) {
     }
 
     // Auto-submit when all fields are filled
-    if (newOtp.every(digit => digit) && index === 5) {
+    if (newOtp.every((digit) => digit) && index === 5) {
       handleVerify(newOtp.join(''));
     }
   };
@@ -50,7 +50,7 @@ export default function OTPVerificationScreen({ route, navigation }: Props) {
 
   const handleVerify = async (code?: string) => {
     const verificationCode = code || otp.join('');
-    
+
     if (verificationCode.length !== 6) {
       Alert.alert('Error', 'Please enter a 6-digit code');
       return;
@@ -86,17 +86,12 @@ export default function OTPVerificationScreen({ route, navigation }: Props) {
         style={styles.keyboardView}
       >
         <View style={styles.content}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
 
           <Text style={styles.title}>Verify your number</Text>
-          <Text style={styles.subtitle}>
-            We&apos;ve sent a code to {phoneNumber}
-          </Text>
+          <Text style={styles.subtitle}>We&apos;ve sent a code to {phoneNumber}</Text>
 
           <View style={styles.otpContainer}>
             {otp.map((digit, index) => (
@@ -105,10 +100,7 @@ export default function OTPVerificationScreen({ route, navigation }: Props) {
                 ref={(ref) => {
                   if (ref) inputRefs.current[index] = ref;
                 }}
-                style={[
-                  styles.otpInput,
-                  digit && styles.otpInputFilled,
-                ]}
+                style={[styles.otpInput, digit && styles.otpInputFilled]}
                 value={digit}
                 onChangeText={(value) => handleOtpChange(value, index)}
                 onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}
@@ -125,14 +117,10 @@ export default function OTPVerificationScreen({ route, navigation }: Props) {
             onPress={() => handleVerify()}
             loading={isLoading}
             style={styles.verifyButton}
-            disabled={!otp.every(digit => digit)}
+            disabled={!otp.every((digit) => digit)}
           />
 
-          <TouchableOpacity
-            style={styles.resendButton}
-            onPress={handleResend}
-            disabled={isLoading}
-          >
+          <TouchableOpacity style={styles.resendButton} onPress={handleResend} disabled={isLoading}>
             <Text style={styles.resendText}>
               Didn&apos;t receive code? <Text style={styles.resendLink}>Resend</Text>
             </Text>

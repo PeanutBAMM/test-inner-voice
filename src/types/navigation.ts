@@ -9,13 +9,13 @@ export type RootStackParamList = {
   Auth: NavigatorScreenParams<AuthStackParamList>;
   OnboardingChat: undefined;
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
-  
+
   // Modal screens
   UpgradeModal: {
     reason?: string;
     resetTime?: string;
   };
-  
+
   // Detail screens
   ConversationDetailScreen: {
     conversationId: string;
@@ -45,20 +45,20 @@ export type MainTabParamList = {
 };
 
 // Screen props types
-export type RootStackScreenProps<T extends keyof RootStackParamList> =
-  NativeStackScreenProps<RootStackParamList, T>;
+export type RootStackScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<
+  RootStackParamList,
+  T
+>;
 
-export type AuthStackScreenProps<T extends keyof AuthStackParamList> =
-  CompositeScreenProps<
-    NativeStackScreenProps<AuthStackParamList, T>,
-    RootStackScreenProps<keyof RootStackParamList>
-  >;
+export type AuthStackScreenProps<T extends keyof AuthStackParamList> = CompositeScreenProps<
+  NativeStackScreenProps<AuthStackParamList, T>,
+  RootStackScreenProps<keyof RootStackParamList>
+>;
 
-export type MainTabScreenProps<T extends keyof MainTabParamList> =
-  CompositeScreenProps<
-    BottomTabScreenProps<MainTabParamList, T>,
-    RootStackScreenProps<keyof RootStackParamList>
-  >;
+export type MainTabScreenProps<T extends keyof MainTabParamList> = CompositeScreenProps<
+  BottomTabScreenProps<MainTabParamList, T>,
+  RootStackScreenProps<keyof RootStackParamList>
+>;
 
 // Declare global navigation types for useNavigation hook
 declare global {

@@ -19,7 +19,7 @@ export interface MoodPalettes {
 export const MOOD_PALETTES: MoodPalettes = {
   peaceful: {
     primary: ['#FFF0F5', '#FFE4E1', '#FFD6E8', '#FFC8DD', '#FFB6C1', '#FFDAB9'], // Lavender blush naar perzik
-    accent: ['#FFB6C1', '#FFA07A', '#FF7F50'], // Roze naar koraal accenten
+    accent: ['#FFB6C1', '#FF69B4', '#FF1493'], // Light pink, hot pink (Dot style), deep pink
     glow: '#FFB6C1', // Zachte roze gloed
     sparkle: '#FFD700', // Gouden sparkle ✨
     orb1: '#FF69B4', // Hot pink voor diepte

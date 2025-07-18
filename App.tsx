@@ -9,34 +9,43 @@ import useAuthStore from '@/store/useAuthStore';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { BackgroundProvider } from '@/contexts/BackgroundContext';
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+} from '@expo-google-fonts/inter';
 
 // StatusBar configuration mapping
-const STATUS_BAR_CONFIG: Record<string, { style: 'light' | 'dark' | 'auto'; backgroundColor: string }> = {
-  'Chat': { style: 'light', backgroundColor: 'transparent' },
-  'Library': { style: 'light', backgroundColor: 'transparent' },
-  'Profile': { style: 'light', backgroundColor: 'transparent' },
-  'Settings': { style: 'light', backgroundColor: 'transparent' },
-  'Auth': { style: 'light', backgroundColor: 'transparent' },
-  'Onboarding': { style: 'light', backgroundColor: 'transparent' },
-  'OnboardingChat': { style: 'light', backgroundColor: 'transparent' },
-  'ConversationDetail': { style: 'light', backgroundColor: 'transparent' },
-  'LanguageSettings': { style: 'light', backgroundColor: 'transparent' },
-  'PrivacyPolicy': { style: 'light', backgroundColor: 'transparent' },
-  'TermsOfService': { style: 'light', backgroundColor: 'transparent' },
-  'default': { style: 'auto', backgroundColor: 'transparent' }
+const STATUS_BAR_CONFIG: Record<
+  string,
+  { style: 'light' | 'dark' | 'auto'; backgroundColor: string }
+> = {
+  Chat: { style: 'light', backgroundColor: 'transparent' },
+  Library: { style: 'light', backgroundColor: 'transparent' },
+  Profile: { style: 'light', backgroundColor: 'transparent' },
+  Settings: { style: 'light', backgroundColor: 'transparent' },
+  Auth: { style: 'light', backgroundColor: 'transparent' },
+  Onboarding: { style: 'light', backgroundColor: 'transparent' },
+  OnboardingChat: { style: 'light', backgroundColor: 'transparent' },
+  ConversationDetail: { style: 'light', backgroundColor: 'transparent' },
+  LanguageSettings: { style: 'light', backgroundColor: 'transparent' },
+  PrivacyPolicy: { style: 'light', backgroundColor: 'transparent' },
+  TermsOfService: { style: 'light', backgroundColor: 'transparent' },
+  default: { style: 'auto', backgroundColor: 'transparent' },
 };
 
 // Helper function to get current route name
 const getCurrentRouteName = (navigationState: any): string => {
   if (!navigationState) return '';
-  
+
   const route = navigationState.routes[navigationState.index];
-  
+
   // Handle nested navigation (tabs)
   if (route.state) {
     return getCurrentRouteName(route.state);
   }
-  
+
   return route.name;
 };
 
@@ -44,8 +53,14 @@ function App() {
   const isLoadingComplete = useCachedResources();
   const { isAuthenticated, isLoading } = useAuthStore();
   const [currentRoute, setCurrentRoute] = useState('');
+  
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+  });
 
-  if (!isLoadingComplete || isLoading) {
+  if (!isLoadingComplete || isLoading || !fontsLoaded) {
     return null; // Or a splash screen component
   }
 
@@ -65,7 +80,7 @@ function App() {
           <BackgroundProvider>
             <NavigationContainer onStateChange={onNavigationStateChange}>
               <RootNavigator />
-              <StatusBar 
+              <StatusBar
                 style={getStatusBarStyle().style}
                 backgroundColor={getStatusBarStyle().backgroundColor}
                 translucent={true}

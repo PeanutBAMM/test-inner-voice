@@ -1,10 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import {
-  View,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-} from 'react-native';
+import { View, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MessageList } from './MessageList';
 import { ChatInput } from './ChatInput';
@@ -34,7 +29,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   background,
   inputComponent: InputComponent = ChatInput,
   isTyping = false,
-  placeholder = "Type je bericht...",
+  placeholder = 'Type je bericht...',
   onSaveToLibrary,
   useSelectableMessages = false,
   style,
@@ -58,11 +53,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
   return (
     <View style={[styles.container, style]}>
       {/* Background layer */}
-      {background && (
-        <View style={StyleSheet.absoluteFillObject}>
-          {background}
-        </View>
-      )}
+      {background && <View style={StyleSheet.absoluteFillObject}>{background}</View>}
 
       <KeyboardAvoidingView
         style={styles.keyboardAvoid}
@@ -77,7 +68,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = ({
             onSaveToLibrary={onSaveToLibrary}
             useSelectableMessages={useSelectableMessages}
           />
-          
+
           <InputComponent
             onSend={onSendMessage}
             placeholder={placeholder}
@@ -101,5 +92,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    justifyContent: 'flex-end',
   },
 });

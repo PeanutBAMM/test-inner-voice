@@ -28,9 +28,9 @@ export default function LoginScreen({ navigation }: Props) {
   const [passwordError, setPasswordError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const { login, loginWithGoogle } = useAuthStore();
-  
+
   // Development test credentials
   const TEST_EMAIL = 'test@example.com';
   const TEST_PASSWORD = 'Niquegek$11';
@@ -45,7 +45,7 @@ export default function LoginScreen({ navigation }: Props) {
 
   const validateForm = () => {
     let isValid = true;
-    
+
     if (!email) {
       setEmailError('Email is vereist');
       isValid = false;
@@ -55,7 +55,7 @@ export default function LoginScreen({ navigation }: Props) {
     } else {
       setEmailError('');
     }
-    
+
     if (!password) {
       setPasswordError('Wachtwoord is vereist');
       isValid = false;
@@ -65,13 +65,13 @@ export default function LoginScreen({ navigation }: Props) {
     } else {
       setPasswordError('');
     }
-    
+
     return isValid;
   };
 
   const handleLogin = async () => {
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
     try {
       await login(email, password);
@@ -79,7 +79,7 @@ export default function LoginScreen({ navigation }: Props) {
     } catch (error: any) {
       console.warn('[LoginScreen] Login failed:', error.message);
       let errorMessage = 'Controleer je email en wachtwoord en probeer opnieuw.';
-      
+
       // Handle specific Supabase errors
       if (error.message?.includes('Invalid login credentials')) {
         errorMessage = 'Onjuiste email of wachtwoord.';
@@ -88,7 +88,7 @@ export default function LoginScreen({ navigation }: Props) {
       } else if (error.message?.includes('Network')) {
         errorMessage = 'Geen internetverbinding. Probeer het later opnieuw.';
       }
-      
+
       Alert.alert('Login Mislukt', errorMessage);
     } finally {
       setIsLoading(false);
@@ -136,10 +136,7 @@ export default function LoginScreen({ navigation }: Props) {
           </View>
 
           {isDev && (
-            <TouchableOpacity
-              style={styles.testAccountButton}
-              onPress={handleUseTestAccount}
-            >
+            <TouchableOpacity style={styles.testAccountButton} onPress={handleUseTestAccount}>
               <Text style={styles.testAccountText}>🧪 Gebruik test account</Text>
             </TouchableOpacity>
           )}
@@ -169,13 +166,8 @@ export default function LoginScreen({ navigation }: Props) {
               icon="lock-closed"
             />
 
-            <TouchableOpacity
-              style={styles.forgotPassword}
-              onPress={handleForgotPassword}
-            >
-              <Text style={styles.forgotPasswordText}>
-                Wachtwoord vergeten?
-              </Text>
+            <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
+              <Text style={styles.forgotPasswordText}>Wachtwoord vergeten?</Text>
             </TouchableOpacity>
 
             <PrimaryButton
@@ -192,23 +184,17 @@ export default function LoginScreen({ navigation }: Props) {
             </View>
 
             <View style={styles.socialButtons}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.socialButton}
                 onPress={handleGoogleLogin}
                 disabled={isLoading}
               >
                 <Text style={styles.socialButtonText}>G</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.socialButton, styles.socialButtonDisabled]}
-                disabled
-              >
+              <TouchableOpacity style={[styles.socialButton, styles.socialButtonDisabled]} disabled>
                 <Text style={styles.socialButtonText}>f</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.socialButton, styles.socialButtonDisabled]}
-                disabled
-              >
+              <TouchableOpacity style={[styles.socialButton, styles.socialButtonDisabled]} disabled>
                 <Text style={styles.socialButtonText}>🍎</Text>
               </TouchableOpacity>
             </View>

@@ -12,9 +12,7 @@
       "backgroundColor": "#ffffff"
     },
     "newArchEnabled": true,
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.apex.testinnervoicetemplatefixed",

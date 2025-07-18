@@ -1,9 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Animated,
-  StyleSheet,
-} from 'react-native';
+import { View, Animated, StyleSheet } from 'react-native';
 
 export const TypingIndicator: React.FC = () => {
   const dot1 = useRef(new Animated.Value(0)).current;
@@ -29,11 +25,7 @@ export const TypingIndicator: React.FC = () => {
       );
     };
 
-    Animated.parallel([
-      animateDot(dot1, 0),
-      animateDot(dot2, 150),
-      animateDot(dot3, 300),
-    ]).start();
+    Animated.parallel([animateDot(dot1, 0), animateDot(dot2, 150), animateDot(dot3, 300)]).start();
   }, []);
 
   const renderDot = (animValue: Animated.Value) => {

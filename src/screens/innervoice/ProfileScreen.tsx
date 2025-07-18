@@ -1,13 +1,5 @@
 import React, { useRef, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -36,7 +28,10 @@ export default function ProfileScreen() {
 
   const stats = [
     { label: 'Gesprekken', value: usage.conversationCount },
-    { label: 'Vragen vandaag', value: `${usage.questionsToday}${tier.type === 'free' ? '/1000' : ''}` },
+    {
+      label: 'Vragen vandaag',
+      value: `${usage.questionsToday}${tier.type === 'free' ? '/1000' : ''}`,
+    },
     { label: 'Dagen actief', value: '7' }, // Mock value
   ];
 
@@ -47,22 +42,31 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <View style={[styles.container, { 
-      paddingTop: insets.top,
-      paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
-    }]}>
-      <UniversalBackground 
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top,
+          paddingBottom: TAB_BAR_HEIGHT + insets.bottom,
+        },
+      ]}
+    >
+      <UniversalBackground
         variant="gradient"
         mood="peaceful"
         timeOfDay="afternoon"
         enableEffects={false}
       />
-      
+
       <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.avatarContainer}>
             <LinearGradient
-              colors={theme.isDark ? ['#2E5984', '#0F1419'] : [theme.colors.peaceful.primary[2], theme.colors.peaceful.primary[0]]}
+              colors={
+                theme.isDark
+                  ? ['#2E5984', '#0F1419']
+                  : [theme.colors.peaceful.primary[2], theme.colors.peaceful.primary[0]]
+              }
               style={styles.avatarGradient}
             >
               <Text style={styles.avatarText}>
@@ -70,19 +74,28 @@ export default function ProfileScreen() {
               </Text>
             </LinearGradient>
           </View>
-          
-          <Text style={[styles.welcomeText, { color: theme.colors.textSecondary }]}>Welkom terug,</Text>
-          <Text style={[styles.nameText, { color: theme.colors.text }]}>{userProfile?.userName || 'Gebruiker'}</Text>
-          
-          <View style={[styles.tierBadge, { 
-            backgroundColor: theme.colors.card,
-            shadowColor: theme.isDark ? theme.colors.primary : '#000',
-            shadowOpacity: theme.isDark ? 0.2 : 0.05,
-          }]}>
-            <Ionicons 
-              name={tier.type === 'premium' ? 'star' : 'star-outline'} 
-              size={16} 
-              color={tier.type === 'premium' ? '#FFD700' : theme.colors.textLight} 
+
+          <Text style={[styles.welcomeText, { color: theme.colors.textSecondary }]}>
+            Welkom terug,
+          </Text>
+          <Text style={[styles.nameText, { color: theme.colors.text }]}>
+            {userProfile?.userName || 'Gebruiker'}
+          </Text>
+
+          <View
+            style={[
+              styles.tierBadge,
+              {
+                backgroundColor: theme.colors.card,
+                shadowColor: theme.isDark ? theme.colors.primary : '#000',
+                shadowOpacity: theme.isDark ? 0.2 : 0.05,
+              },
+            ]}
+          >
+            <Ionicons
+              name={tier.type === 'premium' ? 'star' : 'star-outline'}
+              size={16}
+              color={tier.type === 'premium' ? '#FFD700' : theme.colors.textLight}
             />
             <Text style={[styles.tierText, { color: theme.colors.text }]}>
               {tier.type === 'premium' ? 'Premium' : 'Free'}
@@ -90,15 +103,24 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <View style={[styles.statsContainer, { 
-          backgroundColor: theme.colors.card,
-          shadowColor: theme.isDark ? theme.colors.primary : '#000',
-          shadowOpacity: theme.isDark ? 0.2 : 0.05,
-        }]}>
+        <View
+          style={[
+            styles.statsContainer,
+            {
+              backgroundColor: theme.colors.card,
+              shadowColor: theme.isDark ? theme.colors.primary : '#000',
+              shadowOpacity: theme.isDark ? 0.2 : 0.05,
+            },
+          ]}
+        >
           {stats.map((stat, index) => (
             <View key={index} style={styles.statItem}>
-              <Text style={[styles.statValue, { color: theme.colors.textSecondary }]}>{stat.value}</Text>
-              <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>{stat.label}</Text>
+              <Text style={[styles.statValue, { color: theme.colors.textSecondary }]}>
+                {stat.value}
+              </Text>
+              <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
+                {stat.label}
+              </Text>
             </View>
           ))}
         </View>
@@ -106,8 +128,13 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Profiel Details</Text>
           {profileItems.map((item, index) => (
-            <View key={index} style={[styles.profileItem, { borderBottomColor: theme.colors.border + '4D' }]}>
-              <Text style={[styles.itemLabel, { color: theme.colors.textSecondary }]}>{item.label}</Text>
+            <View
+              key={index}
+              style={[styles.profileItem, { borderBottomColor: theme.colors.border + '4D' }]}
+            >
+              <Text style={[styles.itemLabel, { color: theme.colors.textSecondary }]}>
+                {item.label}
+              </Text>
               <Text style={[styles.itemValue, { color: theme.colors.text }]}>{item.value}</Text>
             </View>
           ))}
@@ -115,11 +142,16 @@ export default function ProfileScreen() {
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Jouw Reis</Text>
-          <View style={[styles.journeyCard, { 
-            backgroundColor: theme.colors.card,
-            shadowColor: theme.isDark ? theme.colors.primary : '#000',
-            shadowOpacity: theme.isDark ? 0.2 : 0.05,
-          }]}>
+          <View
+            style={[
+              styles.journeyCard,
+              {
+                backgroundColor: theme.colors.card,
+                shadowColor: theme.isDark ? theme.colors.primary : '#000',
+                shadowOpacity: theme.isDark ? 0.2 : 0.05,
+              },
+            ]}
+          >
             <Text style={[styles.journeyText, { color: theme.colors.text }]}>
               Je bent begonnen met: &quot;{userProfile?.primaryIntention || 'Zelfontdekking'}&quot;
             </Text>
@@ -142,36 +174,32 @@ export default function ProfileScreen() {
             </LinearGradient>
           </TouchableOpacity>
         )}
-        
+
         {/* Logout Button */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.logoutButton}
           onPress={async () => {
-            Alert.alert(
-              'Uitloggen',
-              'Weet je zeker dat je wilt uitloggen?',
-              [
-                { text: 'Annuleren', style: 'cancel' },
-                { 
-                  text: 'Uitloggen', 
-                  style: 'destructive',
-                  onPress: async () => {
-                    // Clear auth status
-                    await mockAuthService.logout();
-                    // Clear user data
-                    await AsyncStorage.multiRemove([
-                      'userProfile',
-                      'onboardingCompleted',
-                      'conversation-store',
-                      'subscription-store',
-                      'user-store',
-                      'coach-store'
-                    ]);
-                    // Navigation wordt automatisch afgehandeld door RootNavigator
-                  }
-                }
-              ]
-            );
+            Alert.alert('Uitloggen', 'Weet je zeker dat je wilt uitloggen?', [
+              { text: 'Annuleren', style: 'cancel' },
+              {
+                text: 'Uitloggen',
+                style: 'destructive',
+                onPress: async () => {
+                  // Clear auth status
+                  await mockAuthService.logout();
+                  // Clear user data
+                  await AsyncStorage.multiRemove([
+                    'userProfile',
+                    'onboardingCompleted',
+                    'conversation-store',
+                    'subscription-store',
+                    'user-store',
+                    'coach-store',
+                  ]);
+                  // Navigation wordt automatisch afgehandeld door RootNavigator
+                },
+              },
+            ]);
           }}
         >
           <Text style={styles.logoutText}>Uitloggen</Text>

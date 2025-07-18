@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Switch,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -37,14 +29,14 @@ export default function SettingsScreen() {
   const { userProfile, updateUserProfile } = useUserStore();
   const { tier, restorePurchases } = useSubscriptionStore();
   const { theme: currentTheme, toggleTheme } = useAppStore();
-  
+
   const [biometricEnabled, setBiometricEnabled] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     userProfile?.notificationPreference !== 'Nee, ik kom wel als ik er behoefte aan heb'
   );
   const [voiceOutputEnabled, setVoiceOutputEnabled] = useState(false);
   const [cloudBackupEnabled, setCloudBackupEnabled] = useState(false);
-  
+
   const isDark = currentTheme === 'dark';
   const themeColors = getThemeColors(isDark);
 
@@ -52,7 +44,7 @@ export default function SettingsScreen() {
     if (value) {
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      
+
       if (!hasHardware || !isEnrolled) {
         Alert.alert(
           'Biometrie niet beschikbaar',
@@ -61,7 +53,7 @@ export default function SettingsScreen() {
         return;
       }
     }
-    
+
     setBiometricEnabled(value);
     await AsyncStorage.setItem('biometricEnabled', value.toString());
   };
@@ -116,7 +108,9 @@ export default function SettingsScreen() {
       value: cloudBackupEnabled,
       onPress: () => {
         if (tier.type === 'free') {
-          navigation.navigate('UpgradeModal', { reason: 'Cloud backup is alleen voor Premium gebruikers' });
+          navigation.navigate('UpgradeModal', {
+            reason: 'Cloud backup is alleen voor Premium gebruikers',
+          });
         } else {
           setCloudBackupEnabled(!cloudBackupEnabled);
         }
@@ -152,7 +146,9 @@ export default function SettingsScreen() {
       value: voiceOutputEnabled,
       onPress: () => {
         if (tier.type === 'free') {
-          navigation.navigate('UpgradeModal', { reason: 'Spraak output is alleen voor Premium gebruikers' });
+          navigation.navigate('UpgradeModal', {
+            reason: 'Spraak output is alleen voor Premium gebruikers',
+          });
         } else {
           setVoiceOutputEnabled(!voiceOutputEnabled);
         }
@@ -174,7 +170,8 @@ export default function SettingsScreen() {
       title: 'Exporteer gesprekken',
       type: 'action',
       icon: 'download-outline',
-      onPress: () => Alert.alert('Binnenkort beschikbaar', 'Deze functie komt in een volgende update.'),
+      onPress: () =>
+        Alert.alert('Binnenkort beschikbaar', 'Deze functie komt in een volgende update.'),
     },
     {
       id: 'clearData',
@@ -223,20 +220,25 @@ export default function SettingsScreen() {
         <View style={styles.textContainer}>
           <Text style={[styles.settingTitle, { color: themeColors.text }]}>{item.title}</Text>
           {item.subtitle && (
-            <Text style={[styles.settingSubtitle, { color: themeColors.textSecondary }]}>{item.subtitle}</Text>
+            <Text style={[styles.settingSubtitle, { color: themeColors.textSecondary }]}>
+              {item.subtitle}
+            </Text>
           )}
         </View>
       </View>
-      
+
       {item.type === 'toggle' && (
         <Switch
           value={item.value}
           onValueChange={item.onPress}
-          trackColor={{ false: themeColors.peaceful.primary[2], true: themeColors.peaceful.accent[0] }}
+          trackColor={{
+            false: themeColors.peaceful.primary[2],
+            true: themeColors.peaceful.accent[0],
+          }}
           thumbColor={item.value ? themeColors.textSecondary : '#f4f3f4'}
         />
       )}
-      
+
       {item.type === 'navigation' && (
         <Ionicons name="chevron-forward" size={20} color={themeColors.textLight} />
       )}
@@ -244,34 +246,45 @@ export default function SettingsScreen() {
   );
 
   return (
-    <View style={[styles.container, { 
-      paddingTop: insets.top,
-      paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
-    }]}>
-      <UniversalBackground 
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top,
+          paddingBottom: TAB_BAR_HEIGHT + insets.bottom,
+        },
+      ]}
+    >
+      <UniversalBackground
         variant="gradient"
         mood="peaceful"
         timeOfDay="afternoon"
         enableEffects={false}
       />
-      
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={[styles.headerTitle, { color: themeColors.text }]}>Instellingen</Text>
         </View>
 
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: themeColors.textSecondary }]}>Privacy & Beveiliging</Text>
+          <Text style={[styles.sectionTitle, { color: themeColors.textSecondary }]}>
+            Privacy & Beveiliging
+          </Text>
           {privacySettings.map(renderSettingItem)}
         </View>
 
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: themeColors.textSecondary }]}>App Instellingen</Text>
+          <Text style={[styles.sectionTitle, { color: themeColors.textSecondary }]}>
+            App Instellingen
+          </Text>
           {appSettings.map(renderSettingItem)}
         </View>
 
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: themeColors.textSecondary }]}>Data Beheer</Text>
+          <Text style={[styles.sectionTitle, { color: themeColors.textSecondary }]}>
+            Data Beheer
+          </Text>
           {dataSettings.map(renderSettingItem)}
         </View>
 
@@ -282,7 +295,9 @@ export default function SettingsScreen() {
 
         <View style={styles.footer}>
           <Text style={[styles.version, { color: themeColors.textLight }]}>InnerVoice v1.0.0</Text>
-          <Text style={[styles.footerText, { color: themeColors.textSecondary }]}>Met liefde gemaakt voor jouw innerlijke reis</Text>
+          <Text style={[styles.footerText, { color: themeColors.textSecondary }]}>
+            Met liefde gemaakt voor jouw innerlijke reis
+          </Text>
         </View>
       </ScrollView>
     </View>

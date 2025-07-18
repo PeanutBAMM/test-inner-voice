@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Modal,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { RouteProp } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -28,43 +22,32 @@ export default function UpgradeModal() {
     >
       <View style={styles.container}>
         <View style={styles.modalContent}>
-          <LinearGradient
-            colors={['#E8DFFD', '#C3B5E3']}
-            style={styles.iconContainer}
-          >
+          <LinearGradient colors={['#E8DFFD', '#C3B5E3']} style={styles.iconContainer}>
             <Ionicons name="star" size={48} color="white" />
           </LinearGradient>
 
           <Text style={styles.title}>Tijd voor Premium!</Text>
-          
+
           {reason && <Text style={styles.reason}>{reason}</Text>}
-          
+
           {resetTime && (
-            <Text style={styles.resetTime}>
-              Je kunt weer vragen stellen over {resetTime}
-            </Text>
+            <Text style={styles.resetTime}>Je kunt weer vragen stellen over {resetTime}</Text>
           )}
 
           <View style={styles.benefits}>
-            <BenefitItem icon='infinite' text='Ongelimiteerde vragen' />
-            <BenefitItem icon='mic' text='Coach praat terug' />
-            <BenefitItem icon='cloud-upload' text='Veilige cloud backup' />
-            <BenefitItem icon='time' text='18 maanden geschiedenis' />
+            <BenefitItem icon="infinite" text="Ongelimiteerde vragen" />
+            <BenefitItem icon="mic" text="Coach praat terug" />
+            <BenefitItem icon="cloud-upload" text="Veilige cloud backup" />
+            <BenefitItem icon="time" text="18 maanden geschiedenis" />
           </View>
 
           <TouchableOpacity style={styles.upgradeButton}>
-            <LinearGradient
-              colors={['#8B7BA7', '#C3B5E3']}
-              style={styles.buttonGradient}
-            >
+            <LinearGradient colors={['#8B7BA7', '#C3B5E3']} style={styles.buttonGradient}>
               <Text style={styles.upgradeText}>Upgrade voor €4,99/maand</Text>
             </LinearGradient>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.laterButton}
-            onPress={() => navigation.goBack()}
-          >
+          <TouchableOpacity style={styles.laterButton} onPress={() => navigation.goBack()}>
             <Text style={styles.laterText}>Misschien later</Text>
           </TouchableOpacity>
         </View>
@@ -75,7 +58,7 @@ export default function UpgradeModal() {
 
 const BenefitItem = ({ icon, text }: { icon: string; text: string }) => (
   <View style={styles.benefitItem}>
-    <Ionicons name={icon as any} size={20} color='#8B7BA7' />
+    <Ionicons name={icon as any} size={20} color="#8B7BA7" />
     <Text style={styles.benefitText}>{text}</Text>
   </View>
 );

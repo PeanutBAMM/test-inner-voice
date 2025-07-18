@@ -1,10 +1,5 @@
-import React, { useState } from 'react';
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  Platform,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, TouchableOpacity, View, Platform, Keyboard } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -33,13 +28,28 @@ export default function ChatScreen() {
   const { saveTextSelection } = useLibraryStore();
   const [messageSent, setMessageSent] = useState(false);
   const [isVoiceRecording, setIsVoiceRecording] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   const handleSendMessage = async (text: string) => {
     // Check if user can ask question (free tier limit)
     const permission = await canAskQuestion();
     if (!permission.allowed) {
-        // Show upgrade prompt
-      navigation.navigate('UpgradeModal', { 
+      // Show upgrade prompt
+      navigation.navigate('UpgradeModal', {
         reason: permission.message || '',
         resetTime: permission.resetTime?.toISOString(),
       });
@@ -55,7 +65,7 @@ export default function ChatScreen() {
     };
     addMessage(userMessage);
     recordQuestion();
-    
+
     // Trigger animation
     setMessageSent(true);
     setTimeout(() => setMessageSent(false), 100); // Reset after triggering
@@ -64,14 +74,14 @@ export default function ChatScreen() {
     setTyping(true);
 
     // Get coach response - convert messages to expected format
-    const history = messages.map(msg => ({
+    const history = messages.map((msg) => ({
       role: msg.sender === 'user' ? 'user' : 'assistant',
-      content: msg.text
+      content: msg.text,
     }));
     const response = await getCoachResponse(text, history);
-    
+
     setTyping(false);
-    
+
     // Add coach message
     const coachMessage = {
       id: `${Date.now() + 1}-${Math.random().toString(36).substr(2, 9)}`,
@@ -105,22 +115,27 @@ export default function ChatScreen() {
   };
 
   return (
-    <UniversalBackground 
-      variant="spiritual"
+    <UniversalBackground
+      variant="transparent"
       mood="peaceful"
       timeOfDay="afternoon"
       enableEffects={true}
     >
-      <View style={[styles.container, { 
-        paddingTop: insets.top,
-        paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
-      }]}>
+      <View
+        style={[
+          styles.container,
+          {
+            paddingTop: insets.top,
+            paddingBottom: isKeyboardVisible ? 0 : TAB_BAR_HEIGHT + insets.bottom,
+          },
+        ]}
+      >
         {/* Chat UI on top */}
         <ChatContainer
           messages={messages}
           onSendMessage={handleSendMessage}
           isTyping={isTyping}
-          placeholder='Deel je gedachten...'
+          placeholder="Deel je gedachten..."
           onSaveToLibrary={handleSaveToLibrary}
           useSelectableMessages={true}
           showVoiceButton={true}
@@ -128,28 +143,28 @@ export default function ChatScreen() {
           onStopVoiceRecording={handleStopVoiceRecording}
           isVoiceRecording={isVoiceRecording}
           bottomPadding={0}
-          keyboardVerticalOffset={0}
+          keyboardVerticalOffset={insets.top}
         />
-        
+
         {/* Floating Profile Button */}
         <TouchableOpacity
-          style={[styles.floatingButton, { top: insets.top + 20, right: 20 }]}
+          style={[styles.floatingButton, { 
+            top: insets.top + 20, 
+            right: 20,
+            opacity: 0.8 
+          }]}
           onPress={() => navigation.navigate('MainTabs', { screen: 'Profile' })}
-          activeOpacity={0.7}
+          activeOpacity={0.9}
         >
           <LinearGradient
             colors={
               theme.isDark
                 ? [moodPalette.primary[5] || '#1A2332', moodPalette.primary[4] || '#2A3342']
-                : [moodPalette.primary[0] || '#FFF5F8', moodPalette.primary[1] || '#FFE5EA']
+                : ['rgba(255, 245, 248, 0.5)', 'rgba(255, 229, 234, 0.5)']
             }
             style={styles.gradientBackground}
           >
-            <Ionicons 
-              name="person-circle-outline" 
-              size={22} 
-              color={theme.isDark ? moodPalette.accent[0] : moodPalette.sparkle} 
-            />
+            <Ionicons name="person-circle-outline" size={24} color={moodPalette.accent[1]} />
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -166,16 +181,16 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    zIndex: 10,
+    zIndex: 100,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
+        shadowOpacity: 0.05,
+        shadowRadius: 6,
       },
       android: {
-        elevation: 12,
+        elevation: 8,
       },
     }),
   },

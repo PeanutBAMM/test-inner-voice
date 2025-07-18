@@ -28,14 +28,14 @@ export default function PhoneAuthScreen({ navigation }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [phoneError, setPhoneError] = useState('');
   const [codeError, setCodeError] = useState('');
-  
+
   const { loginWithPhone, verifyPhone } = useAuthStore();
   const codeInputRefs = useRef<TextInput[]>([]);
 
   const formatPhoneNumber = (value: string) => {
     // Remove all non-numeric characters
     const cleaned = value.replace(/\D/g, '');
-    
+
     // Format as Dutch phone number
     let formatted = cleaned;
     if (cleaned.length > 0) {
@@ -50,45 +50,40 @@ export default function PhoneAuthScreen({ navigation }: Props) {
         formatted = '0' + cleaned;
       }
     }
-    
+
     return formatted;
   };
 
   const validatePhone = () => {
     const cleaned = phone.replace(/\D/g, '');
-    
+
     // Check for valid Dutch phone number (10 digits starting with 0, or +31 followed by 9 digits)
     if (phone.startsWith('+31') && cleaned.length === 11) {
       return true;
     } else if (phone.startsWith('0') && cleaned.length === 10) {
       return true;
     }
-    
+
     setPhoneError('Voer een geldig Nederlands telefoonnummer in');
     return false;
   };
 
   const handleSendCode = async () => {
     setPhoneError('');
-    
+
     if (!validatePhone()) return;
-    
+
     setIsLoading(true);
     try {
       const result = await loginWithPhone(phone);
       setSessionId(result.sessionId);
       setIsVerifying(true);
-      
-      Alert.alert(
-        'Code Verzonden',
-        'We hebben een verificatiecode naar je telefoon gestuurd.',
-        [{ text: 'OK', onPress: () => codeInputRefs.current[0]?.focus() }]
-      );
+
+      Alert.alert('Code Verzonden', 'We hebben een verificatiecode naar je telefoon gestuurd.', [
+        { text: 'OK', onPress: () => codeInputRefs.current[0]?.focus() },
+      ]);
     } catch (error: any) {
-      Alert.alert(
-        'Fout',
-        error.message || 'Er ging iets mis bij het verzenden van de code.'
-      );
+      Alert.alert('Fout', error.message || 'Er ging iets mis bij het verzenden van de code.');
     } finally {
       setIsLoading(false);
     }
@@ -96,12 +91,12 @@ export default function PhoneAuthScreen({ navigation }: Props) {
 
   const handleVerifyCode = async () => {
     setCodeError('');
-    
+
     if (verificationCode.length !== 6) {
       setCodeError('Voer een 6-cijferige code in');
       return;
     }
-    
+
     setIsLoading(true);
     try {
       await verifyPhone(phone, verificationCode, sessionId);
@@ -116,19 +111,19 @@ export default function PhoneAuthScreen({ navigation }: Props) {
   const handleCodeChange = (text: string, index: number) => {
     // Only allow digits
     const digit = text.replace(/\D/g, '').slice(-1);
-    
+
     // Update verification code
     const newCode = verificationCode.split('');
     newCode[index] = digit;
     setVerificationCode(newCode.join(''));
-    
+
     // Auto-focus next input
     if (digit && index < 5) {
       codeInputRefs.current[index + 1]?.focus();
     }
-    
+
     // Auto-submit when all digits entered
-    if (digit && index === 5 && newCode.filter(d => d).length === 6) {
+    if (digit && index === 5 && newCode.filter((d) => d).length === 6) {
       handleVerifyCode();
     }
   };
@@ -151,10 +146,7 @@ export default function PhoneAuthScreen({ navigation }: Props) {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Text style={styles.backButtonText}>← Terug</Text>
           </TouchableOpacity>
 
@@ -163,10 +155,9 @@ export default function PhoneAuthScreen({ navigation }: Props) {
               {isVerifying ? 'Verifieer je nummer' : 'Login met telefoon'}
             </Text>
             <Text style={styles.subtitle}>
-              {isVerifying 
+              {isVerifying
                 ? `We hebben een code gestuurd naar ${phone}`
-                : 'Voer je telefoonnummer in om door te gaan'
-              }
+                : 'Voer je telefoonnummer in om door te gaan'}
             </Text>
           </View>
 
@@ -214,10 +205,8 @@ export default function PhoneAuthScreen({ navigation }: Props) {
                   />
                 ))}
               </View>
-              
-              {codeError ? (
-                <Text style={styles.errorText}>{codeError}</Text>
-              ) : null}
+
+              {codeError ? <Text style={styles.errorText}>{codeError}</Text> : null}
 
               <PrimaryButton
                 title="Verifieer"
@@ -232,17 +221,13 @@ export default function PhoneAuthScreen({ navigation }: Props) {
                 onPress={handleSendCode}
                 disabled={isLoading}
               >
-                <Text style={styles.resendButtonText}>
-                  Code niet ontvangen? Opnieuw versturen
-                </Text>
+                <Text style={styles.resendButtonText}>Code niet ontvangen? Opnieuw versturen</Text>
               </TouchableOpacity>
             </View>
           )}
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              {__DEV__ ? 'Dev mode: gebruik code 123456' : ''}
-            </Text>
+            <Text style={styles.footerText}>{__DEV__ ? 'Dev mode: gebruik code 123456' : ''}</Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

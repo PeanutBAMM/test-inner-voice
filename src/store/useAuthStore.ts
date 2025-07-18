@@ -10,7 +10,7 @@ interface AuthState {
   user: User | null;
   session: AuthSession | null;
   biometricEnabled: boolean;
-  
+
   // Actions
   login: (email: string, password: string) => Promise<void>;
   loginWithPhone: (phone: string) => Promise<{ sessionId: string }>;
@@ -34,12 +34,12 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       session: null,
       biometricEnabled: false,
-      
+
       login: async (email: string, password: string) => {
         try {
           set({ isLoading: true });
           const session = await authService.signIn(email, password);
-          
+
           set({
             isAuthenticated: true,
             user: session.user,
@@ -51,7 +51,7 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
-      
+
       loginWithPhone: async (phone: string) => {
         try {
           set({ isLoading: true });
@@ -63,12 +63,12 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
-      
+
       verifyPhone: async (phone: string, code: string, sessionId: string) => {
         try {
           set({ isLoading: true });
           const session = await authService.verifyPhone(phone, code, sessionId);
-          
+
           set({
             isAuthenticated: true,
             user: session.user,
@@ -80,12 +80,12 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
-      
+
       loginWithGoogle: async () => {
         try {
           set({ isLoading: true });
           const session = await authService.signInWithGoogle();
-          
+
           set({
             isAuthenticated: true,
             user: session.user,
@@ -97,12 +97,12 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
-      
+
       loginWithApple: async () => {
         try {
           set({ isLoading: true });
           const session = await authService.signInWithApple();
-          
+
           set({
             isAuthenticated: true,
             user: session.user,
@@ -114,12 +114,12 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
-      
+
       loginWithBiometric: async () => {
         try {
           set({ isLoading: true });
           const session = await authService.signInWithBiometric();
-          
+
           set({
             isAuthenticated: true,
             user: session.user,
@@ -131,12 +131,12 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
-      
+
       signup: async (email: string, password: string, name: string) => {
         try {
           set({ isLoading: true });
           const session = await authService.signUp(email, password, { name });
-          
+
           set({
             isAuthenticated: true,
             user: session.user,
@@ -148,7 +148,7 @@ export const useAuthStore = create<AuthState>()(
           throw error;
         }
       },
-      
+
       logout: async () => {
         try {
           await authService.signOut();
@@ -167,25 +167,25 @@ export const useAuthStore = create<AuthState>()(
           });
         }
       },
-      
+
       updateUser: async (updates: Partial<User>) => {
         const updatedUser = await authService.updateUser(updates);
         set({ user: updatedUser });
-        
+
         // Update session with new user data
         const currentSession = get().session;
         if (currentSession) {
           set({
-            session: { ...currentSession, user: updatedUser }
+            session: { ...currentSession, user: updatedUser },
           });
         }
       },
-      
+
       checkAuth: async () => {
         try {
           set({ isLoading: true });
           const session = await authService.getCurrentSession();
-          
+
           if (session) {
             const biometricEnabled = await authService.isBiometricEnabled();
             set({
@@ -202,12 +202,12 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: false, isAuthenticated: false });
         }
       },
-      
+
       enableBiometric: async () => {
         await authService.enableBiometric();
         set({ biometricEnabled: true });
       },
-      
+
       resetPassword: async (email: string) => {
         await authService.resetPassword(email);
       },

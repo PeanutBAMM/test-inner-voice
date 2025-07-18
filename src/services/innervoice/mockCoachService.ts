@@ -26,36 +26,48 @@ export const MOCK_COACH_RESPONSES = {
 // Mock mood detection
 export const detectMood = (message: string): 'positive' | 'negative' | 'neutral' | 'question' => {
   const lowerMessage = message.toLowerCase();
-  
+
   // Positive indicators
-  if (lowerMessage.includes('blij') || lowerMessage.includes('fijn') || 
-      lowerMessage.includes('dankbaar') || lowerMessage.includes('😊')) {
+  if (
+    lowerMessage.includes('blij') ||
+    lowerMessage.includes('fijn') ||
+    lowerMessage.includes('dankbaar') ||
+    lowerMessage.includes('😊')
+  ) {
     return 'positive';
   }
-  
+
   // Negative indicators
-  if (lowerMessage.includes('verdrietig') || lowerMessage.includes('boos') || 
-      lowerMessage.includes('moeilijk') || lowerMessage.includes('😢')) {
+  if (
+    lowerMessage.includes('verdrietig') ||
+    lowerMessage.includes('boos') ||
+    lowerMessage.includes('moeilijk') ||
+    lowerMessage.includes('😢')
+  ) {
     return 'negative';
   }
-  
+
   // Question indicators
-  if (lowerMessage.includes('?') || lowerMessage.includes('hoe') || 
-      lowerMessage.includes('wat') || lowerMessage.includes('waarom')) {
+  if (
+    lowerMessage.includes('?') ||
+    lowerMessage.includes('hoe') ||
+    lowerMessage.includes('wat') ||
+    lowerMessage.includes('waarom')
+  ) {
     return 'question';
   }
-  
+
   return 'neutral';
 };
 
 // Get appropriate response based on context
 export const getMockCoachResponse = (
-  message: string, 
+  message: string,
   coachType: 'gentle' | 'wise' | 'earthly' = 'gentle'
 ): string => {
   const mood = detectMood(message);
   const responses = MOCK_COACH_RESPONSES[coachType];
-  
+
   // Voor demo: selecteer response based on mood en een beetje randomness
   let index = 0;
   switch (mood) {
@@ -71,7 +83,7 @@ export const getMockCoachResponse = (
     default:
       index = Math.floor(Math.random() * responses.length);
   }
-  
+
   return responses[index] || responses[0];
 };
 

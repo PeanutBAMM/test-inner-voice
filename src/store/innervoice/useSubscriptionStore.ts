@@ -24,7 +24,7 @@ interface SubscriptionStore {
   tier: Tier;
   usage: Usage;
   isPremium: boolean;
-  
+
   checkDailyLimit: () => void;
   canAskQuestion: () => Promise<{ allowed: boolean; message?: string; resetTime?: Date }>;
   recordQuestion: () => Promise<void>;
@@ -75,7 +75,7 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
       checkDailyLimit: () => {
         const today = new Date().toDateString();
         const { usage } = get();
-        
+
         if (usage.lastResetDate !== today) {
           set({
             usage: {
@@ -89,34 +89,34 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
 
       canAskQuestion: async () => {
         const { tier, usage, checkDailyLimit } = get();
-        
+
         // Reset counter if new day
         checkDailyLimit();
-        
+
         // Premium users have unlimited questions
         if (tier.type === 'premium') {
           return { allowed: true };
         }
-        
+
         // Check free tier limit
         if (usage.questionsToday >= tier.dailyQuestionLimit) {
           const tomorrow = new Date();
           tomorrow.setDate(tomorrow.getDate() + 1);
           tomorrow.setHours(0, 0, 0, 0);
-          
+
           return {
             allowed: false,
             message: `Je hebt je dagelijkse limiet van ${tier.dailyQuestionLimit} vragen bereikt. Upgrade naar Premium voor ongelimiteerde toegang!`,
             resetTime: tomorrow,
           };
         }
-        
+
         return { allowed: true };
       },
 
       recordQuestion: async () => {
         const { usage } = get();
-        
+
         set({
           usage: {
             ...usage,
@@ -128,10 +128,10 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
       upgradeToPremium: async () => {
         // Here you would integrate with your payment provider
         // For now, just switching to premium tier
-        
+
         // In real app: process payment
         // const purchase = await processPayment('premium_monthly');
-        
+
         set({
           tier: TIERS.premium,
           isPremium: true,
@@ -141,21 +141,20 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
       restorePurchases: async () => {
         // Here you would check with your payment provider
         // For now, checking a mock flag
-        
+
         try {
           // In real app: check purchase history
           // const purchases = await getPurchaseHistory();
           // const hasPremium = purchases.some(p => p.productId === 'premium_monthly');
-          
+
           const hasPremium = false; // Mock value
-          
+
           if (hasPremium) {
             set({
               tier: TIERS.premium,
               isPremium: true,
             });
           }
-          
         } catch (error) {
           // Error restoring purchases
         }
@@ -166,11 +165,11 @@ export const useSubscriptionStore = create<SubscriptionStore>()(
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         tomorrow.setHours(0, 0, 0, 0);
-        
+
         const diff = tomorrow.getTime() - now.getTime();
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        
+
         if (hours > 0) {
           return `${hours} uur en ${minutes} minuten`;
         }

@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { RouteProp } from '@react-navigation/native';
@@ -24,22 +18,24 @@ export default function ConversationDetailScreen() {
   const { conversationId, date } = route.params || {};
 
   return (
-    <View style={[styles.container, { 
-      paddingTop: insets.top,
-      paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
-    }]}>
-      <UniversalBackground 
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top,
+          paddingBottom: TAB_BAR_HEIGHT + insets.bottom,
+        },
+      ]}
+    >
+      <UniversalBackground
         variant="gradient"
         mood="peaceful"
         timeOfDay="afternoon"
         enableEffects={false}
       />
-      
+
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#8B7BA7" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Gesprek Details</Text>
@@ -55,7 +51,8 @@ export default function ConversationDetailScreen() {
         <View style={styles.messageContainer}>
           <Text style={styles.messageTitle}>Gesprek</Text>
           <Text style={styles.messageText}>
-            Dit is een placeholder voor het gesprek. In de volledige versie worden hier de berichten van het gesprek weergegeven.
+            Dit is een placeholder voor het gesprek. In de volledige versie worden hier de berichten
+            van het gesprek weergegeven.
           </Text>
         </View>
 

@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  TouchableWithoutFeedback,
-  ViewStyle,
-} from 'react-native';
+import { StyleSheet, TouchableWithoutFeedback, ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -39,17 +35,13 @@ export function AnimatedCard({ children, style, onPress, delay = 0 }: AnimatedCa
 
   const animatedStyle = useAnimatedStyle(() => {
     const pressedScale = interpolate(pressed.value, [0, 1], [1, 0.95]);
-    
+
     return {
       opacity: opacity.value,
       transform: [
         { scale: scale.value * pressedScale },
         {
-          rotateZ: `${interpolate(
-            scale.value,
-            [0, 0.5, 1],
-            [10, -5, 0]
-          )}deg`,
+          rotateZ: `${interpolate(scale.value, [0, 0.5, 1], [10, -5, 0])}deg`,
         },
       ],
     };
@@ -76,14 +68,7 @@ export function AnimatedCard({ children, style, onPress, delay = 0 }: AnimatedCa
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
     >
-      <Animated.View
-        style={[
-          styles.container,
-          style,
-          animatedStyle,
-          shadowStyle,
-        ]}
-      >
+      <Animated.View style={[styles.container, style, animatedStyle, shadowStyle]}>
         {children}
       </Animated.View>
     </TouchableWithoutFeedback>

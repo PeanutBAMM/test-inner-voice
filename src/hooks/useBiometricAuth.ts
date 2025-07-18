@@ -15,8 +15,12 @@ export function useBiometricAuth(): BiometricAuthResult {
   const [isAvailable, setIsAvailable] = useState(false);
   const [biometricType, setBiometricType] = useState<BiometricAuthResult['biometricType']>('none');
   const [isEnrolled, setIsEnrolled] = useState(false);
-  
-  const { loginWithBiometric, enableBiometric: enableBiometricInStore, biometricEnabled } = useAuthStore();
+
+  const {
+    loginWithBiometric,
+    enableBiometric: enableBiometricInStore,
+    biometricEnabled,
+  } = useAuthStore();
 
   useEffect(() => {
     checkBiometricAvailability();
@@ -35,7 +39,7 @@ export function useBiometricAuth(): BiometricAuthResult {
 
         // Get supported biometric types
         const supportedTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
-        
+
         if (supportedTypes.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
           setBiometricType('facial');
         } else if (supportedTypes.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
@@ -96,16 +100,16 @@ export function useBiometricAuth(): BiometricAuthResult {
         'Stel eerst biometrische beveiliging in op je apparaat om deze functie te gebruiken.',
         [
           { text: 'Annuleren', style: 'cancel' },
-          { 
-            text: 'Instellingen', 
+          {
+            text: 'Instellingen',
             onPress: () => {
               // Note: Can't directly open settings in Expo Go
               Alert.alert(
                 'Open Instellingen',
                 'Ga naar je apparaatinstellingen en stel Face ID, Touch ID of vingerafdruk in.'
               );
-            }
-          }
+            },
+          },
         ]
       );
       return false;
@@ -120,10 +124,7 @@ export function useBiometricAuth(): BiometricAuthResult {
 
       if (result.success) {
         await enableBiometricInStore();
-        Alert.alert(
-          'Succes',
-          'Biometrische authenticatie is ingeschakeld voor je account.'
-        );
+        Alert.alert('Succes', 'Biometrische authenticatie is ingeschakeld voor je account.');
         return true;
       }
       return false;

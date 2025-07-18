@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  ViewStyle,
-  Dimensions,
-} from 'react-native';
+import { View, StyleSheet, ViewStyle, Dimensions } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -61,14 +56,7 @@ const Meteor = ({ delay, duration, colors }: MeteorProps) => {
       )
     );
 
-    opacity.value = withDelay(
-      delay,
-      withRepeat(
-        withTiming(1, { duration: 200 }),
-        -1,
-        false
-      )
-    );
+    opacity.value = withDelay(delay, withRepeat(withTiming(1, { duration: 200 }), -1, false));
   }, [delay, duration, opacity, translateX, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -118,10 +106,8 @@ export function MeteorCard({
           />
         ))}
       </View>
-      
-      <View style={styles.content}>
-        {children}
-      </View>
+
+      <View style={styles.content}>{children}</View>
     </View>
   );
 }

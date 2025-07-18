@@ -38,7 +38,7 @@ export const VoiceWaveform: React.FC<VoiceWaveformProps> = ({
 
       Animated.stagger(50, animations).start();
     } else {
-      animatedValues.forEach(value => {
+      animatedValues.forEach((value) => {
         value.setValue(0.1);
       });
     }

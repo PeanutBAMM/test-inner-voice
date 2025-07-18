@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ViewStyle,
-} from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -25,11 +20,7 @@ export function ShimmerButton({ title, onPress, style, disabled }: ShimmerButton
   const shimmerTranslateX = useSharedValue(-200);
 
   React.useEffect(() => {
-    shimmerTranslateX.value = withRepeat(
-      withTiming(200, { duration: 1500 }),
-      -1,
-      false
-    );
+    shimmerTranslateX.value = withRepeat(withTiming(200, { duration: 1500 }), -1, false);
   }, [shimmerTranslateX]);
 
   const shimmerStyle = useAnimatedStyle(() => {
@@ -52,7 +43,7 @@ export function ShimmerButton({ title, onPress, style, disabled }: ShimmerButton
         style={styles.gradient}
       >
         <Text style={styles.title}>{title}</Text>
-        
+
         <Animated.View style={[styles.shimmer, shimmerStyle]}>
           <LinearGradient
             colors={[

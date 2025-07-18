@@ -1,9 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  Text,
-  TextProps,
-  StyleSheet,
-} from 'react-native';
+import { Text, TextProps, StyleSheet } from 'react-native';
 import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
@@ -44,7 +40,7 @@ export function AnimatedText({
         case 'fade':
           opacity.value = withTiming(1, { duration });
           break;
-        
+
         case 'slide':
           opacity.value = withTiming(1, { duration: duration / 2 });
           translateY.value = withSpring(0, {
@@ -52,21 +48,21 @@ export function AnimatedText({
             stiffness: 100,
           });
           break;
-        
+
         case 'bounce':
           scale.value = withSequence(
             withSpring(1.2, { damping: 5 }),
             withSpring(1, { damping: 15 })
           );
           break;
-        
+
         case 'typewriter':
           textLength.value = withTiming(children.length, {
             duration: duration,
             easing: Easing.linear,
           });
           break;
-        
+
         case 'gradient':
           opacity.value = withRepeat(
             withSequence(
@@ -100,10 +96,7 @@ export function AnimatedText({
   const animatedStyle = useAnimatedStyle(() => {
     return {
       opacity: opacity.value,
-      transform: [
-        { translateY: translateY.value },
-        { scale: scale.value },
-      ],
+      transform: [{ translateY: translateY.value }, { scale: scale.value }],
     };
   });
 
@@ -118,10 +111,7 @@ export function AnimatedText({
   }
 
   return (
-    <AnimatedTextComponent
-      style={[styles.text, style, animatedStyle]}
-      {...props}
-    >
+    <AnimatedTextComponent style={[styles.text, style, animatedStyle]} {...props}>
       {children}
     </AnimatedTextComponent>
   );

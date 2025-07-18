@@ -23,10 +23,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
         {themes.map((theme) => (
           <TouchableOpacity
             key={theme.value}
-            style={[
-              styles.option,
-              selectedTheme === theme.value && styles.selected,
-            ]}
+            style={[styles.option, selectedTheme === theme.value && styles.selected]}
             onPress={() => onThemeChange?.(theme.value)}
           >
             <View

@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TextInputProps,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, TextInput, StyleSheet, TextInputProps, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '@/constants/theme';
 
@@ -30,23 +23,18 @@ export function FormInput({
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      
+
       <View style={[styles.inputContainer, error && styles.inputError]}>
         {icon && (
-          <Ionicons
-            name={icon}
-            size={20}
-            color={theme.colors.textSecondary}
-            style={styles.icon}
-          />
+          <Ionicons name={icon} size={20} color={theme.colors.textSecondary} style={styles.icon} />
         )}
-        
+
         <TextInput
           style={[styles.input, icon && styles.inputWithIcon]}
           placeholderTextColor={theme.colors.textLight}
           {...props}
         />
-        
+
         {showSecureToggle && (
           <TouchableOpacity onPress={onToggleSecure} style={styles.secureToggle}>
             <Ionicons
@@ -57,7 +45,7 @@ export function FormInput({
           </TouchableOpacity>
         )}
       </View>
-      
+
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
