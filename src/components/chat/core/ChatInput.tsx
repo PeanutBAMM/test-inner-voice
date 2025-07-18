@@ -153,8 +153,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       <LinearGradient
         colors={
           theme.isDark 
-            ? ['rgba(255, 255, 255, 0.12)', 'rgba(255, 255, 255, 0.08)']
-            : ['rgba(255, 255, 255, 0.95)', 'rgba(255, 255, 255, 0.85)']
+            ? ['rgba(30, 30, 30, 0.95)', 'rgba(20, 20, 20, 0.95)']
+            : ['rgba(255, 251, 247, 0.98)', 'rgba(255, 248, 243, 0.98)']
         }
         style={[
           styles.gradientContainer,
@@ -178,8 +178,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                     backgroundColor: isVoiceRecording 
                       ? moodPalette.accent[0] 
                       : theme.isDark 
-                        ? moodPalette.glow + '30' 
-                        : moodPalette.accent[0] + '20',
+                        ? 'rgba(255, 255, 255, 0.1)' 
+                        : 'rgba(139, 123, 167, 0.1)',
                   },
                 ]}
               >
@@ -214,15 +214,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               { 
                 height: inputHeight,
                 color: theme.colors.text,
-                borderRadius: inputHeight / 2,
+                borderRadius: 22,
                 backgroundColor: theme.isDark 
-                  ? 'rgba(0, 0, 0, 0.15)' 
-                  : moodPalette.primary[0] + '10',
-                borderWidth: 1,
-                borderColor: theme.isDark 
-                  ? 'rgba(255, 255, 255, 0.1)'
-                  : moodPalette.accent[0] + '15',
-                textAlign: text ? 'left' : 'center',
+                  ? 'rgba(0, 0, 0, 0.3)' 
+                  : 'rgba(255, 255, 255, 0.95)',
+                textAlign: 'left',
               },
             ]}
             value={text}
@@ -250,8 +246,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 backgroundColor: text.trim() 
                   ? moodPalette.accent[0] 
                   : theme.isDark 
-                    ? moodPalette.glow + '30' 
-                    : moodPalette.accent[0] + '20',
+                    ? 'rgba(255, 255, 255, 0.1)' 
+                    : 'rgba(139, 123, 167, 0.1)',
                 shadowColor: moodPalette.glow,
               },
               !text.trim() && styles.sendButtonDisabled
@@ -261,7 +257,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           >
             <Ionicons 
               name="send" 
-              size={18} 
+              size={20} 
               color={
                 text.trim() 
                   ? '#FFFFFF'
@@ -292,33 +288,32 @@ const styles = StyleSheet.create({
   },
   gradientContainer: {
     borderRadius: 28,
-    borderWidth: 1,
-    borderColor: 'rgba(195, 181, 227, 0.2)', // This will be overridden dynamically
   },
   inputWrapper: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingVertical: Platform.OS === 'ios' ? 12 : 10,
-    paddingHorizontal: 16,
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
     gap: 12,
   },
   input: {
     flex: 1,
     fontSize: 16,
     maxHeight: 120,
-    minHeight: 40,
+    minHeight: 44,
     paddingHorizontal: 16,
-    paddingVertical: Platform.OS === 'ios' ? 8 : 6,
-    textAlignVertical: 'top',
+    paddingVertical: 12,
+    lineHeight: 20,
+    textAlignVertical: 'center',
   },
   voiceButton: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   voiceButtonContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -332,12 +327,12 @@ const styles = StyleSheet.create({
     left: -10,
   },
   sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#8B7BA7', // This will be overridden dynamically
+    shadowColor: '#8B7BA7',
     shadowOffset: {
       width: 0,
       height: 1,

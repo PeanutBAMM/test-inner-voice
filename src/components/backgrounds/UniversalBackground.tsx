@@ -99,14 +99,14 @@ export const UniversalBackground: React.FC<UniversalBackgroundProps> = ({
                   cy={SCREEN_HEIGHT * 0.2} 
                   r={120} 
                   fill={adjustColor(moodPalette.glow)} 
-                  opacity={0.1} 
+                  opacity={theme.isDark ? 0.1 : 0.2} 
                 />
                 <Circle 
                   cx={SCREEN_WIDTH * 0.3} 
                   cy={SCREEN_HEIGHT * 0.7} 
                   r={100} 
                   fill={adjustColor(moodPalette.glow)} 
-                  opacity={0.08} 
+                  opacity={theme.isDark ? 0.08 : 0.15} 
                 />
               </Svg>
             </View>
@@ -124,11 +124,11 @@ export const UniversalBackground: React.FC<UniversalBackgroundProps> = ({
               <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT} style={StyleSheet.absoluteFillObject}>
                 <Defs>
                   <Pattern id="grain" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
-                    <Circle cx="1" cy="1" r="0.5" fill={theme.isDark ? 'rgba(0,191,255,0.05)' : 'rgba(255,215,0,0.05)'} />
-                    <Circle cx="3" cy="0" r="0.3" fill="rgba(255,255,255,0.08)" />
-                    <Circle cx="0" cy="3" r="0.4" fill="rgba(255,255,255,0.06)" />
-                    <Circle cx="2" cy="2" r="0.3" fill="rgba(255,255,255,0.1)" />
-                    <Circle cx="3" cy="3" r="0.5" fill="rgba(255,255,255,0.05)" />
+                    <Circle cx="1" cy="1" r={theme.isDark ? "0.5" : "0.7"} fill={theme.isDark ? 'rgba(0,191,255,0.05)' : 'rgba(255,215,0,0.15)'} />
+                    <Circle cx="3" cy="0" r="0.3" fill={theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,215,0,0.12)'} />
+                    <Circle cx="0" cy="3" r="0.4" fill={theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,215,0,0.10)'} />
+                    <Circle cx="2" cy="2" r="0.3" fill={theme.isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,215,0,0.13)'} />
+                    <Circle cx="3" cy="3" r="0.5" fill={theme.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,215,0,0.11)'} />
                   </Pattern>
                 </Defs>
                 <Rect width="100%" height="100%" fill="url(#grain)" opacity={0.3} />

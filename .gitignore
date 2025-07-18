@@ -95,3 +95,7 @@ ios/Pods/
 # Security: Environment config with API keys
 src/config/environment.ts.backup
 src/config/environment.ts
+
+# Test scripts with API keys
+test-*-pricing.js
+test-pricing-*.js

@@ -42,12 +42,12 @@ export const MOOD_PALETTES: MoodPalettes = {
     orb2: '#FFE4B5', // Moccasin
   },
   grounded: {
-    primary: ['#F5E6E6', '#F0DADA', '#EBCECE', '#E6C2C2', '#E1B6B6', '#DCAAAA'], // Aardse roze
-    accent: ['#CD5C5C', '#BC8F8F', '#F4A460'], // Indian red naar sandy brown
-    glow: '#BC8F8F', // Rosy brown gloed
+    primary: ['#FFF9F0', '#FFF5E6', '#FFEDD9', '#FFE5CC', '#FFDDBF', '#FFD5B2'], // Zacht geel-roze spectrum
+    accent: ['#FFB888', '#FFA574', '#FF9B6B'], // Zachte sienna naar warme abrikoos
+    glow: '#FFCCA5', // Perzik gloed
     sparkle: '#FFD700', // Gouden sparkle ✨
-    orb1: '#CD5C5C', // Indian red
-    orb2: '#FFE4E1', // Misty rose
+    orb1: '#FFB888', // Zachte sienna
+    orb2: '#FFF0E5', // Licht perzik
   },
   neutral: {
     primary: ['#FFF0F5', '#F5E6EA', '#EBDCE0', '#E1D2D6', '#D7C8CC', '#CDBEC2'], // Lavender blush naar grijs-roze

@@ -50,8 +50,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
           styles.bubble,
           isUser ? styles.userBubble : styles.assistantBubble,
           {
-            shadowColor: theme.isDark ? 'rgba(255, 255, 255, 0.1)' : '#000',
-            shadowOpacity: theme.isDark ? 0.3 : 0.15,
+            shadowColor: theme.isDark ? 'rgba(255, 255, 255, 0.05)' : '#8B7BA7',
+            shadowOpacity: theme.isDark ? 0.1 : 0.08,
           }
         ]}
       >
@@ -82,24 +82,22 @@ const styles = StyleSheet.create({
   userBubble: {
     backgroundColor: '#E8DFFD',
     borderBottomRightRadius: 4,
-    // Schaduw aan rechterkant voor user messages
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
+    // Moderne zachte schaduw
+    shadowColor: '#8B7BA7',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 1,
   },
   assistantBubble: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: '#FFFFFF',
     borderBottomLeftRadius: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(232, 223, 253, 0.3)',
-    // Schaduw aan linkerkant voor assistant messages
-    shadowColor: '#000',
-    shadowOffset: { width: -2, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
+    // Zachte schaduw zonder border
+    shadowColor: '#8B7BA7',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 2,
+    elevation: 0,
   },
   text: {
     fontSize: 16,

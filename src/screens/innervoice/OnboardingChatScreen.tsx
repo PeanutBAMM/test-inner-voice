@@ -10,7 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { ChatContainer, GlassOverlay } from '../../components/chat';
+import { ChatContainer } from '../../components/chat';
 import { UniversalBackground } from '../../components/backgrounds/UniversalBackground';
 import useUserStore from '../../store/innervoice/useUserStore';
 import useConversationStore from '../../store/innervoice/useConversationStore';
@@ -306,36 +306,16 @@ export default function OnboardingChatScreen() {
 
   const currentQ = ONBOARDING_QUESTIONS[currentQuestion];
 
-  return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Optimized background for onboarding performance */}
-      <UniversalBackground 
-        variant="spiritual"
-        mood="peaceful"
-        timeOfDay="morning" // Onboarding is like a new dawn
-        enableEffects={false} // Disabled for better performance
-      />
-      
-      <GlassOverlay intensity={8}>
-        {/* Skip button */}
-        <TouchableOpacity 
-          onPress={skipOnboarding} 
-          style={[styles.skipButton, { top: 16 }]}
-        >
-          <Text style={styles.skipText}>Overslaan</Text>
-        </TouchableOpacity>
-        
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
-            <View 
-              style={[
-                styles.progressFill, 
-                { width: `${((currentQuestion + 1) / ONBOARDING_QUESTIONS.length) * 100}%` }
-              ]} 
-            />
-          </View>
-        </View>
+  // Components verwijderd - nu direct in render
 
+  return (
+    <UniversalBackground 
+      variant="spiritual"
+      mood="peaceful"
+      timeOfDay="morning" // Onboarding is like a new dawn
+      enableEffects={false} // Disabled for better performance
+    >
+      <View style={[styles.container, { paddingTop: insets.top }]}>
         <ChatContainer
           messages={messages}
           onSendMessage={handleTextSubmit}
@@ -374,10 +354,30 @@ export default function OnboardingChatScreen() {
           }
           placeholder={currentQ.optional ? 'Dit mag je overslaan...' : 'Type je antwoord...'}
           bottomPadding={0}
-          keyboardVerticalOffset={insets.top + 60}
+          keyboardVerticalOffset={60}
         />
-      </GlassOverlay>
-    </View>
+        
+        {/* Progress Bar */}
+        <View style={[styles.progressContainer, { top: insets.top + 16 }]}>
+          <View style={styles.progressBar}>
+            <View 
+              style={[
+                styles.progressFill, 
+                { width: `${((currentQuestion + 1) / ONBOARDING_QUESTIONS.length) * 100}%` }
+              ]} 
+            />
+          </View>
+        </View>
+        
+        {/* Skip Button */}
+        <TouchableOpacity 
+          onPress={skipOnboarding} 
+          style={[styles.skipButton, { top: insets.top + 16 }]}
+        >
+          <Text style={styles.skipText}>Overslaan</Text>
+        </TouchableOpacity>
+      </View>
+    </UniversalBackground>
   );
 }
 
@@ -545,9 +545,10 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   progressContainer: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 8,
+    position: 'absolute',
+    left: 24,
+    right: 80,
+    paddingVertical: 8,
   },
   progressBar: {
     height: 3,
@@ -632,9 +633,9 @@ const styles = StyleSheet.create({
   skipButton: {
     position: 'absolute',
     right: 20,
-    zIndex: 10,
     paddingHorizontal: 14,
     paddingVertical: 6,
+    zIndex: 10,
   },
   skipText: {
     color: '#8B7BA7',

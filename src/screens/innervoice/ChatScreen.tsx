@@ -10,7 +10,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient';
 import { RootStackScreenProps } from '../../types/navigation';
 import { Ionicons } from '@expo/vector-icons';
-import { ChatContainer, GlassOverlay } from '../../components/chat';
+import { ChatContainer } from '../../components/chat';
 import { UniversalBackground } from '../../components/backgrounds/UniversalBackground';
 import useCoachStore from '../../store/innervoice/useCoachStore';
 import useConversationStore from '../../store/innervoice/useConversationStore';
@@ -105,20 +105,17 @@ export default function ChatScreen() {
   };
 
   return (
-    <View style={[styles.container, { 
-      paddingTop: insets.top,
-      paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
-    }]}>
-      {/* Spiritual gradient background */}
-      <UniversalBackground 
-        variant="spiritual"
-        mood="peaceful"
-        timeOfDay="afternoon"
-        enableEffects={true}
-      />
-      
-      {/* Chat UI on top */}
-      <GlassOverlay intensity={8}>
+    <UniversalBackground 
+      variant="spiritual"
+      mood="peaceful"
+      timeOfDay="afternoon"
+      enableEffects={true}
+    >
+      <View style={[styles.container, { 
+        paddingTop: insets.top,
+        paddingBottom: TAB_BAR_HEIGHT + insets.bottom 
+      }]}>
+        {/* Chat UI on top */}
         <ChatContainer
           messages={messages}
           onSendMessage={handleSendMessage}
@@ -131,79 +128,32 @@ export default function ChatScreen() {
           onStopVoiceRecording={handleStopVoiceRecording}
           isVoiceRecording={isVoiceRecording}
           bottomPadding={0}
-          keyboardVerticalOffset={insets.top}
+          keyboardVerticalOffset={0}
         />
-      </GlassOverlay>
-      
-      {/* Glass Morphism Floating Button */}
-      <View style={[styles.floatingButton, styles.profileButton, { top: 20 }]}>
-          {/* Background layers for glass effect */}
-          <View style={StyleSheet.absoluteFillObject}>
-            {/* Base layer */}
-            <View
-              style={[
-                StyleSheet.absoluteFillObject,
-                {
-                  backgroundColor: theme.isDark
-                    ? `rgba(${parseInt(moodPalette.primary[5]?.slice(1, 3) || '1A', 16)}, ${parseInt(moodPalette.primary[5]?.slice(3, 5) || '23', 16)}, ${parseInt(moodPalette.primary[5]?.slice(5, 7) || '32', 16)}, 0.85)`
-                    : `rgba(${parseInt(moodPalette.primary[0]?.slice(1, 3) || 'FF', 16)}, ${parseInt(moodPalette.primary[0]?.slice(3, 5) || 'F5', 16)}, ${parseInt(moodPalette.primary[0]?.slice(5, 7) || 'F8', 16)}, 0.85)`,
-                  borderRadius: 16,
-                },
-              ]}
-            />
-            
-            {/* Gradient overlay 1 */}
-            <LinearGradient
-              colors={
-                theme.isDark
-                  ? [`rgba(${parseInt(moodPalette.accent[0]?.slice(1, 3) || '2E', 16)}, ${parseInt(moodPalette.accent[0]?.slice(3, 5) || '59', 16)}, ${parseInt(moodPalette.accent[0]?.slice(5, 7) || '84', 16)}, 0.10)`, `rgba(${parseInt(moodPalette.accent[0]?.slice(1, 3) || '2E', 16)}, ${parseInt(moodPalette.accent[0]?.slice(3, 5) || '59', 16)}, ${parseInt(moodPalette.accent[0]?.slice(5, 7) || '84', 16)}, 0.05)`]
-                  : [`rgba(${parseInt(moodPalette.accent[0]?.slice(1, 3) || 'FF', 16)}, ${parseInt(moodPalette.accent[0]?.slice(3, 5) || 'B6', 16)}, ${parseInt(moodPalette.accent[0]?.slice(5, 7) || 'C1', 16)}, 0.10)`, `rgba(${parseInt(moodPalette.accent[1]?.slice(1, 3) || 'FF', 16)}, ${parseInt(moodPalette.accent[1]?.slice(3, 5) || 'DA', 16)}, ${parseInt(moodPalette.accent[1]?.slice(5, 7) || 'B9', 16)}, 0.05)`]
-              }
-              style={[StyleSheet.absoluteFillObject, { borderRadius: 16 }]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            />
-            
-            {/* Gradient overlay 2 for depth */}
-            <LinearGradient
-              colors={
-                theme.isDark
-                  ? ['transparent', `rgba(${parseInt(moodPalette.primary[5]?.slice(1, 3) || '0F', 16)}, ${parseInt(moodPalette.primary[5]?.slice(3, 5) || '14', 16)}, ${parseInt(moodPalette.primary[5]?.slice(5, 7) || '19', 16)}, 0.2)`]
-                  : ['transparent', `rgba(${parseInt(moodPalette.primary[0]?.slice(1, 3) || 'FF', 16)}, ${parseInt(moodPalette.primary[0]?.slice(3, 5) || 'FF', 16)}, ${parseInt(moodPalette.primary[0]?.slice(5, 7) || 'FF', 16)}, 0.2)`]
-              }
-              style={[StyleSheet.absoluteFillObject, { borderRadius: 16 }]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-            />
-          </View>
-
-          {/* Border for glass edge effect */}
-          <View
-            style={[
-              StyleSheet.absoluteFillObject,
-              {
-                borderRadius: 16,
-                borderWidth: 1,
-                borderColor: theme.isDark
-                  ? `rgba(${parseInt(moodPalette.accent[0]?.slice(1, 3) || 'FF', 16)}, ${parseInt(moodPalette.accent[0]?.slice(3, 5) || 'FF', 16)}, ${parseInt(moodPalette.accent[0]?.slice(5, 7) || 'FF', 16)}, 0.08)`
-                  : `rgba(${parseInt(moodPalette.accent[0]?.slice(1, 3) || 'FF', 16)}, ${parseInt(moodPalette.accent[0]?.slice(3, 5) || 'B6', 16)}, ${parseInt(moodPalette.accent[0]?.slice(5, 7) || 'C1', 16)}, 0.20)`,
-              },
-            ]}
-          />
-
-          <TouchableOpacity
-            style={styles.buttonContent}
-            onPress={() => navigation.navigate('MainTabs', { screen: 'Profile' })}
-            activeOpacity={0.7}
+        
+        {/* Floating Profile Button */}
+        <TouchableOpacity
+          style={[styles.floatingButton, { top: insets.top + 20, right: 20 }]}
+          onPress={() => navigation.navigate('MainTabs', { screen: 'Profile' })}
+          activeOpacity={0.7}
+        >
+          <LinearGradient
+            colors={
+              theme.isDark
+                ? [moodPalette.primary[5] || '#1A2332', moodPalette.primary[4] || '#2A3342']
+                : [moodPalette.primary[0] || '#FFF5F8', moodPalette.primary[1] || '#FFE5EA']
+            }
+            style={styles.gradientBackground}
           >
             <Ionicons 
               name="person-circle-outline" 
-              size={28} 
+              size={22} 
               color={theme.isDark ? moodPalette.accent[0] : moodPalette.sparkle} 
             />
-          </TouchableOpacity>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
-    </View>
+    </UniversalBackground>
   );
 }
 
@@ -213,9 +163,10 @@ const styles = StyleSheet.create({
   },
   floatingButton: {
     position: 'absolute',
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    zIndex: 10,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -228,13 +179,10 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  profileButton: {
-    right: 20,
-  },
-  buttonContent: {
+  gradientBackground: {
     flex: 1,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 16,
   },
 });

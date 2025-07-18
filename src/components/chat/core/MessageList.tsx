@@ -78,7 +78,6 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 10,
     flexGrow: 1,
-    minHeight: '100%',
   },
   typingContainer: {
     marginLeft: 16,
