@@ -17,6 +17,50 @@ import { Spacing } from '../constants/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import useAppStore from '../store/useAppStore';
 import { UniversalBackground } from '../components/backgrounds/UniversalBackground';
+import Svg, { Circle, Path, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
+
+// Onboarding emblems: soft rings in the app's pink/peach palette
+const OnboardingEmblem = ({ variant, isDark }: { variant: string; isDark: boolean }) => {
+  const a = isDark ? '#4A7BA7' : '#FF69B4';
+  const b = isDark ? '#00CED1' : '#FFB08A';
+  const ring = isDark ? '#4A7BA7' : '#FFB6C1';
+  return (
+    <Svg width={150} height={150} viewBox="0 0 150 150">
+      <Defs>
+        <SvgGradient id="emb" x1="0" y1="0" x2="1" y2="1">
+          <Stop offset="0" stopColor={a} />
+          <Stop offset="1" stopColor={b} />
+        </SvgGradient>
+      </Defs>
+      <Circle cx="75" cy="75" r="70" stroke={ring} strokeOpacity={0.35} strokeWidth={2} fill="none" />
+      <Circle cx="75" cy="75" r="56" stroke={ring} strokeOpacity={0.55} strokeWidth={2} fill="none" />
+      <Circle cx="75" cy="75" r="42" fill="url(#emb)" opacity={0.95} />
+      {variant === '1' && (
+        // sound wave: the inner voice
+        <Path
+          d="M51 75 L57 75 M61 68 L61 82 M67 60 L67 90 M73 66 L73 84 M79 56 L79 94 M85 64 L85 86 M91 70 L91 80 M97 75 L99 75"
+          stroke="#FFFFFF" strokeWidth={3.5} strokeLinecap="round" fill="none"
+        />
+      )}
+      {variant === '2' && (
+        // listening inward: ripples around a still point
+        <>
+          <Circle cx="75" cy="75" r="6" fill="#FFFFFF" />
+          <Circle cx="75" cy="75" r="15" stroke="#FFFFFF" strokeWidth={3} strokeOpacity={0.85} fill="none" />
+          <Circle cx="75" cy="75" r="25" stroke="#FFFFFF" strokeWidth={3} strokeOpacity={0.55} fill="none" />
+        </>
+      )}
+      {variant === '3' && (
+        // growth: a sprout
+        <>
+          <Path d="M75 98 L75 70" stroke="#FFFFFF" strokeWidth={3.5} strokeLinecap="round" fill="none" />
+          <Path d="M75 76 C75 62 64 56 54 58 C54 70 62 78 75 76 Z" fill="#FFFFFF" />
+          <Path d="M75 70 C75 56 86 50 96 52 C96 64 88 72 75 70 Z" fill="#FFFFFF" fillOpacity={0.85} />
+        </>
+      )}
+    </Svg>
+  );
+};
 
 // type Props = RootStackScreenProps<'Onboarding'>;
 
@@ -94,7 +138,7 @@ export default function OnboardingScreen() {
           <Image source={item.image} style={styles.image} resizeMode="contain" />
         ) : (
           <View style={[styles.imagePlaceholder, { backgroundColor: theme.colors.primary + '20' }]}>
-            <Text style={styles.imagePlaceholderText}>🧘‍♀️</Text>
+            <OnboardingEmblem variant={item.id} isDark={theme.isDark} />
           </View>
         )}
       </View>
